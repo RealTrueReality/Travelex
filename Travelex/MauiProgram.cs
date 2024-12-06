@@ -2,6 +2,7 @@
 using CommunityToolkit.Maui.Markup;
 using Microsoft.Extensions.Logging;
 using Travelex.Data;
+using Travelex.Services;
 
 namespace Travelex;
 
@@ -28,6 +29,7 @@ public static class MauiProgram {
 
         builder.Services.AddMauiBlazorWebView();
         builder.Services.AddSingleton<DatabaseContext>();
+        builder.Services.AddTransient<SeedDataService>();
 #if DEBUG
         builder.Services.AddBlazorWebViewDeveloperTools();
         builder.Logging.AddDebug();

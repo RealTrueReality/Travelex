@@ -8,7 +8,7 @@ namespace Travelex.Data;
         private const string DbName = "Travelex.db3";
         private static string DbPath => Path.Combine(FileSystem.AppDataDirectory, DbName);
 
-        private SQLiteAsyncConnection _connection;
+        private SQLiteAsyncConnection? _connection;
         private SQLiteAsyncConnection Database =>
             (_connection ??= new SQLiteAsyncConnection(DbPath,
                 SQLiteOpenFlags.Create | SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.SharedCache));
@@ -44,9 +44,8 @@ namespace Travelex.Data;
 
         public async Task<TTable> GetItemByKeyAsync<TTable>(object primaryKey) where TTable : class, new()
         {
-            //await CreateTableIfNotExists<TTable>();
-            //return await Database.GetAsync<TTable>(primaryKey);
-            return await Execute<TTable, TTable>(async () => await Database.GetAsync<TTable>(primaryKey));
+            
+            return await Execute<TTable, TTable>(async () => await Database.FindAsync<TTable>(primaryKey));
         }
 
         public async Task<bool> AddItemAsync<TTable>(TTable item) where TTable : class, new()
@@ -73,6 +72,14 @@ namespace Travelex.Data;
             await CreateTableIfNotExists<TTable>();
             return await Database.DeleteAsync<TTable>(primaryKey) > 0;
         }
+        
+        
+        public async Task<bool> TableItemExistsAsync<TTable>() where TTable : class, new() {
+            return await Execute<TTable, bool>(async () => await Database.Table<TTable>().CountAsync() > 0);
+        }
+        
+        
 
-        public async ValueTask DisposeAsync() => await _connection?.CloseAsync();
+        
+        public async ValueTask DisposeAsync() => await _connection?.CloseAsync()!;
     }

@@ -1,5 +1,9 @@
-﻿namespace Travelex.Data;
+﻿using System.ComponentModel.DataAnnotations;
+using SQLite;
+using MaxLength = System.ComponentModel.DataAnnotations.MaxLengthAttribute;
+
+namespace Travelex.Data;
 
 public class ExpenseCategory {
-    public string? Name { get; set; }
+    [PrimaryKey, MaxLength(100)] public string? Name { get; set; }
 }

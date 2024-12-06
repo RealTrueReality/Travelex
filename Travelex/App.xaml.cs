@@ -1,9 +1,19 @@
-﻿namespace Travelex;
+﻿using Travelex.Services;
+
+namespace Travelex;
 
 public partial class App : Application {
-    public App() {
-        InitializeComponent();
+    private readonly SeedDataService _seedDataService;
 
+    public App(SeedDataService seedDataService) {
+        InitializeComponent();
         MainPage = new MainPage();
+        _seedDataService = seedDataService;
+    }
+
+    protected override async void OnStart() {
+        
+        base.OnStart();
+        await _seedDataService.SeedDataAsync();
     }
 }
