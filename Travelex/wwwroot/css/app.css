@@ -1,39 +1,73 @@
-﻿html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+﻿@font-face {
+    font-family: 'HarmonyOSSans';
+    src: url('./fonts/HarmonyOS_Sans_Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
 }
 
-a, .btn-link {
-    color: #006bb7;
+@font-face {
+    font-family: 'HarmonyOSSans';
+    src: url('./fonts/HarmonyOS_Sans_Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
 }
 
-.btn-primary {
-    color: #fff;
-    background-color: #1b6ec2;
-    border-color: #1861ac;
+@font-face {
+    font-family: 'HarmonyOSSans';
+    src: url('./fonts/HarmonyOS_Sans_Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
 }
+
+@font-face {
+    font-family: 'PlusJakartaSans';
+    src: url('./fonts/PlusJakartaSans-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'PlusJakartaSans';
+    src: url('./fonts/PlusJakartaSans-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'PlusJakartaSans';
+    src: url('./fonts/PlusJakartaSans-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+}
+
+html, body {
+    font-family: 'HarmonyOSSans', 'PlusJakartaSans', Arial, sans-serif;
+}
+
+
+
+
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
     box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
-.content {
-    padding-top: 1.1rem;
-}
 
 h1:focus {
     outline: none;
 }
 
 .valid.modified:not([type=checkbox]) {
-    outline: 1px solid #26b050;
+    border-color:  #26b050;
 }
 
 .invalid {
-    outline: 1px solid #e50000;
+  border-color:  #e50000;
 }
 
 .validation-message {
     color: #e50000;
+    font-size: 12px;
 }
 
 #blazor-error-ui {
