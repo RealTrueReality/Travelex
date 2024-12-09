@@ -1,4 +1,4 @@
-﻿namespace Travelex.Data;
+﻿namespace Travelex.Entities;
 
 public enum TripStatus {
     Planning,

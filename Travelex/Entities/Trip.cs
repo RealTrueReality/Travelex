@@ -1,8 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using SQLite;
 using MaxLength = System.ComponentModel.DataAnnotations.MaxLengthAttribute;
 
-namespace Travelex.Data;
+namespace Travelex.Entities;
 
 public class Trip {
     [PrimaryKey, AutoIncrement] 
@@ -10,7 +10,7 @@ public class Trip {
     
     [Required, MaxLength(30)] 
     public required string Title { get; set; }
-
+    
     public string? Description { get; set; } = string.Empty;
     
     [Required, MaxLength(50)] 
@@ -29,4 +29,9 @@ public class Trip {
     public TripCategory? Category { get; set; }
 
     public TripStatus Status { get; set; }=TripStatus.Planning;
+
+    [MaxLength(200)]
+    public string? ImageUrl { get; set; }
+    
+    
 }

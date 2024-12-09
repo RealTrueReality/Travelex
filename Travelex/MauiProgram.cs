@@ -1,6 +1,7 @@
-﻿using CommunityToolkit.Maui;
+using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Markup;
 using Microsoft.Extensions.Logging;
+using Syncfusion.Blazor;
 using Travelex.Data;
 using Travelex.Services;
 
@@ -26,10 +27,13 @@ public static class MauiProgram {
                 fonts.AddFont("PlusJakartaSans-Regular.ttf", "PJRegular");
             });
 
-
         builder.Services.AddMauiBlazorWebView();
+        builder.Services.AddSyncfusionBlazor();
         builder.Services.AddSingleton<DatabaseContext>();
         builder.Services.AddTransient<SeedDataService>();
+        builder.Services.AddTransient<AuthService>();
+
+
 #if DEBUG
         builder.Services.AddBlazorWebViewDeveloperTools();
         builder.Logging.AddDebug();

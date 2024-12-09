@@ -1,0 +1,17 @@
+﻿@page "/"
+@using Travelex.Services
+@inject AuthService AuthService
+@inject NavigationManager NavigationManager
+
+@code {
+    protected override Task OnInitializedAsync() {
+        if (AuthService.IsUserLoggedIn) {
+            NavigationManager.NavigateTo("/home",replace:true);
+        }
+        else {
+            NavigationManager.NavigateTo("/login",replace:true);
+        }
+        return base.OnInitializedAsync();
+    }
+
+}

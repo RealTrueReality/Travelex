@@ -38,6 +38,10 @@
         <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
     </PropertyGroup>
+    <PropertyGroup Condition="$(TargetFramework.Contains('-ios')) And $(Configuration.Contains('Release')) ">
+        <UseInterpreter>true</UseInterpreter>
+        <MtouchExtraArgs>--linkskip=Syncfusion.Blazor.Themes --linkskip=Syncfusion.Blazor.Inputs</MtouchExtraArgs>
+    </PropertyGroup>
 
     <ItemGroup>
         <!-- App Icon -->
@@ -73,11 +77,30 @@
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.1"/>
         <PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
         <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.10" />
+        <PackageReference Include="Syncfusion.Blazor" Version="27.2.5" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Models\" />
+      <Folder Include="Resources\Images\TripImages\" />
       <Folder Include="Utils\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="wwwroot\images\homePage\KailuaKona.png" />
+      <None Include="wwwroot\images\homePage\LosAngeles.png" />
+      <None Include="wwwroot\images\homePage\Truckee.png" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AndroidAsset Include="wwwroot\images\tripCategory\abroad.png" />
+      <AndroidAsset Include="wwwroot\images\tripCategory\buddha.png" />
+      <AndroidAsset Include="wwwroot\images\tripCategory\chair.png" />
+      <AndroidAsset Include="wwwroot\images\tripCategory\city.png" />
+      <AndroidAsset Include="wwwroot\images\tripCategory\conservation.png" />
+      <AndroidAsset Include="wwwroot\images\tripCategory\island.png" />
+      <AndroidAsset Include="wwwroot\images\tripCategory\mountain.png" />
+      <AndroidAsset Include="wwwroot\images\tripCategory\roadtrip.png" />
+      <AndroidAsset Include="wwwroot\images\tripCategory\travels.png" />
     </ItemGroup>
 
 </Project>

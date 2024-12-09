@@ -5,19 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>Travelex</title>
     <base href="/" />
-
-    <link rel="stylesheet" href="boxicons/css/boxicons.css" />
-    <link rel="stylesheet" href="css/app.css" />
+    <link rel="stylesheet" href="css/app.min.css" />
     <link rel="stylesheet" href="Travelex.styles.css" />
-    <link rel="stylesheet" href="css/apptailwind.css"/>
     <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link href="_content/Syncfusion.Blazor.Themes/bootstrap5.css" rel="stylesheet" />
+    <script src="_content/Syncfusion.Blazor.Core/scripts/syncfusion-blazor.min.js" type="text/javascript"></script>
+    <style>
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .loading-spinner {
+            animation: spin 1s linear infinite;
+        }
+    </style>
 </head>
 
 <body>
-
     <div class="status-bar-safe-area"></div>
 
-    <div id="app">Loading...</div>
+    <div id="app">
+        <div class="fixed inset-0 flex items-center justify-center bg-white">
+            <div class="flex flex-col items-center space-y-4">
+                <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full loading-spinner"></div>
+                <div class="text-gray-600 text-lg font-medium">加载中...</div>
+            </div>
+        </div>
+    </div>
 
     <div id="blazor-error-ui">
         An unhandled error has occurred.
@@ -28,5 +42,4 @@
     <script src="_framework/blazor.webview.js" autostart="false"></script>
 
 </body>
-
 </html>

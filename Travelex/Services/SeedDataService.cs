@@ -1,4 +1,6 @@
 ﻿using Travelex.Data;
+using Travelex.Entities;
+using Travelex.Models;
 
 namespace Travelex.Services;
 
@@ -10,8 +12,9 @@ public class SeedDataService {
     }
 
     public async Task SeedDataAsync() {
+
         // 检查并初始化 ExpenseCategory 表数据
-        if (!await _db.TableItemExistsAsync<ExpenseCategory>()) {
+        if (!await _db.TableExistsAsync<ExpenseCategory>()) {
             var expenseCategories = new List<ExpenseCategory> {
                 new() { Name = "交通" },
                 new() { Name = "美食" },
@@ -28,7 +31,7 @@ public class SeedDataService {
         }
 
         // 检查并初始化 TripCategory 表数据
-        if (!await _db.TableItemExistsAsync<TripCategory>()) {
+        if (!await _db.TableExistsAsync<TripCategory>()) {
             var tripCategories = new List<TripCategory> {
                 new() { CategoryName = "海滩", CategoryImage = "/images/chair.png" },
                 new() { CategoryName = "野外", CategoryImage = "/images/conservation.png" },

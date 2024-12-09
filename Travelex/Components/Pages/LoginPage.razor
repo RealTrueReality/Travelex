@@ -1,0 +1,66 @@
+@page "/login"
+@using Travelex.Models
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager NavigationManager
+<div class="flex flex-col min-h-screen bg-white">
+    <div class="flex items-center px-4 py-4">
+        <div class="w-6"></div> 
+        <h1 class="flex-grow text-lg font-bold text-center text-[#111416]">登录页</h1>
+        <button class="w-6 p-2 rounded-xl">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+    </div>
+
+    <div class="w-full h-[218px] bg-cover bg-center" style="background-image: url('images/loginPage/banner.png')"></div>
+
+    <EditForm Model="@_loggingModel" OnValidSubmit="HandleLogin" class="p-4 flex flex-col gap-6">
+        <DataAnnotationsValidator />
+        
+        <div class="relative">
+            <InputText @bind-Value="_loggingModel.UserName"
+                      class="w-full h-14 px-4 rounded-xl bg-[#EFF2F4] text-[#607A89] focus:outline-none"
+                      placeholder="用户名"/>
+            <div class="absolute right-4 top-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#607A89]" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+            </div>
+            <ValidationMessage For="@(() => _loggingModel.UserName)" class="text-red-500 text-sm mt-1" />
+        </div>
+
+        <div class="relative">
+            <InputText type="password" @bind-Value="_loggingModel.Password"
+                      class="w-full h-14 px-4 rounded-xl bg-[#EFF2F4] text-[#607A89] focus:outline-none"
+                      placeholder="密码"/>
+            <div class="absolute right-4 top-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#607A89]" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                </svg>
+            </div>
+            <ValidationMessage For="@(() => _loggingModel.Password)" class="text-red-500 text-sm mt-1" />
+        </div>
+
+        <button type="button" class="text-sm text-[#607A89] text-center w-full">忘记密码?</button>
+
+        <button type="submit" class="w-full h-12 bg-[#119BED] text-white font-bold rounded-xl">登陆</button>
+
+        <div class="text-sm text-[#607A89] text-center w-full">还没有账号？<button type="button" class="text-[#607A89]">点击注册</button></div>
+    </EditForm>
+</div>
+
+@code {
+    private LoggingModel _loggingModel = new();
+
+    private async Task HandleLogin() {
+        // TODO: Implement login logic
+        Console.WriteLine($"Login attempt with: {_loggingModel.ToJson()}");
+        NavigationManager.NavigateTo("/home");
+    }
+}

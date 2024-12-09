@@ -1,8 +1,8 @@
-﻿using SQLite;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using SQLite;
 using MaxLength = System.ComponentModel.DataAnnotations.MaxLengthAttribute;
 
-namespace Travelex.Data;
+namespace Travelex.Entities;
 
 public class TripCategory {
     [PrimaryKey,MaxLength(100)]

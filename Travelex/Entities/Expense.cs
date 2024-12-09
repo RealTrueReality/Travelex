@@ -2,7 +2,7 @@
 using SQLite;
 using MaxLength = System.ComponentModel.DataAnnotations.MaxLengthAttribute;
 
-namespace Travelex.Data;
+namespace Travelex.Entities;
 
 public class Expense {
     [PrimaryKey, AutoIncrement] public long Id { get; set; }

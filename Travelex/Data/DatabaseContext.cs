@@ -5,7 +5,7 @@ namespace Travelex.Data;
 
  public class DatabaseContext : IAsyncDisposable
     {
-        private const string DbName = "Travelex.db3";
+        private const string DbName = "Travelex.db";
         private static string DbPath => Path.Combine(FileSystem.AppDataDirectory, DbName);
 
         private SQLiteAsyncConnection? _connection;
@@ -74,7 +74,7 @@ namespace Travelex.Data;
         }
         
         
-        public async Task<bool> TableItemExistsAsync<TTable>() where TTable : class, new() {
+        public async Task<bool> TableExistsAsync<TTable>() where TTable : class, new() {
             return await Execute<TTable, bool>(async () => await Database.Table<TTable>().CountAsync() > 0);
         }
         
