@@ -3,7 +3,10 @@ using CommunityToolkit.Maui.Markup;
 using Microsoft.Extensions.Logging;
 using Syncfusion.Blazor;
 using Travelex.Data;
+using Travelex.Pages;
 using Travelex.Services;
+using Travelex.Utils;
+using Travelex.ViewModels;
 
 namespace Travelex;
 
@@ -32,7 +35,18 @@ public static class MauiProgram {
         builder.Services.AddSingleton<DatabaseContext>();
         builder.Services.AddTransient<SeedDataService>();
         builder.Services.AddTransient<AuthService>();
-
+        builder.Services.AddTransient<ActivityIndicatorViewModel>();
+        
+        // 注册应用程序核心服务
+        builder.Services.AddTransient<AppShell>();
+        builder.Services.AddTransient<MainPage>();
+        builder.Services.AddTransient<OnboardingPage>();
+        
+        // 注册 Blazor MAUI 互操作服务
+        builder.Services.AddSingleton<ActivityIndicatorViewModel>();
+        builder.Services.AddSingleton<BlazorMauiInterop>();
+        
+        
 
 #if DEBUG
         builder.Services.AddBlazorWebViewDeveloperTools();

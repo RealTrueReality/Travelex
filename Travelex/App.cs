@@ -5,22 +5,23 @@ namespace Travelex;
 
 public class App : Application {
     private readonly SeedDataService _seedDataService;
+    private readonly AppShell _shell;
 
-    public App(SeedDataService seedDataService) {
+    public App(SeedDataService seedDataService, AppShell shell) {
+
+        _seedDataService = seedDataService;
+        _shell = shell;
 
         // 检查是否是首次启动
         if (Preferences.Default.Get("FirstLaunch", true))
         {
-            MainPage = new NavigationPage(new OnboardingPage());
+            MainPage = new NavigationPage(new OnboardingPage(_shell));
             Preferences.Default.Set("FirstLaunch", false);
         }
         else
         {
-            //为了测试暂时注释
-            MainPage = new AppShell();
+            MainPage = _shell;
         }
-
-        _seedDataService = seedDataService;
     }
 
     protected override async void OnStart() {

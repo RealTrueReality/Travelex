@@ -16,7 +16,7 @@ public class AuthService {
     public bool IsUserLoggedIn => Preferences.ContainsKey("logged");
 
 
-    public async Task<ResultModel> LogIn(LoggingModel loggingModel) {
+    public async Task<ResultModel> LogInAsync(LoggingModel loggingModel) {
         var usersFiltered = await _db.GetFileteredAsync<User>(u =>
             u.UserName == loggingModel.UserName && u.Password == loggingModel.Password);
         var user = usersFiltered.FirstOrDefault();
