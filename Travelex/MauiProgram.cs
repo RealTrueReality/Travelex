@@ -1,5 +1,6 @@
 using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Markup;
+
 using Microsoft.Extensions.Logging;
 using Syncfusion.Blazor;
 using Travelex.Data;
@@ -45,8 +46,7 @@ public static class MauiProgram {
         // 注册 Blazor MAUI 互操作服务
         builder.Services.AddSingleton<ActivityIndicatorViewModel>();
         builder.Services.AddSingleton<BlazorMauiInterop>();
-        
-        
+        Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MzYxNjE0MEAzMjM3MmUzMDJlMzBra1A1MmxKUVVvcWVaWUxIYkpsbnU5S01vVlg4Z1VwL3FSSDkvU2lKZkUwPQ==");
 
 #if DEBUG
         builder.Services.AddBlazorWebViewDeveloperTools();

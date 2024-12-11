@@ -4,126 +4,136 @@
 @using Syncfusion.Blazor.Popups
 @using Travelex.Services
 @using Travelex.Utils
+@using Travelex.Components.Controls
 @inject NavigationManager NavigationManager
 @inject AuthService AuthService
 @inject BlazorMauiInterop BlazorMauiInterop
-<div class="flex flex-col min-h-screen bg-white select-none">
-    <div class="flex items-center px-4 py-4">
-        <div class="w-6"></div>
-        <h1 class="flex-grow text-lg font-bold text-center text-[#111416]">登录页</h1>
-        <button class="w-6 p-2 rounded-xl">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                 stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-        </button>
-    </div>
 
-    <div class="w-full h-[218px] bg-cover bg-center"
-         style="background-image: url('images/loginPage/loginBanner.png')"></div>
 
-    <EditForm Model="@_loggingModel" OnValidSubmit="HandleLoginAsync" class="p-4 flex flex-col gap-6">
-        <DataAnnotationsValidator/>
+<FixedPageComponent>
+    <TopBarTitle>
+        登录页
+    </TopBarTitle>
+    <PageBody>
+        @* Banner *@
+        <div class="w-full h-[218px] bg-cover bg-center"
+             style="background-image: url('images/loginPage/loginBanner.png')"></div>
 
-        <div class="relative">
-            <InputText @bind-Value="_loggingModel.UserName"
-                       class="w-full h-14 px-4 rounded-xl bg-[#EFF2F4] text-[#607A89] focus:outline-none"
-                       placeholder="用户名"/>
-            <div class="absolute right-4 top-4">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#607A89]" fill="none" viewBox="0 0 24 24"
-                     stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                </svg>
+        <EditForm Model="@_loggingModel" OnValidSubmit="HandleLoginAsync" class="p-4 flex flex-col gap-6">
+            <DataAnnotationsValidator/>
+
+            <div class="relative">
+                <InputText @bind-Value="_loggingModel.UserName"
+                           class="w-full h-14 px-4 rounded-xl bg-[#EFF2F4] text-[#607A89] focus:outline-none"
+                           placeholder="用户名"/>
+                <div class="absolute right-4 top-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#607A89]" fill="none" viewBox="0 0 24 24"
+                         stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+                <ValidationMessage For="@(() => _loggingModel.UserName)" class="text-red-500 text-sm mt-1"/>
             </div>
-            <ValidationMessage For="@(() => _loggingModel.UserName)" class="text-red-500 text-sm mt-1"/>
-        </div>
 
-        <div class="relative">
-            <InputText type="password" @bind-Value="_loggingModel.Password"
-                       class="w-full h-14 px-4 rounded-xl bg-[#EFF2F4] text-[#607A89] focus:outline-none"
-                       placeholder="密码"/>
-            <div class="absolute right-4 top-4">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#607A89]" fill="none" viewBox="0 0 24 24"
-                     stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
-                </svg>
+            <div class="relative">
+                <InputText type="password" @bind-Value="_loggingModel.Password"
+                           class="w-full h-14 px-4 rounded-xl bg-[#EFF2F4] text-[#607A89] focus:outline-none"
+                           placeholder="密码"/>
+                <div class="absolute right-4 top-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#607A89]" fill="none" viewBox="0 0 24 24"
+                         stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                    </svg>
+                </div>
+                <ValidationMessage For="@(() => _loggingModel.Password)" class="text-red-500 text-sm mt-1"/>
             </div>
-            <ValidationMessage For="@(() => _loggingModel.Password)" class="text-red-500 text-sm mt-1"/>
-        </div>
 
-        <button type="button" class="text-sm text-[#607A89] text-center w-full">忘记密码?</button>
+            <button type="button" class="text-sm text-[#607A89] text-center w-full">忘记密码?</button>
 
-        <button type="submit" class="w-full h-12 bg-[#119BED] text-white font-bold rounded-[20px]">登陆</button>
-
-        <div class="text-sm text-[#607A89] text-center w-full">还没有账号？
-            <button type="button" class="text-[#607A89]" @onclick="() => IsRegisterDialogVisible = true">点击注册
+            <button type="submit" class="w-full h-12 bg-[#119BED] text-white font-bold rounded-[20px]">
+                登陆
             </button>
-        </div>
-    </EditForm>
-</div>
-<SfDialog @bind-Visible="@IsRegisterDialogVisible"
-          Width="100%"
-          Height="auto"
-          IsModal="true"
-          ShowCloseIcon="false"
-          AllowDragging="false"
-          Target="#app"
-          Position="@DialogPosition">
-    <DialogTemplates>
-        <Content>
-            <div class="p-4">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-xl font-bold">创建账号</h2>
-                    <button @onclick="() => IsRegisterDialogVisible = false" class="p-2">
-                        <i class="fas fa-times text-gray-500"></i>
-                    </button>
-                </div>
+            <button type="button" class="w-full h-12 bg-[#EFF2F4] text-black font-bold rounded-[20px]"
+                    @onclick="() => { IsRegisterDialogVisible = true;_signUpModel=new ();}">
+                注册
+            </button>
 
-                <div class="space-y-4">
-                    <!-- 姓名输入框 -->
-                    <div class="relative">
-                        <input type="text"
-                               @bind="_signUpModel.Name"
-                               class="w-full px-4 py-3 bg-[#F7F9FA] rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-                               placeholder="姓名"/>
-                        <i class="fas fa-envelope absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+        </EditForm>
+        <SfDialog @bind-Visible="@IsRegisterDialogVisible"
+                  Width="100%"
+                  Height="auto"
+                  IsModal="true"
+                  ShowCloseIcon="true"
+                  AllowDragging="false"
+                  Target="#app"
+                  Header="注册您的账户">
+            <DialogAnimationSettings Effect="DialogEffect.SlideBottom" Duration="400"/>
+            <DialogTemplates>
+                <Content>
+                    <div class="p-4">
+                        <EditForm Model="@_signUpModel" OnValidSubmit="HandleRegisterAsync" class="p-4 flex flex-col gap-6">
+                            <DataAnnotationsValidator/>
+
+                            <div class="relative">
+                                <InputText @bind-Value="_signUpModel.Name"
+                                           class="w-full h-14 px-4 rounded-xl bg-[#EFF2F4] text-[#607A89] focus:outline-none"
+                                           placeholder="姓名"/>
+                                <div class="absolute right-4 top-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#607A89]" fill="none"
+                                         viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M12 12c2.28 0 4-1.72 4-4s-1.72-4-4-4-4 1.72-4 4 1.72 4 4 4zM12 14c-3.33 0-10 1.67-10 5v1h20v-1c0-3.33-6.67-5-10-5z"/>
+                                    </svg>
+                                </div>
+                                <ValidationMessage For="@(() => _signUpModel.Name)" class="text-red-500 text-sm mt-1"/>
+                            </div>
+
+                            <div class="relative">
+                                <InputText @bind-Value="_signUpModel.UserName"
+                                           class="w-full h-14 px-4 rounded-xl bg-[#EFF2F4] text-[#607A89] focus:outline-none"
+                                           placeholder="用户名"/>
+                                <div class="absolute right-4 top-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#607A89]" fill="none"
+                                         viewBox="0 0 24 24"
+                                         stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                    </svg>
+                                </div>
+                                <ValidationMessage For="@(() => _signUpModel.UserName)" class="text-red-500 text-sm mt-1"/>
+                            </div>
+
+                            <div class="relative">
+                                <InputText type="password" @bind-Value="_signUpModel.Password"
+                                           class="w-full h-14 px-4 rounded-xl bg-[#EFF2F4] text-[#607A89] focus:outline-none"
+                                           placeholder="密码"/>
+                                <div class="absolute right-4 top-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#607A89]" fill="none"
+                                         viewBox="0 0 24 24"
+                                         stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                                    </svg>
+                                </div>
+                                <ValidationMessage For="@(() => _signUpModel.Password)" class="text-red-500 text-sm mt-1"/>
+                            </div>
+
+                            <button type="submit" class="w-full h-12 bg-[#119BED] text-white font-bold rounded-[20px]">
+                                注册并登陆
+                            </button>
+                        </EditForm>
                     </div>
-                    <!-- 用户名输入框 -->
-                    <div class="relative">
-                        <input type="text"
-                               @bind="_signUpModel.UserName"
-                               class="w-full px-4 py-3 bg-[#F7F9FA] rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-                               placeholder="用户名"/>
-                        <i class="fas fa-envelope absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                    </div>
-
-                    <!-- 密码输入框 -->
-                    <div class="relative">
-                        <input type="password"
-                               @bind="_signUpModel.Password"
-                               class="w-full px-4 py-3 bg-[#F7F9FA] rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-                               placeholder="密码"/>
-                        <i class="fas fa-key absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                    </div>
-
-                    <!-- 注册按钮 -->
-                    <button @onclick="HandleRegisterAsync"
-                            class="w-full bg-[#119BED] text-white py-3 rounded-xl text-base font-medium hover:bg-blue-600 transition-colors">
-                        注册
-                    </button>
-                </div>
-            </div>
-        </Content>
-    </DialogTemplates>
-</SfDialog>
-
+                </Content>
+            </DialogTemplates>
+        </SfDialog>
+    </PageBody>
+</FixedPageComponent>
 @code {
     private LoggingModel _loggingModel = new();
-    private bool IsRegisterDialogVisible { get; set; }
     private SignUpModel _signUpModel = new();
-    private DialogPositionData DialogPosition = new DialogPositionData { X = "0", Y = "bottom" };
+    private bool IsRegisterDialogVisible { get; set; }
 
     private async Task HandleLoginAsync() {
         Console.WriteLine($"Login attempt with: {_loggingModel.ToJson()}");
@@ -152,14 +162,32 @@
     }
 
     private async Task HandleRegisterAsync() {
-        if (string.IsNullOrWhiteSpace(_signUpModel.Name) || string.IsNullOrWhiteSpace(_signUpModel.UserName) || string.IsNullOrWhiteSpace(_signUpModel.Password)) {
-            await BlazorMauiInterop.ShowAlertAsync("请填写完整的注册信息");
-            return;
+        Console.WriteLine($"Register attempt with: {_signUpModel.ToJson()}");
+        //显示加载(ActivityIndicator)
+        BlazorMauiInterop.ShowIndicator();
+        try {
+            //注册
+            var res = await AuthService.SignUpAsync(_signUpModel);
+            
+            if (res.IsSuccess) {
+                //重定向到首页
+                BlazorMauiInterop.HideIndicator();
+                IsRegisterDialogVisible = false;
+                await BlazorMauiInterop.ShowAlertAsync("注册成功！", title: "提示");
+                NavigationManager.NavigateTo("/home", replace: true);
+            }
+            else {
+                //显示弹出框警告
+                await BlazorMauiInterop.ShowAlertAsync(res.Message ?? "注册失败");
+                BlazorMauiInterop.HideIndicator();
+            }
         }
-
-        // TODO: 处理注册逻辑
-        await BlazorMauiInterop.ShowAlertAsync("注册成功！");
-        IsRegisterDialogVisible = false;
+        catch (Exception ex) {
+            await BlazorMauiInterop.ShowAlertAsync(ex.Message);
+        }
+        finally {
+            BlazorMauiInterop.HideIndicator();
+        }
     }
 
 }

@@ -1,2 +1,87 @@
-﻿@inherits LayoutComponentBase
-@Body
+@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+<div class="main-container">
+    @Body
+    @if (ShowBottomNav) {
+        <nav class="bottom-nav">
+            <NavLink class="nav-item" href="" Match="NavLinkMatch.All">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </NavLink>
+            <NavLink class="nav-item" href="charts">
+                <i class="fas fa-chart-bar"></i>
+                <span>Charts</span>
+            </NavLink>
+            <NavLink class="nav-item" href="ai-summary">
+                <i class="fas fa-robot"></i>
+                <span>AI Summary</span>
+            </NavLink>
+            <NavLink class="nav-item" href="account">
+                <i class="fas fa-user"></i>
+                <span>Account</span>
+            </NavLink>
+        </nav>
+    }
+</div>
+
+<style>
+    .main-container {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
+    .bottom-nav {
+        position: fixed;
+        bottom: 16px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        background-color: #ffffff;
+        padding: 12px 24px;
+        border-radius: 50px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        width: 90%;
+        max-width: 400px;
+        z-index: 1000;
+    }
+
+    .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: #607A89;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        padding: 8px 16px;
+    }
+
+    .nav-item:hover {
+        color: #252525;
+    }
+
+    .nav-item.active {
+        color: #ffffff;
+    }
+
+    .nav-item i {
+        font-size: 1.25rem;
+        margin-bottom: 4px;
+    }
+
+    .nav-item span {
+        font-size: 0.75rem;
+    }
+</style>
+@code {
+    private bool ShowBottomNav = true;
+
+    protected override void OnParametersSet()
+    {
+        // 判断是否为登录页
+        var currentUri = NavigationManager.Uri;
+        ShowBottomNav = !currentUri.Contains("login", StringComparison.OrdinalIgnoreCase);
+    }
+}
