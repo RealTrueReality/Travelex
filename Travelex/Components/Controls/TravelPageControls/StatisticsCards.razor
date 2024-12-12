@@ -1,0 +1,35 @@
+@using Travelex.Entities
+
+<div>
+    <!-- 统计卡片区域 -->
+    <div class="grid grid-cols-2 gap-4 p-4">
+        <!-- 行程数量卡片 -->
+        <div class="bg-[#EFF2F4] rounded-xl p-6">
+            <p class="text-[#252525] text-xl font-medium">行程数</p>
+            <p class="text-[#252525] text-2xl font-bold mt-1">@TripCount</p>
+        </div>
+
+        <!-- 最贵行程卡片 -->
+        <div class="bg-[#EFF2F4] rounded-xl p-6">
+            <p class="text-[#252525] text-xl font-medium">最贵旅行支出</p>
+            <p class="text-[#252525] text-2xl font-bold mt-1">$@MaxExpense</p>
+        </div>
+    </div>
+
+    <!-- 总支出卡片 -->
+    <div class="px-4 mb-4">
+        <div class="bg-[#EFF2F4] rounded-xl p-6">
+            <p class="text-[#252525] text-xl font-medium">总支出</p>
+            <p class="text-[#252525] text-2xl font-bold mt-1">$@TotalExpense</p>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public IEnumerable<Travel>? Trips { get; set; }
+
+    private int TripCount => Trips?.Count() ?? 0;
+    private decimal MaxExpense => 11.4514m; // TODO: 计算实际的最大支出
+    private decimal TotalExpense => 15_0011.4514m; // TODO: 计算实际的总支出
+}

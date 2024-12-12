@@ -1,0 +1,55 @@
+@using Syncfusion.Blazor.Popups
+
+<SfDialog Width="300px" IsModal="true" @bind-Visible="@IsVisible" ShowCloseIcon="true">
+    <DialogTemplates>
+        <Header>
+            <div class="flex items-center text-lg font-medium text-[#252525]">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                删除确认
+            </div>
+        </Header>
+        <Content>
+            <div class="p-4">
+                <p class="text-[#607A89] mb-6">确定要删除这个行程吗？此操作无法撤销。</p>
+                <div class="flex justify-end gap-3">
+                    <button @onclick="OnCancel" 
+                            class="px-4 py-2 rounded-lg border border-gray-300 text-[#607A89] hover:bg-gray-50 transition-colors">
+                        取消
+                    </button>
+                    <button @onclick="OnConfirm" 
+                            class="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors">
+                        删除
+                    </button>
+                </div>
+            </div>
+        </Content>
+    </DialogTemplates>
+</SfDialog>
+
+@code {
+    [Parameter]
+    public bool IsVisible { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsVisibleChanged { get; set; }
+
+    [Parameter]
+    public EventCallback OnConfirmed { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancelled { get; set; }
+
+    private async Task OnConfirm()
+    {
+        await IsVisibleChanged.InvokeAsync(false);
+        await OnConfirmed.InvokeAsync();
+    }
+
+    private async Task OnCancel()
+    {
+        await IsVisibleChanged.InvokeAsync(false);
+        await OnCancelled.InvokeAsync();
+    }
+}

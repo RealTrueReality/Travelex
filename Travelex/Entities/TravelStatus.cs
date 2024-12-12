@@ -1,6 +1,6 @@
 ﻿namespace Travelex.Entities;
 
-public enum TripStatus {
+public enum TravelStatus {
     Planning,
     Ongoing,
     Completed,

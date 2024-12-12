@@ -1,0 +1,78 @@
+@inject IJSRuntime JSRuntime
+
+<div class="h-[72px] px-4 py-4 bg-white flex items-center justify-between relative">
+    @if (!IsSearching)
+    {
+        <div class="flex-1"></div>
+        <h1 class="text-[#252525] text-lg font-bold">我的旅行</h1>
+        <div class="flex-1 flex justify-end">
+            <button @onclick="ToggleSearch">
+                <img src="images/search.png" class="p-2" alt="搜索"/>
+            </button>
+        </div>
+    }
+    else
+    {
+        <div class="w-full flex items-center gap-2 animate-fade-in">
+            <input type="text"
+                   @bind="SearchQuery"
+                   @bind:event="oninput"
+                   @onkeyup="HandleKeyUp"
+                   inputmode="search"
+                   class="flex-1 h-10 px-3 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 text-base"
+                   placeholder="搜索旅行..."
+                   @ref="_searchInput"/>
+            <button @onclick="ToggleSearch" class="p-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+    }
+</div>
+
+@code {
+    private bool IsSearching { get; set; }
+    private ElementReference _searchInput;
+    
+    [Parameter]
+    public string SearchQuery { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback<string> SearchQueryChanged { get; set; }
+
+    private async Task ToggleSearch()
+    {
+        IsSearching = !IsSearching;
+        SearchQuery = string.Empty;
+        await SearchQueryChanged.InvokeAsync(SearchQuery);
+        
+        if (IsSearching)
+        {
+            StateHasChanged();
+            await Task.Delay(100); // 等待DOM更新
+            await FocusSearchInput();
+        }
+    }
+
+    private async Task FocusSearchInput()
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("focusElement", _searchInput);
+        }
+        catch
+        {
+            Console.WriteLine("Failed to focus search input.");
+        }
+    }
+
+    private async Task HandleKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await JSRuntime.InvokeVoidAsync("eval", "document.activeElement.blur()");
+        }
+    }
+}

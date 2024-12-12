@@ -12,7 +12,6 @@ public class SeedDataService {
     }
 
     public async Task SeedDataAsync() {
-
         // 检查并初始化 ExpenseCategory 表数据
         if (!await _db.TableExistsAsync<ExpenseCategory>()) {
             var expenseCategories = new List<ExpenseCategory> {
@@ -25,14 +24,12 @@ public class SeedDataService {
                 new() { Name = "其他" }
             };
 
-            foreach (var category in expenseCategories) {
-                await _db.AddItemAsync(category);
-            }
+            foreach (var category in expenseCategories) await _db.AddItemAsync(category);
         }
 
-        // 检查并初始化 TripCategory 表数据
-        if (!await _db.TableExistsAsync<TripCategory>()) {
-            var tripCategories = new List<TripCategory> {
+        // 检查并初始化 TravelCategory 表数据
+        if (!await _db.TableExistsAsync<TravelCategory>()) {
+            var tripCategories = new List<TravelCategory> {
                 new() { CategoryName = "海滩", CategoryImage = "/images/chair.png" },
                 new() { CategoryName = "野外", CategoryImage = "/images/conservation.png" },
                 new() { CategoryName = "爬山", CategoryImage = "/images/mountain.png" },
@@ -44,9 +41,50 @@ public class SeedDataService {
                 new() { CategoryName = "其他", CategoryImage = "/images/travels.png" }
             };
 
-            foreach (var category in tripCategories) {
-                await _db.AddItemAsync(category);
-            }
+            foreach (var category in tripCategories) await _db.AddItemAsync(category);
+        }
+
+        // 检查并初始化 Travel 表数据
+        if (!await _db.TableExistsAsync<Travel>()) {
+            var travels = new List<Travel> {
+                new() {
+                    Id = 1,
+                    Title = "特拉基之旅",
+                    LocationName = "特拉基",
+                    StartDate = new DateTime(2022, 1, 7),
+                    EndDate = new DateTime(2022, 1, 10),
+                    ImageUrl = "Truckee.png",
+                    Status = TravelStatus.Completed
+                },
+                new() {
+                    Id = 2,
+                    Title = "洛杉矶之旅",
+                    LocationName = "洛杉矶",
+                    StartDate = new DateTime(2021, 8, 9),
+                    EndDate = new DateTime(2021, 8, 13),
+                    ImageUrl = "LosAngeles.png",
+                    Status = TravelStatus.Completed
+                },
+                new() {
+                    Id = 3,
+                    Title = "凯卢阿之旅",
+                    LocationName = "凯卢阿",
+                    StartDate = new DateTime(2021, 7, 9),
+                    EndDate = new DateTime(2021, 7, 13),
+                    ImageUrl = "KailuaKona.png",
+                    Status = TravelStatus.Completed
+                },
+                new() {
+                    Id = 4,
+                    Title = "小狼的秘密旅行",
+                    LocationName = "小狼家",
+                    StartDate = new DateTime(2024, 12, 19),
+                    EndDate = new DateTime(2024, 12, 24),
+                    ImageUrl = "furnace.jpg",
+                    Status = TravelStatus.Planning
+                }
+            };
+            foreach (var travel in travels) await _db.AddItemAsync(travel);
         }
     }
 }
