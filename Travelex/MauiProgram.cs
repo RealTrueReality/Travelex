@@ -36,6 +36,7 @@ public static class MauiProgram {
         builder.Services.AddSingleton<DatabaseContext>();
         builder.Services.AddTransient<SeedDataService>();
         builder.Services.AddTransient<AuthService>();
+        builder.Services.AddTransient<TravelService>();
         builder.Services.AddTransient<ActivityIndicatorViewModel>();
         
         // 注册应用程序核心服务

@@ -18,7 +18,7 @@ namespace Travelex.Data;
             await Database.CreateTableAsync<TTable>();
         }
 
-        private async Task<AsyncTableQuery<TTable>> GetTableAsync<TTable>() where TTable : class, new()
+        public async Task<AsyncTableQuery<TTable>> GetTableAsync<TTable>() where TTable : class, new()
         {
             await CreateTableIfNotExists<TTable>();
             return Database.Table<TTable>();
@@ -36,13 +36,13 @@ namespace Travelex.Data;
             return await table.Where(predicate).ToListAsync();
         }
 
-        private async Task<TResult> Execute<TTable, TResult>(Func<Task<TResult>> action) where TTable : class, new()
+        private async Task<TResult?> Execute<TTable, TResult>(Func<Task<TResult>> action) where TTable : class, new()
         {
             await CreateTableIfNotExists<TTable>();
             return await action();
         }
 
-        public async Task<TTable> GetItemByKeyAsync<TTable>(object primaryKey) where TTable : class, new()
+        public async Task<TTable?> GetItemByKeyAsync<TTable>(object primaryKey) where TTable : class, new()
         {
             
             return await Execute<TTable, TTable>(async () => await Database.FindAsync<TTable>(primaryKey));
