@@ -25,7 +25,7 @@
         <ApplicationTitle>Travelex</ApplicationTitle>
 
         <!-- App Identifier -->
-        <ApplicationId>com.companyname.travelex</ApplicationId>
+        <ApplicationId>com.truereality.travelex</ApplicationId>
 
         <!-- Versions -->
         <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
@@ -77,13 +77,16 @@
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.1" />
         <PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
         <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.10" />
-        <PackageReference Include="Syncfusion.Blazor.Notifications" Version="27.2.5" />
-        <PackageReference Include="Syncfusion.Blazor.Popups" Version="27.2.5" />
-        <PackageReference Include="Syncfusion.Blazor.Themes" Version="27.2.5" />
+        <PackageReference Include="Syncfusion.Blazor.Calendars" Version="28.1.33" />
+        <PackageReference Include="Syncfusion.Blazor.DropDowns" Version="28.1.33" />
+        <PackageReference Include="Syncfusion.Blazor.Notifications" Version="28.1.33" />
+        <PackageReference Include="Syncfusion.Blazor.Popups" Version="28.1.33" />
+        <PackageReference Include="Syncfusion.Blazor.Themes" Version="28.1.33" />
     </ItemGroup>
 
     <ItemGroup>
       <Folder Include="Resources\Images\TripImages\" />
+      <Folder Include="wwwroot\images\homePage\" />
     </ItemGroup>
 
     <ItemGroup>
@@ -93,6 +96,10 @@
     </ItemGroup>
 
     <ItemGroup>
+      <AndroidAsset Include="wwwroot\images\travelImages\furnace.jpg" />
+      <AndroidAsset Include="wwwroot\images\travelImages\KailuaKona.png" />
+      <AndroidAsset Include="wwwroot\images\travelImages\LosAngeles.png" />
+      <AndroidAsset Include="wwwroot\images\travelImages\Truckee.png" />
       <AndroidAsset Include="wwwroot\images\tripCategory\abroad.png" />
       <AndroidAsset Include="wwwroot\images\tripCategory\buddha.png" />
       <AndroidAsset Include="wwwroot\images\tripCategory\chair.png" />

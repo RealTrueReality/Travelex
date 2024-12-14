@@ -1,9 +1,16 @@
 @inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
 
 <div class="h-[72px] px-4 py-4 bg-white flex items-center justify-between relative">
     @if (!IsSearching)
     {
-        <div class="flex-1"></div>
+        <div class="flex-1">
+            <button @onclick="NavigateToAdd" class="p-2 text-[#252525]">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+            </button>
+        </div>
         <h1 class="text-[#252525] text-lg font-bold">我的旅行</h1>
         <div class="flex-1 flex justify-end">
             <button @onclick="ToggleSearch">
@@ -35,9 +42,19 @@
 @code {
     private bool IsSearching { get; set; }
     private ElementReference _searchInput;
+    private string _searchQuery = string.Empty;
     
     [Parameter]
-    public string SearchQuery { get; set; } = string.Empty;
+    public string SearchQuery
+    {
+        get => _searchQuery;
+        set
+        {
+            if (_searchQuery == value) return;
+            _searchQuery = value;
+            SearchQueryChanged.InvokeAsync(value);
+        }
+    }
 
     [Parameter]
     public EventCallback<string> SearchQueryChanged { get; set; }
@@ -45,10 +62,12 @@
     private async Task ToggleSearch()
     {
         IsSearching = !IsSearching;
-        SearchQuery = string.Empty;
-        await SearchQueryChanged.InvokeAsync(SearchQuery);
-        
-        if (IsSearching)
+        if (!IsSearching)
+        {
+            SearchQuery = string.Empty;
+            await SearchQueryChanged.InvokeAsync(SearchQuery);
+        }
+        else
         {
             StateHasChanged();
             await Task.Delay(100); // 等待DOM更新
@@ -74,5 +93,10 @@
         {
             await JSRuntime.InvokeVoidAsync("eval", "document.activeElement.blur()");
         }
+    }
+
+    private void NavigateToAdd()
+    {
+        NavigationManager.NavigateTo("/travel/add");
     }
 }

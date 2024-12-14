@@ -28,5 +28,11 @@
     </array>
     <key>XSAppIconAssets</key>
     <string>Assets.xcassets/appicon.appiconset</string>
+    <key>NSCameraUsageDescription</key>
+    <string>此应用需要访问相机来拍摄旅行照片</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>此应用需要访问相册来选择旅行照片</string>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>此应用需要访问相册来保存旅行照片</string>
 </dict>
 </plist>

@@ -37,6 +37,7 @@ public static class MauiProgram {
         builder.Services.AddTransient<SeedDataService>();
         builder.Services.AddTransient<AuthService>();
         builder.Services.AddTransient<TravelService>();
+        builder.Services.AddTransient<TravelCategoryService>();
         builder.Services.AddTransient<ActivityIndicatorViewModel>();
         
         // 注册应用程序核心服务
@@ -46,8 +47,8 @@ public static class MauiProgram {
         
         // 注册 Blazor MAUI 互操作服务
         builder.Services.AddSingleton<ActivityIndicatorViewModel>();
-        builder.Services.AddSingleton<BlazorMauiInterop>();
-        Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MzYxNjE0MEAzMjM3MmUzMDJlMzBra1A1MmxKUVVvcWVaWUxIYkpsbnU5S01vVlg4Z1VwL3FSSDkvU2lKZkUwPQ==");
+        builder.Services.AddSingleton<BlazorMauiInterop>();   
+        Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NMaF5cXmBCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWH1fc3RVRWFZVUJ0VkE=");
 
 #if DEBUG
         builder.Services.AddBlazorWebViewDeveloperTools();

@@ -1,6 +1,209 @@
-﻿@page "/travel/add"
-<h3>TravelAddPage</h3>
+@page "/travel/add"
+@using Travelex.Entities
+@using Travelex.Services
+@using Travelex.Components.Controls
+@inject NavigationManager NavigationManager
+@inject TravelService TravelService
+@inject TravelCategoryService CategoryService
+@inject IJSRuntime JSRuntime
+
+
+    <FlexedPageComponent>
+        <TopBarLeft>
+            <button @onclick="NavigateBack" class="p-2 text-[#252525]">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </TopBarLeft>
+        <TopBarTitle>
+            创建行程
+        </TopBarTitle>
+        <PageBody>
+            <!-- 表单内容 -->
+            <div class="flex-1 p-4 overflow-auto">
+                <EditForm Model="@_travel" OnValidSubmit="HandleValidSubmit">
+                    <DataAnnotationsValidator />
+
+                    <!-- 行程名称 -->
+                    <div class="mb-4">
+                        <div class="relative bg-[#F8FAFC] rounded-xl">
+                            <InputText @bind-Value="_travel.Title"
+                                       class="w-full h-14 px-4 pr-12 bg-transparent text-lg text-gray-600 placeholder-gray-400 focus:outline-none"
+                                       placeholder="输入行程名称" />
+                            <div class="absolute right-4 top-1/2 -translate-y-1/2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#64748B]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <ValidationMessage For="@(() => _travel.Title)" class="text-red-500 text-sm mt-1" />
+                    </div>
+
+                    <!-- 行程描述 -->
+                    <div class="mb-4">
+                        <div class="relative bg-[#F8FAFC] rounded-xl">
+                            <InputTextArea @bind-Value="_travel.Description"
+                                           class="w-full min-h-[100px] p-4 bg-transparent text-lg text-gray-600 placeholder-gray-400 focus:outline-none resize-none"
+                                           placeholder="添加行程描述" />
+                        </div>
+                    </div>
+
+                    <!-- 日期选择 -->
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <DatePicker Label="开始日期"
+                                    Min="@DateTime.Today"
+                                    @bind-Value="_travel.StartDate"
+                                    Error="@(context.GetValidationMessages(() => _travel.StartDate).FirstOrDefault())"
+                        />
+
+                        <DatePicker Label="结束日期"
+                                    Min="@_travel.StartDate"
+                                    @bind-Value="_travel.EndDate"
+                                    Error="@(context.GetValidationMessages(() => _travel.EndDate).FirstOrDefault())" />
+                    </div>
+
+                    <!-- 目的地 -->
+                    <div class="mb-4">
+                        <div class="relative bg-[#F8FAFC] rounded-xl">
+                            <InputText @bind-Value="_travel.LocationName"
+                                       class="w-full h-14 px-4 pr-12 bg-transparent text-lg text-gray-600 placeholder-gray-400 focus:outline-none"
+                                       placeholder="添加目的地"/>
+                            <button @onclick="OpenMap" type="button" class="absolute right-4 top-1/2 -translate-y-1/2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#64748B]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </button>
+                        </div>
+                        <ValidationMessage For="@(() => _travel.LocationName)" class="text-red-500 text-sm mt-1" />
+                    </div>
+
+                    <!-- 行程类别 -->
+                    <div class="mb-4">
+                        <div class="relative bg-[#F8FAFC] rounded-xl">
+                            <InputSelect @bind-Value="_travel.CategoryName"
+                                         class="w-full h-14 px-4 pr-12 bg-transparent text-lg text-gray-600 appearance-none focus:outline-none">
+                                <option value="" disabled>选择行程类别</option>
+                                @foreach (var category in _categories)
+                                {
+                                    <option value="@category.CategoryName">@category.CategoryName</option>
+                                }
+                                <option value="Other">其他</option>
+                            </InputSelect>
+                            <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#64748B]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
+                        </div>
+                        @if (_travel.CategoryName == "Other")
+                        {
+                            <div class="mt-2">
+                                <div class="relative bg-[#F8FAFC] rounded-xl">
+                                    <InputText @bind-Value="_customCategory"
+                                              class="w-full h-14 px-4 bg-transparent text-lg text-gray-600 placeholder-gray-400 focus:outline-none"
+                                              placeholder="请输入自定义类别" />
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- 行程状态 -->
+                    <div class="mb-4">
+                        <div class="relative bg-[#F8FAFC] rounded-xl">
+                            <InputSelect @bind-Value="_travel.Status"
+                                         class="w-full h-14 px-4 pr-12 bg-transparent text-lg text-gray-600 appearance-none focus:outline-none">
+                                <option value="@TravelStatus.Planning">计划中</option>
+                                <option value="@TravelStatus.Ongoing">进行中</option>
+                                <option value="@TravelStatus.Completed">已完成</option>
+                                <option value="@TravelStatus.Cancelled">已取消</option>
+                            </InputSelect>
+                            <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#64748B]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 封面照片上传 -->
+                    <div class="mb-8">
+                        <PhotoPicker @bind-ImagePath="_travel.ImageUrl" />
+                    </div>
+
+                    <!-- 创建按钮 -->
+                    <button type="submit" class="w-full h-12 bg-[#119BED] text-white text-lg font-medium rounded-[20px] disabled:opacity-50"
+                            disabled="@(!IsValid())">
+                        创建行程
+                    </button>
+                </EditForm>
+            </div>
+        </PageBody>
+    </FlexedPageComponent>
+
+@if (_showMap)
+{
+    <MapPicker OnLocationSelected="HandleLocationSelected"
+               OnClose="() => _showMap = false" />
+}
 
 @code {
-    
+    private Travel _travel = new();
+    private bool _showMap;
+    private double _latitude;
+    private double _longitude;
+    private List<TravelCategory> _categories = new();
+    private string _customCategory;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _travel.Status = TravelStatus.Planning;
+        _categories = await CategoryService.GetCategoriesAsync();
+    }
+
+    private bool IsValid()
+    {
+        return !string.IsNullOrWhiteSpace(_travel.Title)
+               && !string.IsNullOrWhiteSpace(_travel.LocationName)
+               && _travel.StartDate.HasValue
+               && _travel.EndDate.HasValue
+               && (!string.IsNullOrWhiteSpace(_travel.CategoryName) || !string.IsNullOrWhiteSpace(_customCategory));
+    }
+
+    private void NavigateBack()
+    {
+        NavigationManager.NavigateTo("/home");
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (_travel.CategoryName == "Other" && !string.IsNullOrWhiteSpace(_customCategory))
+        {
+            _travel.CategoryName = _customCategory;
+        }
+        
+        if (_latitude != 0 && _longitude != 0)
+        {
+            _travel.Latitude = _latitude;
+            _travel.Longitude = _longitude;
+        }
+
+        _travel.AddedOn = DateTime.Now;
+        
+        await TravelService.AddTravelAsync(_travel);
+        NavigationManager.NavigateTo("/home");
+    }
+
+    private void OpenMap()
+    {
+        _showMap = true;
+    }
+
+    private void HandleLocationSelected((string Name, string Address, double Latitude, double Longitude) location)
+    {
+        _travel.LocationName = location.Name;
+        _latitude = location.Latitude;
+        _longitude = location.Longitude;
+    }
 }
