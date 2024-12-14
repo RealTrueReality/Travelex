@@ -25,14 +25,46 @@
                 </div>
             </div>
 
-            <div class="rounded-xl overflow-hidden">
-                <img src="images/homePage/@Trip.ImageUrl" class="h-[101px] w-[130px] object-cover" alt="@Trip.Title"/>
+            <div class="rounded-xl overflow-hidden w-[130px] h-[101px]">
+                @if (!string.IsNullOrEmpty(Trip.ImageUrl))
+                {
+                    @if (Trip.ImageUrl.StartsWith("images/"))
+                    {
+                        <img src="@Trip.ImageUrl" class="w-full h-full object-cover" alt="@Trip.Title"/>
+                    }
+                    else if (File.Exists(Trip.ImageUrl))
+                    {
+                        <img src="data:image/jpeg;base64,@Convert.ToBase64String(File.ReadAllBytes(Trip.ImageUrl))"
+                             class="w-full h-full object-cover"
+                             alt="@Trip.Title"/>
+                    }
+                    else
+                    {
+                        <div class="w-full h-full bg-gray-100 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="w-full h-full bg-gray-100 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                }
             </div>
         </div>
     </div>
     <div class="absolute top-0 bottom-0 right-0 w-20 bg-red-500 text-white flex items-center justify-center rounded-r-xl transition-transform duration-300 ease-out"
          style="@GetDeleteButtonStyle()"
-         @onclick="@(() => OnDelete.InvokeAsync(Trip))">
+         @onclick="@(async () => {
+             TouchedTripId = -1;
+             _swipeOffset = 0;
+             await OnDelete.InvokeAsync(Trip);
+         })">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
@@ -50,11 +82,11 @@
     [Parameter]
     public EventCallback<Travel> OnClick { get; set; }
 
+    private int? TouchedTripId;
     private const double SwipeThreshold = 80.0;
     private const double ClickPreventionThreshold = 5.0;
     private double _touchStartX;
     private double _swipeOffset;
-    private int? TouchedTripId;
 
     private string GetTripCardStyle()
     {
@@ -75,6 +107,8 @@
 
     private void HandleTouchMove(TouchEventArgs e)
     {
+        if (TouchedTripId != Trip.Id) return;
+
         double currentX = e.Touches[0].ClientX;
         double deltaX = currentX - _touchStartX;
 
@@ -96,6 +130,8 @@
 
     private void HandleTouchEnd()
     {
+        if (TouchedTripId != Trip.Id) return;
+
         // 如果滑动距离超过阈值的一半，自动展开删除按钮
         if (Math.Abs(_swipeOffset) > SwipeThreshold / 2)
         {

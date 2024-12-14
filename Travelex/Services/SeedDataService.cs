@@ -37,8 +37,7 @@ public class SeedDataService {
                 new() { CategoryName = "岛屿", CategoryImage = "/images/island.png" },
                 new() { CategoryName = "宗教", CategoryImage = "/images/buddha.png" },
                 new() { CategoryName = "出境", CategoryImage = "/images/abroad.png" },
-                new() { CategoryName = "长途旅行", CategoryImage = "/images/roadtrip.png" },
-                new() { CategoryName = "其他", CategoryImage = "/images/travels.png" }
+                new() { CategoryName = "长途旅行", CategoryImage = "/images/roadtrip.png" }
             };
 
             foreach (var category in tripCategories) await _db.AddItemAsync(category);
@@ -53,7 +52,7 @@ public class SeedDataService {
                     LocationName = "特拉基",
                     StartDate = new DateTime(2022, 1, 7),
                     EndDate = new DateTime(2022, 1, 10),
-                    ImageUrl = "Truckee.png",
+                    ImageUrl = "images/travelImages/Truckee.png",
                     Status = TravelStatus.Completed
                 },
                 new() {
@@ -62,7 +61,7 @@ public class SeedDataService {
                     LocationName = "洛杉矶",
                     StartDate = new DateTime(2021, 8, 9),
                     EndDate = new DateTime(2021, 8, 13),
-                    ImageUrl = "LosAngeles.png",
+                    ImageUrl = "images/travelImages/LosAngeles.png",
                     Status = TravelStatus.Completed
                 },
                 new() {
@@ -71,7 +70,7 @@ public class SeedDataService {
                     LocationName = "凯卢阿",
                     StartDate = new DateTime(2021, 7, 9),
                     EndDate = new DateTime(2021, 7, 13),
-                    ImageUrl = "KailuaKona.png",
+                    ImageUrl = "images/travelImages/KailuaKona.png",
                     Status = TravelStatus.Completed
                 },
                 new() {
@@ -80,9 +79,11 @@ public class SeedDataService {
                     LocationName = "小狼家",
                     StartDate = new DateTime(2024, 12, 19),
                     EndDate = new DateTime(2024, 12, 24),
-                    ImageUrl = "furnace.jpg",
+                    ImageUrl = "images/travelImages/furnace.jpg",
                     Status = TravelStatus.Planning
-                }
+                },
+                
+                
             };
             foreach (var travel in travels) await _db.AddItemAsync(travel);
         }

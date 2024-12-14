@@ -8,7 +8,6 @@ public class App : Application {
     private readonly AppShell _shell;
 
     public App(SeedDataService seedDataService, AppShell shell) {
-
         _seedDataService = seedDataService;
         _shell = shell;
 
