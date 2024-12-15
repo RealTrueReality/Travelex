@@ -11,11 +11,13 @@ public class TravelService {
         _db = db;
     }
     //获取所有旅行
-    public async Task<List<Travel>?> GetTripsAsync(int page=1,int count=10) {
+    public async Task<ResultDataModel<List<Travel>?>> GetTripsAsync(int page=1,int count=10) {
         var travels = await _db.GetTableAsync<Travel>();
-        return await travels.OrderByDescending(t=> t.AddedOn)
+        var filteredTravels = await travels.OrderByDescending(t=> t.AddedOn)
             .Skip((page - 1) * count)
             .Take(count).ToListAsync();
+        return filteredTravels is not null? ResultDataModel<List<Travel>?>.Success(data:filteredTravels) : ResultDataModel<List<Travel>?>.Failure("获取失败");
+        
     }
     //根据id获取旅行
     public async Task<ResultDataModel<Travel>> GetTravelByIdAsync(int id) {

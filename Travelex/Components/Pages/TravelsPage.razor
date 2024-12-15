@@ -1,0 +1,143 @@
+@page "/home"
+@using Travelex.Entities
+@using Travelex.Services
+@using Syncfusion.Blazor.Popups
+@using Travelex.Components.Layout
+@using Travelex.Components.Controls.TravelPageControls
+@using Travelex.Utils
+@inject IJSRuntime JSRuntime
+@inject TravelService TravelService
+@inject BlazorMauiInterop BlazorMauiInterop
+@layout LayoutWithNavBar
+
+<div class="flex flex-col h-full bg-white select-none">
+    <SearchBar @bind-SearchQuery="SearchQuery"/>
+
+    <div class="flex-1 overflow-auto">
+        <StatisticsCards Trips="@Trips"/>
+
+        <!-- 行程列表 -->
+        <div class="px-4">
+            @if (IsLoading) {
+                @for (int i = 0; i < 4; i++) {
+                    <div class="bg-white rounded-xl p-4 mb-4">
+                        <div class="grid grid-cols-[1fr,auto] gap-4">
+                            <div>
+                                <SfSkeleton Width="40%" Height="18px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                                <SfSkeleton Width="98%" Height="14px" CssClass="mt-0.5"
+                                            Effect=ShimmerEffect.Wave></SfSkeleton>
+
+                                <div class="flex items-center gap-2 mt-2">
+                                    <SfSkeleton Shape=SkeletonType.Square Width="40px" Height="36px"
+                                                Effect=ShimmerEffect.Wave></SfSkeleton>
+                                    <div>
+                                        <SfSkeleton Width="60px" Height="14px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                                        <div class="mt-0.2">
+                                            <SfSkeleton Width="80px" Height="16px" CssClass="mt-0.5"
+                                                        Effect=ShimmerEffect.Wave></SfSkeleton>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <SfSkeleton Width="130px" Height="101px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                        </div>
+                    </div>
+                }
+            }
+            else {
+                @if (FilteredTrips != null && FilteredTrips.Any()) {
+                    foreach (var trip in FilteredTrips) {
+                        <TripCard Trip="trip"
+                                  OnDelete="DeleteTrip"
+                                  OnClick="OnTripClick"/>
+                    }
+                }
+                else if (!string.IsNullOrWhiteSpace(SearchQuery)) {
+                    <div class="text-center py-8 text-gray-500">
+                        没有找到匹配的行程
+                    </div>
+                }
+            }
+        </div>
+
+        <!-- 添加行程按钮 -->
+        <div class="p-4">
+            <button @onclick="NavigateToAdd" class="w-full bg-[#119BED] text-white h-12 rounded-[20px] text-base">
+                + 添加行程
+            </button>
+        </div>
+    </div>
+</div>
+
+<DeleteConfirmationDialog @bind-IsVisible="IsDeleteDialogVisible"
+                          OnConfirmed="ConfirmDelete"
+                          OnCancelled="CancelDelete"/>
+
+@code {
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+
+    private bool IsLoading { get; set; } = true;
+    private string SearchQuery { get; set; } = string.Empty;
+    private bool IsDeleteDialogVisible { get; set; }
+    private Travel? TripToDelete { get; set; }
+    public List<Travel>? Trips { get; set; }
+
+    private IEnumerable<Travel>? FilteredTrips => string.IsNullOrWhiteSpace(SearchQuery)
+        ? Trips
+        : Trips?.Where(t => t.Title.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase));
+
+    protected override async Task OnInitializedAsync() {
+        await base.OnInitializedAsync();
+        try {
+            var res = await TravelService.GetTripsAsync();
+            if (res.IsSuccess) {
+                Trips = res.Data;
+            }
+            else {
+                await BlazorMauiInterop.ShowAlertAsync("获取行程列表失败");
+            }
+        }
+        catch (Exception e) {
+            await BlazorMauiInterop.ShowAlertAsync("获取行程列表失败");
+        }
+
+        await Task.Delay(1280);
+        IsLoading = false;
+    }
+
+    private void OnTripClick(Travel trip) {
+        Console.WriteLine($"Clicked travel: {trip.Title}");
+        NavigationManager.NavigateTo($"/travel/details/{trip.Id}");
+    }
+
+    private async Task DeleteTrip(Travel trip) {
+        TripToDelete = trip;
+        IsDeleteDialogVisible = true;
+    }
+
+    private async Task ConfirmDelete() {
+        if (TripToDelete != null) {
+            try {
+                var res = await TravelService.DeleteTravelAsync(TripToDelete.Id);
+                if (!res.IsSuccess) {
+                    await BlazorMauiInterop.ShowAlertAsync("删除行程失败");
+                }
+            }
+            catch (Exception e) {
+                await BlazorMauiInterop.ShowAlertAsync("删除行程失败");
+            }
+
+            Trips!.Remove(TripToDelete);
+            StateHasChanged();
+        }
+    }
+
+    private void CancelDelete() {
+        TripToDelete = null;
+    }
+
+    private void NavigateToAdd() {
+        NavigationManager.NavigateTo("/travel/add");
+    }
+
+}

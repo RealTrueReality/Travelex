@@ -147,6 +147,7 @@
             if (res.IsSuccess) {
                 //重定向到首页
                 BlazorMauiInterop.HideIndicator();
+                await BlazorMauiInterop.ShowToastAsync("登录成功");
                 NavigationManager.NavigateTo("/home", replace: true);
             }
             else {
@@ -156,7 +157,7 @@
             }
         }
         catch (Exception ex) {
-            await BlazorMauiInterop.ShowAlertAsync(ex.Message);
+            await BlazorMauiInterop.ShowAlertAsync("登录失败");
         }
         finally {
             BlazorMauiInterop.HideIndicator();
@@ -175,7 +176,7 @@
                 //重定向到首页
                 BlazorMauiInterop.HideIndicator();
                 IsRegisterDialogVisible = false;
-                await BlazorMauiInterop.ShowAlertAsync("注册成功！", title: "提示");
+                await BlazorMauiInterop.ShowToastAsync("注册成功！");
                 NavigationManager.NavigateTo("/home", replace: true);
             }
             else {

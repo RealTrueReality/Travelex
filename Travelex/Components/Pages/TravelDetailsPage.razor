@@ -1,0 +1,281 @@
+@page "/travel/details/{Id:int}"
+@using Travelex.Components.Controls
+@using Travelex.Entities
+@using Travelex.Utils
+@using Travelex.Services
+@using Syncfusion.Blazor.Popups
+@inject TravelService TravelService;
+@inject NavigationManager NavigationManager;
+@inject BlazorMauiInterop BlazorMauiInterop;
+
+<FlexedPageComponent>
+    <TopBarLeft>
+        <button @onclick="NavigateBack" class="p-2 text-[#252525]">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+    </TopBarLeft>
+    <TopBarTitle>旅行详情</TopBarTitle>
+    <TopBarRight>
+        <button @onclick="NavigateToChart" class="p-2 text-[#252525]">
+            <i class="fas fa-bar-chart text-gray-600"></i>
+        </button>
+    </TopBarRight>
+    <PageBody>
+        <div class="flex-1 overflow-auto">
+            @if (IsLoading) 
+            {
+                <!-- Shimmer Loading State -->
+                <!-- Statistics Cards Shimmer -->
+                <div class="grid grid-cols-2 gap-4 px-4">
+                    <div class="bg-[#EFF2F4] rounded-xl p-6">
+                        <p class="text-base font-medium text-[#111416] mb-2">旅行总支出</p>
+                        <SfSkeleton Width="80%" Height="26px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                    </div>
+                    <div class="bg-[#EFF2F4] rounded-xl p-6">
+                        <p class="text-base font-medium text-[#111416] mb-2">支出数</p>
+                        <SfSkeleton Width="50%" Height="26px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                    </div>
+                </div>
+
+                <!-- Travel Image Shimmer -->
+                <div class="p-4">
+                    <div class="rounded-xl overflow-hidden">
+                        <SfSkeleton Width="100%" Height="192px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                    </div>
+                </div>
+
+                <!-- Travel Details Card Shimmer -->
+                <div class="bg-white mx-4 rounded-xl p-6 shadow-sm border border-gray-200">
+                    <!-- Title and Status -->
+                    <div class="flex items-center justify-between mb-4">
+                        <SfSkeleton Width="30%" Height="24px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                        <SfSkeleton Width="25%" Height="24px" Effect=ShimmerEffect.Wave CssClass="rounded-full"></SfSkeleton>
+                    </div>
+
+                    <!-- Description, Location, Date -->
+                    <div class="space-y-3">
+                        <div class="flex items-start space-x-2">
+                            <SfSkeleton Width="16px" Height="16px" Effect=ShimmerEffect.Wave CssClass="mt-1"></SfSkeleton>
+                            <SfSkeleton Width="50%" Height="16px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                        </div>
+                        <div class="flex items-start space-x-2">
+                            <SfSkeleton Width="16px" Height="16px" Effect=ShimmerEffect.Wave CssClass="mt-1"></SfSkeleton>
+                            <SfSkeleton Width="50%" Height="16px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                        </div>
+                        <div class="flex items-start space-x-2">
+                            <SfSkeleton Width="16px" Height="16px" Effect=ShimmerEffect.Wave CssClass="mt-1"></SfSkeleton>
+                            <SfSkeleton Width="50%" Height="16px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                        </div>
+                        <div class="flex items-start space-x-2">
+                            <SfSkeleton Width="16px" Height="16px" Effect=ShimmerEffect.Wave CssClass="mt-1"></SfSkeleton>
+                            <SfSkeleton Width="50%" Height="16px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                        </div>
+                        <div class="flex items-start space-x-2">
+                            <SfSkeleton Width="16px" Height="16px" Effect=ShimmerEffect.Wave CssClass="mt-1"></SfSkeleton>
+                            <SfSkeleton Width="50%" Height="16px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Expenses List Shimmer -->
+                <div class="flex-1 overflow-auto mt-4">
+                    @for (int i = 0; i < 4; i++) {
+                        <div class="px-4 py-2">
+                            <div class="flex items-center">
+                                <SfSkeleton Shape=SkeletonType.Square Width="46px" Height="46px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                                <div class="ml-4 flex flex-col">
+                                    <SfSkeleton Width="100px" Height="14px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                                    <div class="mt-0.5">
+                                        <SfSkeleton Width="92px" Height="12px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else {
+                <!-- Statistics Cards -->
+                <div class="grid grid-cols-2 gap-4 px-4">
+                    <div class="bg-[#EFF2F4] rounded-xl p-6">
+                        <p class="text-base font-medium text-[#111416] mb-2">旅行总支出</p>
+                        <p class="text-2xl font-semibold text-[#111416]">¥@TotalAmount.ToString("N2")</p>
+                    </div>
+                    <div class="bg-[#EFF2F4] rounded-xl p-6">
+                        <p class="text-base font-medium text-[#111416] mb-2">支出数</p>
+                        <p class="text-2xl font-semibold text-[#111416]">@ExpenseCount</p>
+                    </div>
+                </div>
+
+                <!-- Travel Card -->
+                <div class="p-4">
+                    <div class="rounded-xl overflow-hidden">
+                        <img src="images/detailsPage/lodge.png" class="w-full h-48 object-cover rounded-xl" alt="@_travel.Title"/>
+                    </div>
+                </div>
+
+                <!-- Travel Details Card -->
+                <div class="bg-white mx-4 rounded-xl p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-semibold text-[#111416]">@_travel.Title</h2>
+                        <span class="px-3 py-1 rounded-full text-sm @GetStatusClass()">
+                            @_travel.Status.ToString()
+                        </span>
+                    </div>
+
+                    <div class="space-y-3">
+                        @if (!string.IsNullOrEmpty(_travel.Description)) {
+                            <div class="flex items-start space-x-2">
+                                <i class="fas fa-align-left text-gray-500 mt-1"></i>
+                                <p class="text-gray-600">@_travel.Description</p>
+                            </div>
+                        }
+
+                        <div class="flex items-start space-x-2">
+                            <i class="fas fa-map-marker-alt text-gray-500 mt-1"></i>
+                            @if (_travel is { Longitude: not null, Latitude: not null }) {
+                                <p class="text-gray-600">@($"{_travel.LocationName} 经度: {_travel.Longitude.Value}, 纬度: {_travel.Latitude.Value}")</p>
+                            }
+                            else {
+                                <p class="text-gray-600">@_travel.LocationName</p>
+                            }
+
+                        </div>
+
+                        <div class="flex items-start space-x-2">
+                            <i class="fas fa-calendar text-gray-500 mt-1"></i>
+                            <p class="text-gray-600">
+                                @_travel.StartDate?.ToString("yyyy-MM-dd") - @_travel.EndDate?.ToString("yyyy-MM-dd")
+                            </p>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(_travel.CategoryName))
+                        {
+                            <div class="flex items-start space-x-2">
+                                <i class="fas fa-tag text-gray-500 mt-1"></i>
+                                <p class="text-gray-600">@_travel.CategoryName</p>
+                            </div>
+                        }
+
+                        <div class="flex items-start space-x-2">
+                            <i class="fas fa-clock text-gray-500 mt-1"></i>
+                            <div class="text-gray-600">
+                                <p>创建于：@_travel.AddedOn.ToString("yyyy-MM-dd HH:mm")</p>
+                                @if (_travel.ModifiedOn.HasValue)
+                                {
+                                    <p class="mt-0.5">修改于：@_travel.ModifiedOn.Value.ToString("yyyy-MM-dd HH:mm")</p>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Expenses List -->
+                <div class="mt-4">
+                    @foreach (var expense in Expenses) {
+                        <div class="px-4 py-2">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 bg-[#E8EFF2] rounded-lg flex items-center justify-center">
+                                    <img src="images/expense.svg" class="h-5 w-5" alt="支出"/>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="text-base font-medium text-[#0C161C]">@expense.Title</p>
+                                    <p class="text-sm text-[#4C7C99]">$@expense.Amount.ToString("N2")</p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Add Expense Button -->
+                <div class="p-4">
+                    <button @onclick="AddExpense" class="w-full bg-[#119BED] text-white h-12 rounded-[20px] text-base">
+                        + 添加一笔支出
+                    </button>
+                </div>
+            }
+        </div>
+    </PageBody>
+</FlexedPageComponent>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    private Travel _travel = new();
+    private List<Expense> Expenses { get; set; } = new();
+    private bool IsLoading { get; set; } = true;
+    private decimal TotalAmount => Expenses.Sum(e => e.Amount);
+    private int ExpenseCount => Expenses.Count;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        try {
+            var res = await TravelService.GetTravelByIdAsync(Id);
+            if (res.IsSuccess) {
+                if (res.Data != null) _travel = res.Data;
+                else {
+                    await BlazorMauiInterop.ShowAlertAsync("该旅行不存在");
+                }
+            }
+            else {
+                await BlazorMauiInterop.ShowAlertAsync("服务器错误");
+            }
+
+            // 模拟数据，实际项目中应该从服务获取
+            Expenses = new List<Expense>
+            {
+                new() { Title = "支出 1", Amount = 1200.00m },
+                new() { Title = "支出 2", Amount = 1200.00m },
+                new() { Title = "支出 3", Amount = 1200.00m },
+                new() { Title = "支出 3", Amount = 1200.00m },
+                new() { Title = "支出 3", Amount = 1200.00m },
+                new() { Title = "支出 3", Amount = 1200.00m },
+                new() { Title = "支出 3", Amount = 1200.00m },
+                new() { Title = "支出 3", Amount = 1200.00m },
+                new() { Title = "支出 3", Amount = 1200.00m },
+            };
+        }
+        catch (Exception e) {
+            await BlazorMauiInterop.ShowAlertAsync("服务器错误");
+        }
+        finally {
+            await Task.Delay(1280);
+            IsLoading = false;
+        }
+    }
+        
+    private async Task AddExpense()
+    {
+        // 实现添加费用的逻辑
+    }
+
+    private string GetStatusClass()
+    {
+        return _travel.Status switch
+        {
+            TravelStatus.Planning => "bg-yellow-100 text-yellow-600",
+            TravelStatus.Ongoing => "bg-blue-100 text-blue-600",
+            TravelStatus.Completed => "bg-green-100 text-green-600",
+            TravelStatus.Cancelled => "bg-red-100 text-red-600",
+            _ => ""
+        };
+    }
+
+    public class Expense
+    {
+        public string Title { get; set; }
+        public decimal Amount { get; set; }
+    }
+    
+    private void NavigateBack() {
+        NavigationManager.NavigateTo("/home",replace: true);
+    }
+
+    private void NavigateToChart() {
+        NavigationManager.NavigateTo($"/travel/chart/{Id}");
+    }
+}

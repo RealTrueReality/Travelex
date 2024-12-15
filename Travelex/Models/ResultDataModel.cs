@@ -3,7 +3,7 @@
 public class ResultDataModel<T>(bool isSuccess, string? message, T? data) {
     public bool IsSuccess { get; } = isSuccess;
     public string? Message { get; } = message;
-    public T? Data { get; set; }
+    public T? Data { get; set; } = data;
 
 
     public static ResultDataModel<T> Success(T data) => new(true, string.Empty, data);

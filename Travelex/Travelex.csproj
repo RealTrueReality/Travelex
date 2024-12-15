@@ -90,12 +90,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Include="wwwroot\images\homePage\KailuaKona.png" />
-      <None Include="wwwroot\images\homePage\LosAngeles.png" />
-      <None Include="wwwroot\images\homePage\Truckee.png" />
-    </ItemGroup>
-
-    <ItemGroup>
       <AndroidAsset Include="wwwroot\images\travelImages\furnace.jpg" />
       <AndroidAsset Include="wwwroot\images\travelImages\KailuaKona.png" />
       <AndroidAsset Include="wwwroot\images\travelImages\LosAngeles.png" />

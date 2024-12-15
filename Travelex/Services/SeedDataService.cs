@@ -53,7 +53,13 @@ public class SeedDataService {
                     StartDate = new DateTime(2022, 1, 7),
                     EndDate = new DateTime(2022, 1, 10),
                     ImageUrl = "images/travelImages/Truckee.png",
-                    Status = TravelStatus.Completed
+                    Status = TravelStatus.Completed,
+                    CategoryName = "海滩",
+                    Description = "itrake 是一个位于美国加州的 beach，它位于美国西雅图州西雅图市附近，是西雅图州最大的 beach，并且是西雅图州唯一一个没有水草的 beach。",
+                    AddedOn = DateTime.Now,
+                    ModifiedOn = DateTime.Now,
+                    Longitude = -122.5,
+                    Latitude = 47.5,
                 },
                 new() {
                     Id = 2,
