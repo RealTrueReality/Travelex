@@ -1,0 +1,202 @@
+@using System.Text.Json
+@using Travelex.Utils
+@inject IJSRuntime JSRuntime
+@using static Microsoft.Maui.ApplicationModel.Permissions
+@inject BlazorMauiInterop BlazorMauiInterop
+<div class="grid grid-cols-2 gap-4">
+    <!-- 拍照按钮 -->
+    <button @onclick="TakePhoto" type="button"
+            class="flex flex-col items-center justify-center h-32 bg-[#F8FAFC] rounded-xl hover:bg-gray-100">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        <span class="text-sm text-gray-500">拍照</span>
+    </button>
+
+    <!-- 相册按钮 -->
+    <button @onclick="PickPhoto" type="button"
+            class="flex flex-col items-center justify-center h-32 bg-[#F8FAFC] rounded-xl hover:bg-gray-100">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        <span class="text-sm text-gray-500">相册</span>
+    </button>
+</div>
+
+@if (!string.IsNullOrEmpty(ImagePath))
+{
+    <div class="mt-4 relative w-full aspect-[4/3] overflow-hidden rounded-xl">
+        <img src="data:image/jpeg;base64,@_imageBase64" alt="已选择的照片" 
+             class="w-full h-full object-contain" />
+        <button @onclick="RemovePhoto" type="button"
+                class="absolute top-2 right-2 p-1 bg-white rounded-full shadow-lg hover:bg-gray-100">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string? ImagePath { get; set; }
+
+    [Parameter]
+    public EventCallback<string?> ImagePathChanged { get; set; }
+
+    private string? _imageBase64;
+
+    private async Task TakePhoto()
+    {
+        try
+        {
+            var status = await Permissions.CheckStatusAsync<Permissions.Camera>();
+            if (status != PermissionStatus.Granted)
+            {
+                status = await Permissions.RequestAsync<Permissions.Camera>();
+                if (status != PermissionStatus.Granted)
+                {
+                    await BlazorMauiInterop.ShowAlertAsync ("需要相机权限才能拍照");
+                    return;
+                }
+            }
+
+            if (MediaPicker.Default.IsCaptureSupported)
+            {
+                try
+                {
+                    var photo = await MediaPicker.Default.CapturePhotoAsync(new MediaPickerOptions
+                    {
+                        Title = "拍摄照片"
+                    });
+                    
+                    if (photo != null)
+                    {
+                        await ProcessPhoto(photo);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"拍照出错: {ex.Message}");
+                    await BlazorMauiInterop.ShowAlertAsync ("拍照失败，请重试");
+                }
+            }
+            else
+            {
+                await BlazorMauiInterop.ShowAlertAsync ("此设备不支持拍照功能");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"相机权限检查出错: {ex.Message}");
+            await BlazorMauiInterop.ShowAlertAsync ("无法访问相机，请检查权限设置");
+        }
+    }
+
+    private async Task PickPhoto()
+    {
+        try
+        {
+            var status = await Permissions.CheckStatusAsync<Permissions.StorageRead>();
+            if (status != PermissionStatus.Granted)
+            {
+                status = await Permissions.RequestAsync<Permissions.StorageRead>();
+                if (status != PermissionStatus.Granted)
+                {
+                    await BlazorMauiInterop.ShowAlertAsync ("需要存储权限才能访问相册");
+                    return;
+                }
+            }
+
+            var photo = await MediaPicker.Default.PickPhotoAsync(new MediaPickerOptions
+            {
+                Title = "选择照片"
+            });
+            
+            if (photo != null)
+            {
+                await ProcessPhoto(photo);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"选择照片出错: {ex.Message}");
+            await BlazorMauiInterop.ShowAlertAsync ("选择照片失败，请重试");
+        }
+    }
+
+    private async Task ProcessPhoto(FileResult photo)
+    {
+        try
+        {
+            // 创建应用程序缓存目录
+            var cacheDir = Path.Combine(FileSystem.CacheDirectory, "Photos");
+            Directory.CreateDirectory(cacheDir);
+
+            // 生成唯一的文件名
+            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(photo.FileName)}";
+            var targetPath = Path.Combine(cacheDir, fileName);
+
+            // 复制文件到缓存目录并转换为base64
+            using var sourceStream = await photo.OpenReadAsync();
+            using var memoryStream = new MemoryStream();
+            await sourceStream.CopyToAsync(memoryStream);
+            
+            // 转换为base64
+            _imageBase64 = Convert.ToBase64String(memoryStream.ToArray());
+
+            // 保存文件
+            memoryStream.Position = 0;
+            using var targetStream = File.Create(targetPath);
+            await memoryStream.CopyToAsync(targetStream);
+
+            // 更新图片路径
+            await ImagePathChanged.InvokeAsync(targetPath);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"处理照片出错: {ex.Message}");
+            await BlazorMauiInterop.ShowAlertAsync ("处理照片失败，请重试");
+        }
+    }
+
+    private async Task RemovePhoto()
+    {
+        if (!string.IsNullOrEmpty(ImagePath) && File.Exists(ImagePath))
+        {
+            try
+            {
+                File.Delete(ImagePath);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"删除照片出错: {ex.Message}");
+                await BlazorMauiInterop.ShowAlertAsync ("删除照片失败，请重试");
+            }
+        }
+
+        _imageBase64 = null;
+        await ImagePathChanged.InvokeAsync(null);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrEmpty(ImagePath) && File.Exists(ImagePath))
+        {
+            try
+            {
+                var bytes = await File.ReadAllBytesAsync(ImagePath);
+                _imageBase64 = Convert.ToBase64String(bytes);
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"读取照片出错: {ex.Message}");
+                await BlazorMauiInterop.ShowAlertAsync ("读取照片失败，请重试");
+                
+            }
+        }
+    }
+}

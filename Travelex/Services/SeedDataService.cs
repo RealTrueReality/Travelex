@@ -16,12 +16,11 @@ public class SeedDataService {
         if (!await _db.TableExistsAsync<ExpenseCategory>()) {
             var expenseCategories = new List<ExpenseCategory> {
                 new() { Name = "交通" },
-                new() { Name = "美食" },
+                new() { Name = "餐饮" },
                 new() { Name = "住宿" },
                 new() { Name = "购物" },
                 new() { Name = "运动" },
                 new() { Name = "娱乐" },
-                new() { Name = "其他" }
             };
 
             foreach (var category in expenseCategories) await _db.AddItemAsync(category);
@@ -68,7 +67,8 @@ public class SeedDataService {
                     StartDate = new DateTime(2021, 8, 9),
                     EndDate = new DateTime(2021, 8, 13),
                     ImageUrl = "images/travelImages/LosAngeles.png",
-                    Status = TravelStatus.Completed
+                    Status = TravelStatus.Completed,
+                    Description = "洛杉矶是美国加州的著名城市，以好莱坞和美丽的海滩闻名，是全球娱乐产业的中心。",
                 },
                 new() {
                     Id = 3,
@@ -77,7 +77,8 @@ public class SeedDataService {
                     StartDate = new DateTime(2021, 7, 9),
                     EndDate = new DateTime(2021, 7, 13),
                     ImageUrl = "images/travelImages/KailuaKona.png",
-                    Status = TravelStatus.Completed
+                    Status = TravelStatus.Completed,
+                    Description = "凯卢阿位于夏威夷，是一个以冲浪、海滩和温暖气候闻名的度假胜地，适合家庭和朋友共度假期。",
                 },
                 new() {
                     Id = 4,
@@ -86,12 +87,149 @@ public class SeedDataService {
                     StartDate = new DateTime(2024, 12, 19),
                     EndDate = new DateTime(2024, 12, 24),
                     ImageUrl = "images/travelImages/furnace.jpg",
-                    Status = TravelStatus.Planning
+                    Status = TravelStatus.Planning,
+                    Description = "一次特殊的旅行，前往小狼家探访乖小狼天壤，享受温馨的安心时光。",
                 },
                 
                 
             };
             foreach (var travel in travels) await _db.AddItemAsync(travel);
+        }
+        
+        // 检查并初始化 Expense 表数据
+        if (!await _db.TableExistsAsync<Expense>()) {
+
+            var expenses = new List<Expense> {
+                new Expense {
+                    Id = 1,
+                    TripId = 1, // 特拉基之旅
+                    Title = "住宿费",
+                    Description = "入住酒店费用",
+                    Amount = 500.00,
+                    Category = "住宿",
+                    TimeOnSpend = new DateTime(2024, 1, 7)
+                },
+                new Expense {
+                    Id = 2,
+                    TripId = 1,
+                    Title = "餐饮费",
+                    Description = "餐馆午餐",
+                    Amount = 150.00,
+                    Category = "餐饮",
+                    TimeOnSpend = new DateTime(2024, 1, 8)
+                },
+                new Expense {
+                    Id = 3,
+                    TripId = 1,
+                    Title = "景区门票",
+                    Description = "特拉基滑雪场门票",
+                    Amount = 300.00,
+                    Category = "娱乐",
+                    TimeOnSpend = new DateTime(2024, 1, 9)
+                },
+                new Expense {
+                    Id = 4,
+                    TripId = 2, // 洛杉矶之旅
+                    Title = "机票",
+                    Description = "飞往洛杉矶的机票",
+                    Amount = 1200.00,
+                    Category = "交通",
+                    TimeOnSpend = new DateTime(2024, 8, 9)
+                },
+                new Expense {
+                    Id = 5,
+                    TripId = 2,
+                    Title = "景点门票",
+                    Description = "参观好莱坞的门票",
+                    Amount = 200.00,
+                    Category = "娱乐",
+                    TimeOnSpend = new DateTime(2024, 8, 10)
+                },
+                new Expense {
+                    Id = 6,
+                    TripId = 2,
+                    Title = "晚餐",
+                    Description = "洛杉矶海鲜餐厅晚餐",
+                    Amount = 180.00,
+                    Category = "餐饮",
+                    TimeOnSpend = new DateTime(2024, 8, 11)
+                },
+                new Expense {
+                    Id = 7,
+                    TripId = 2,
+                    Title = "租车费",
+                    Description = "洛杉矶市区租车费用",
+                    Amount = 350.00,
+                    Category = "交通",
+                    TimeOnSpend = new DateTime(2024, 8, 9)
+                },
+                new Expense {
+                    Id = 8,
+                    TripId = 3, // 凯卢阿之旅
+                    Title = "租车费",
+                    Description = "租车自驾游",
+                    Amount = 400.00,
+                    Category = "交通",
+                    TimeOnSpend = new DateTime(2024, 7, 9)
+                },
+                new Expense {
+                    Id = 9,
+                    TripId = 3,
+                    Title = "午餐费",
+                    Description = "凯卢阿海滩餐厅午餐",
+                    Amount = 120.00,
+                    Category = "餐饮",
+                    TimeOnSpend = new DateTime(2024, 7, 10)
+                },
+                new Expense {
+                    Id = 10,
+                    TripId = 3,
+                    Title = "冲浪课程",
+                    Description = "参加凯卢阿冲浪培训班",
+                    Amount = 250.00,
+                    Category = "娱乐",
+                    TimeOnSpend = new DateTime(2024, 7, 11)
+                },
+                new Expense {
+                    Id = 11,
+                    TripId = 4, // 小狼的秘密旅行
+                    Title = "礼物开销",
+                    Description = "给朋友的礼物",
+                    Amount = 300.00,
+                    Category = "购物",
+                    TimeOnSpend = new DateTime(2024, 12, 20)
+                },
+                new Expense {
+                    Id = 12,
+                    TripId = 4,
+                    Title = "零食采购",
+                    Description = "购买旅行零食",
+                    Amount = 50.00,
+                    Category = "餐饮",
+                    TimeOnSpend = new DateTime(2024, 12, 19)
+                },
+                new Expense {
+                    Id = 13,
+                    TripId = 4,
+                    Title = "交通费",
+                    Description = "前往小狼家的火车票",
+                    Amount = 120.00,
+                    Category = "交通",
+                    TimeOnSpend = new DateTime(2024, 12, 19)
+                },
+                new Expense {
+                    Id = 14,
+                    TripId = 4,
+                    Title = "晚餐开销",
+                    Description = "家庭晚餐食材",
+                    Amount = 180.00,
+                    Category = "餐饮",
+                    TimeOnSpend = new DateTime(2024, 12, 22)
+                },
+            };
+            foreach (var expense in expenses) {
+                await _db.AddItemAsync(expense);
+            }
         }
     }
 }

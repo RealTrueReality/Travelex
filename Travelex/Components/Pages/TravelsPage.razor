@@ -14,7 +14,7 @@
     <SearchBar @bind-SearchQuery="SearchQuery"/>
 
     <div class="flex-1 overflow-auto">
-        <StatisticsCards Trips="@Trips"/>
+        <StatisticsCards Trips="@Trips" IsLoading="@IsLoading"/>
 
         <!-- 行程列表 -->
         <div class="px-4">
@@ -24,7 +24,7 @@
                         <div class="grid grid-cols-[1fr,auto] gap-4">
                             <div>
                                 <SfSkeleton Width="40%" Height="18px" Effect=ShimmerEffect.Wave></SfSkeleton>
-                                <SfSkeleton Width="98%" Height="14px" CssClass="mt-0.5"
+                                <SfSkeleton Width="70%" Height="14px" CssClass="mt-0.5"
                                             Effect=ShimmerEffect.Wave></SfSkeleton>
 
                                 <div class="flex items-center gap-2 mt-2">
@@ -71,7 +71,8 @@
 
 <DeleteConfirmationDialog @bind-IsVisible="IsDeleteDialogVisible"
                           OnConfirmed="ConfirmDelete"
-                          OnCancelled="CancelDelete"/>
+                          OnCancelled="CancelDelete"
+                           />
 
 @code {
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
@@ -89,7 +90,7 @@
     protected override async Task OnInitializedAsync() {
         await base.OnInitializedAsync();
         try {
-            var res = await TravelService.GetTripsAsync();
+            var res = await TravelService.GetTripsAsync(includeExpenses:true);
             if (res.IsSuccess) {
                 Trips = res.Data;
             }

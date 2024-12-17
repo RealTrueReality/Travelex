@@ -1,0 +1,58 @@
+@using System.Globalization
+
+<div class="flex flex-col gap-1">
+    <label class="text-sm text-gray-600">@Label</label>
+    <div class="relative bg-[#F8FAFC] rounded-xl">
+        <input type="date" 
+               class="w-full h-14 px-4 pr-12 bg-transparent text-base text-gray-600 focus:outline-none"
+               value="@Value?.ToString("yyyy-MM-dd")"
+               min="@Min?.ToString("yyyy-MM-dd")"
+               max="@Max?.ToString("yyyy-MM-dd")"
+               @onchange="OnDateChanged" />
+        <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#64748B]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+        </div>
+    </div>
+    @if (!string.IsNullOrEmpty(Error))
+    {
+        <span class="text-sm text-red-500">@Error</span>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string Label { get; set; } = "";
+
+    [Parameter]
+    public DateTime? Value { get; set; }
+
+    [Parameter]
+    public DateTime? Min { get; set; }
+
+    [Parameter]
+    public DateTime? Max { get; set; }
+
+    [Parameter]
+    public string Error { get; set; } = "";
+
+    [Parameter]
+    public EventCallback<DateTime?> ValueChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<DateTime?> OnChange { get; set; }
+
+    private async Task OnDateChanged(ChangeEventArgs e)
+    {
+        DateTime? newValue = null;
+        if (!string.IsNullOrEmpty((string)e.Value) && 
+            DateTime.TryParse((string)e.Value, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime date))
+        {
+            newValue = date;
+        }
+
+        await ValueChanged.InvokeAsync(newValue);
+        await OnChange.InvokeAsync(newValue);
+    }
+}

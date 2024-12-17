@@ -18,8 +18,10 @@ public class Travel {
     
     public double? Latitude { get; set; }
 
+    [Required(ErrorMessage = "请选择开始日期")]
     public DateTime? StartDate { get; set; }=DateTime.Today;
 
+    [Required(ErrorMessage = "请选择结束日期")]
     public DateTime? EndDate { get; set; }=DateTime.Now;
 
     public DateTime AddedOn { get; set; }
@@ -29,15 +31,24 @@ public class Travel {
     public string? CategoryName { get; set; }
 
     public TravelStatus Status {
-        get => _status;
+        get => _status; 
         set {
-            StuatusForDisplay = value.ToString();
             _status = value;
+            StatusForDisplay = value switch {
+                TravelStatus.Planning => "规划中",
+                TravelStatus.Ongoing => "进行中",
+                TravelStatus.Completed => "已完成",
+                TravelStatus.Cancelled => "已取消",
+                _ => "未知状态"
+            };
         }
     }
 
     [Ignore]
-    public string? StuatusForDisplay { get; set; }
+    public string? StatusForDisplay { get; private set; } = "规划中";
+
+
+    [Ignore] public List<Expense> Expense { get; set; } = [];
 
     [MaxLength(200)] public string? ImageUrl { get; set; }
 }

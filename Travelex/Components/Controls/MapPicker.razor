@@ -1,0 +1,115 @@
+@inject IJSRuntime JSRuntime
+
+<div class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center" @onclick="Close">
+    <div class="bg-white w-full h-full md:w-[600px] md:h-[80vh] md:rounded-2xl flex flex-col" @onclick:stopPropagation>
+        <!-- 顶部栏 -->
+        <div class="flex items-center px-4 h-[60px] border-b">
+            <button @onclick="Close" class="p-2 -ml-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <h2 class="flex-1 text-center text-lg font-medium">选择位置</h2>
+            <button @onclick="ConfirmLocation" class="text-blue-500 font-medium">确定</button>
+        </div>
+
+        <!-- 搜索框 -->
+        <div class="px-4 py-2">
+            <div class="relative">
+                <input @bind-value="@_searchKeyword" 
+                       @bind-value:event="oninput"
+                       @onkeyup="HandleSearch"
+                       class="w-full h-10 pl-10 pr-4 bg-gray-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                       placeholder="搜索地点" />
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </div>
+        </div>
+
+        <!-- 搜索结果列表 -->
+        @if (_searchResults.Any())
+        {
+            <div class="flex-none overflow-auto max-h-[200px] px-4">
+                @foreach (var result in _searchResults)
+                {
+                    <button @onclick="() => SelectSearchResult(result)"
+                            class="w-full px-4 py-2 text-left hover:bg-gray-100 rounded-lg">
+                        <div class="font-medium">@result.Name</div>
+                        <div class="text-sm text-gray-500">@result.Address</div>
+                    </button>
+                }
+            </div>
+        }
+
+        <!-- 地图容器 -->
+        <div class="flex-1 relative">
+            <div id="map-container" class="absolute inset-0"></div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback<(string Name, string Address, double Latitude, double Longitude)> OnLocationSelected { get; set; }
+
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+
+    private string _searchKeyword = "";
+    private List<LocationResult> _searchResults = new();
+    private DotNetObjectReference<MapPicker>? _dotNetRef;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _dotNetRef = DotNetObjectReference.Create(this);
+            await JSRuntime.InvokeVoidAsync("initAMap", _dotNetRef);
+        }
+    }
+
+    private async Task HandleSearch()
+    {
+        if (string.IsNullOrWhiteSpace(_searchKeyword)) return;
+        await JSRuntime.InvokeVoidAsync("searchLocation", _searchKeyword);
+    }
+
+    [JSInvokable]
+    public void UpdateSearchResults(List<LocationResult> results)
+    {
+        _searchResults = results;
+        StateHasChanged();
+    }
+
+    private async Task SelectSearchResult(LocationResult result)
+    {
+        _searchResults.Clear();
+        await JSRuntime.InvokeVoidAsync("setMapCenter", result.Latitude, result.Longitude);
+    }
+
+    private async Task ConfirmLocation()
+    {
+        var location = await JSRuntime.InvokeAsync<LocationResult>("getCurrentLocation");
+        await OnLocationSelected.InvokeAsync((location.Name, location.Address, location.Latitude, location.Longitude));
+        await Close();
+    }
+
+    private async Task Close()
+    {
+        await OnClose.InvokeAsync();
+    }
+
+    public void Dispose()
+    {
+        _dotNetRef?.Dispose();
+    }
+
+    public class LocationResult
+    {
+        public string Name { get; set; } = "";
+        public string Address { get; set; } = "";
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+    }
+}

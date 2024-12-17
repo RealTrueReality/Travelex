@@ -11,18 +11,35 @@ public class TravelService {
         _db = db;
     }
     //获取所有旅行
-    public async Task<ResultDataModel<List<Travel>?>> GetTripsAsync(int page=1,int count=10) {
+    public async Task<ResultDataModel<List<Travel>>> GetTripsAsync(bool includeExpenses=false) {
         var travels = await _db.GetTableAsync<Travel>();
-        var filteredTravels = await travels.OrderByDescending(t=> t.AddedOn)
-            .Skip((page - 1) * count)
-            .Take(count).ToListAsync();
-        return filteredTravels is not null? ResultDataModel<List<Travel>?>.Success(data:filteredTravels) : ResultDataModel<List<Travel>?>.Failure("获取失败");
+        var filteredTravels = await travels.OrderByDescending(t=> t.AddedOn).ToListAsync();
+        if (filteredTravels is null) {
+            return ResultDataModel<List<Travel>>.Failure("获取失败");
+        }
+        if (includeExpenses) {
+            var expenses = await _db.GetTableAsync<Expense>();
+            foreach (var travel in filteredTravels) {
+                var filteredExpenses = await expenses.Where(e => e.TripId == travel.Id).ToListAsync();
+                travel.Expense = filteredExpenses;
+            }
+        }
+        return ResultDataModel<List<Travel>>.Success(data:filteredTravels);
         
     }
     //根据id获取旅行
-    public async Task<ResultDataModel<Travel>> GetTravelByIdAsync(int id) {
+    public async Task<ResultDataModel<Travel>> GetTravelByIdAsync(int id,bool includeExpenses=false) {
         var travel = await _db.GetItemByKeyAsync<Travel>(id);
-        return travel is not null ? ResultDataModel<Travel>.Success(travel) : ResultDataModel<Travel>.Failure("获取失败");
+        if (travel is null) {
+            return ResultDataModel<Travel>.Failure("获取行程失败");
+        }
+        if (includeExpenses ) {
+            var expenses = await _db.GetTableAsync<Expense>();
+            var filteredExpenses = await expenses.Where(e => e.TripId == travel.Id).ToListAsync();
+            travel.Expense = filteredExpenses;
+        }
+
+        return ResultDataModel<Travel>.Success(travel);
     }
     
     //添加旅行
@@ -48,13 +65,21 @@ public class TravelService {
         }
     }
     //删除旅行
-    public async Task<ResultDataModel<Travel>> DeleteTravelAsync(int id) {
+    public async Task<ResultDataModel<Travel>> DeleteTravelAsync(int id,bool includeExpenses=false) {
         try {
             var travel = await _db.GetItemByKeyAsync<Travel>(id);
             if (travel is null) {
                 return ResultDataModel<Travel>.Failure("不存在该旅行，删除失败");
             }
             var b = await _db.DeleteItemAsync(travel);
+            if (includeExpenses) {
+                var expenses = await _db.GetTableAsync<Expense>();
+                var filteredExpenses = await expenses.Where(e => e.TripId == travel.Id).ToListAsync();
+                foreach (var expense in filteredExpenses) {
+                    await _db.DeleteItemAsync(expense);
+                }
+            }
+            
             return b ? ResultDataModel<Travel>.Success(travel) : ResultDataModel<Travel>.Failure("删除失败");
         }
         catch (Exception e) {
@@ -62,5 +87,12 @@ public class TravelService {
             return ResultDataModel<Travel>.Failure("删除失败");
         }
        
+    }
+    
+    public async Task<ResultDataModel <List<TravelCategory>>> GetTravelCategoriesAsync() {
+        var travelCategoriesTable = await _db.GetTableAsync<TravelCategory>();
+        var travelCategories = await travelCategoriesTable.ToListAsync();
+        return travelCategories is not null ? ResultDataModel<List<TravelCategory>>.Success(travelCategories) 
+            : ResultDataModel<List<TravelCategory>>.Failure("获取行程类别失败");
     }
 }

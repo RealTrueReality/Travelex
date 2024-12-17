@@ -25,8 +25,7 @@
     </TopBarRight>
     <PageBody>
         <div class="flex-1 overflow-auto">
-            @if (IsLoading) 
-            {
+            @if (IsLoading) {
                 <!-- Shimmer Loading State -->
                 <!-- Statistics Cards Shimmer -->
                 <div class="grid grid-cols-2 gap-4 px-4">
@@ -52,30 +51,36 @@
                     <!-- Title and Status -->
                     <div class="flex items-center justify-between mb-4">
                         <SfSkeleton Width="30%" Height="24px" Effect=ShimmerEffect.Wave></SfSkeleton>
-                        <SfSkeleton Width="25%" Height="24px" Effect=ShimmerEffect.Wave CssClass="rounded-full"></SfSkeleton>
+                        <SfSkeleton Width="25%" Height="24px" Effect=ShimmerEffect.Wave
+                                    CssClass="rounded-full"></SfSkeleton>
                     </div>
 
                     <!-- Description, Location, Date -->
                     <div class="space-y-3">
                         <div class="flex items-start space-x-2">
-                            <SfSkeleton Width="16px" Height="16px" Effect=ShimmerEffect.Wave CssClass="mt-1"></SfSkeleton>
-                            <SfSkeleton Width="50%" Height="16px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                            <SfSkeleton Width="18px" Height="18px" Effect=ShimmerEffect.Wave
+                                        CssClass="mt-1"></SfSkeleton>
+                            <SfSkeleton Width="50%" Height="18px" Effect=ShimmerEffect.Wave></SfSkeleton>
                         </div>
                         <div class="flex items-start space-x-2">
-                            <SfSkeleton Width="16px" Height="16px" Effect=ShimmerEffect.Wave CssClass="mt-1"></SfSkeleton>
-                            <SfSkeleton Width="50%" Height="16px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                            <SfSkeleton Width="18px" Height="18px" Effect=ShimmerEffect.Wave
+                                        CssClass="mt-1"></SfSkeleton>
+                            <SfSkeleton Width="50%" Height="18px" Effect=ShimmerEffect.Wave></SfSkeleton>
                         </div>
                         <div class="flex items-start space-x-2">
-                            <SfSkeleton Width="16px" Height="16px" Effect=ShimmerEffect.Wave CssClass="mt-1"></SfSkeleton>
-                            <SfSkeleton Width="50%" Height="16px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                            <SfSkeleton Width="18px" Height="18px" Effect=ShimmerEffect.Wave
+                                        CssClass="mt-1"></SfSkeleton>
+                            <SfSkeleton Width="50%" Height="18px" Effect=ShimmerEffect.Wave></SfSkeleton>
                         </div>
                         <div class="flex items-start space-x-2">
-                            <SfSkeleton Width="16px" Height="16px" Effect=ShimmerEffect.Wave CssClass="mt-1"></SfSkeleton>
-                            <SfSkeleton Width="50%" Height="16px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                            <SfSkeleton Width="18px" Height="18px" Effect=ShimmerEffect.Wave
+                                        CssClass="mt-1"></SfSkeleton>
+                            <SfSkeleton Width="50%" Height="18px" Effect=ShimmerEffect.Wave></SfSkeleton>
                         </div>
                         <div class="flex items-start space-x-2">
-                            <SfSkeleton Width="16px" Height="16px" Effect=ShimmerEffect.Wave CssClass="mt-1"></SfSkeleton>
-                            <SfSkeleton Width="50%" Height="16px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                            <SfSkeleton Width="18px" Height="18px" Effect=ShimmerEffect.Wave
+                                        CssClass="mt-1"></SfSkeleton>
+                            <SfSkeleton Width="50%" Height="18px" Effect=ShimmerEffect.Wave></SfSkeleton>
                         </div>
                     </div>
                 </div>
@@ -84,14 +89,19 @@
                 <div class="flex-1 overflow-auto mt-4">
                     @for (int i = 0; i < 4; i++) {
                         <div class="px-4 py-2">
-                            <div class="flex items-center">
-                                <SfSkeleton Shape=SkeletonType.Square Width="46px" Height="46px" Effect=ShimmerEffect.Wave></SfSkeleton>
-                                <div class="ml-4 flex flex-col">
-                                    <SfSkeleton Width="100px" Height="14px" Effect=ShimmerEffect.Wave></SfSkeleton>
-                                    <div class="mt-0.5">
-                                        <SfSkeleton Width="92px" Height="12px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <SfSkeleton Shape=SkeletonType.Square Width="46px" Height="46px"
+                                                Effect=ShimmerEffect.Wave CssClass="rounded-lg"></SfSkeleton>
+                                    <div class="ml-4">
+                                        <SfSkeleton Width="116px" Height="16px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                                        <div class="flex items-center gap-2 mt-1">
+                                            <SfSkeleton Width="142px" Height="12px"
+                                                        Effect=ShimmerEffect.Wave></SfSkeleton>
+                                        </div>
                                     </div>
                                 </div>
+                                <SfSkeleton Width="78px" Height="16px" Effect=ShimmerEffect.Wave></SfSkeleton>
                             </div>
                         </div>
                     }
@@ -102,7 +112,7 @@
                 <div class="grid grid-cols-2 gap-4 px-4">
                     <div class="bg-[#EFF2F4] rounded-xl p-6">
                         <p class="text-base font-medium text-[#111416] mb-2">旅行总支出</p>
-                        <p class="text-2xl font-semibold text-[#111416]">¥@TotalAmount.ToString("N2")</p>
+                        <p class="text-2xl font-semibold text-[#111416]">¥@TotalAmount?.ToString("N2")</p>
                     </div>
                     <div class="bg-[#EFF2F4] rounded-xl p-6">
                         <p class="text-base font-medium text-[#111416] mb-2">支出数</p>
@@ -112,8 +122,37 @@
 
                 <!-- Travel Card -->
                 <div class="p-4">
-                    <div class="rounded-xl overflow-hidden">
-                        <img src="images/detailsPage/lodge.png" class="w-full h-48 object-cover rounded-xl" alt="@_travel.Title"/>
+                    <div class="rounded-xl overflow-hidden h-[192px] w-full">
+                        @if (!string.IsNullOrEmpty(_travel.ImageUrl)) {
+                            @if (_travel.ImageUrl.StartsWith("images/")) {
+                                <img src="@_travel.ImageUrl" class="w-full h-full object-cover"
+                                     alt="@_travel.Title"/>
+                            }
+                            else if (File.Exists(_travel.ImageUrl)) {
+                                <img
+                                    src="data:image/jpeg;base64,@Convert.ToBase64String(File.ReadAllBytes(_travel.ImageUrl))"
+                                    class="w-full h-full object-cover"
+                                    alt="@_travel.Title"/>
+                            }
+                            else {
+                                <div class="w-full h-full bg-gray-100 flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none"
+                                         viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                </div>
+                            }
+                        }
+                        else {
+                            <div class="w-full h-full bg-gray-100 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none"
+                                     viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                            </div>
+                        }
                     </div>
                 </div>
 
@@ -121,8 +160,8 @@
                 <div class="bg-white mx-4 rounded-xl p-6 shadow-sm border border-gray-200">
                     <div class="flex items-center justify-between mb-4">
                         <h2 class="text-xl font-semibold text-[#111416]">@_travel.Title</h2>
-                        <span class="px-3 py-1 rounded-full text-sm @GetStatusClass()">
-                            @_travel.Status.ToString()
+                        <span class="px-3 py-1 rounded-full text-base @GetStatusClass()">
+                            @_travel.StatusForDisplay
                         </span>
                     </div>
 
@@ -152,8 +191,7 @@
                             </p>
                         </div>
 
-                        @if (!string.IsNullOrEmpty(_travel.CategoryName))
-                        {
+                        @if (!string.IsNullOrEmpty(_travel.CategoryName)) {
                             <div class="flex items-start space-x-2">
                                 <i class="fas fa-tag text-gray-500 mt-1"></i>
                                 <p class="text-gray-600">@_travel.CategoryName</p>
@@ -164,8 +202,7 @@
                             <i class="fas fa-clock text-gray-500 mt-1"></i>
                             <div class="text-gray-600">
                                 <p>创建于：@_travel.AddedOn.ToString("yyyy-MM-dd HH:mm")</p>
-                                @if (_travel.ModifiedOn.HasValue)
-                                {
+                                @if (_travel.ModifiedOn.HasValue) {
                                     <p class="mt-0.5">修改于：@_travel.ModifiedOn.Value.ToString("yyyy-MM-dd HH:mm")</p>
                                 }
                             </div>
@@ -177,14 +214,21 @@
                 <div class="mt-4">
                     @foreach (var expense in Expenses) {
                         <div class="px-4 py-2">
-                            <div class="flex items-center">
-                                <div class="w-12 h-12 bg-[#E8EFF2] rounded-lg flex items-center justify-center">
-                                    <img src="images/expense.svg" class="h-5 w-5" alt="支出"/>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="w-12 h-12 bg-[#E8EFF2] rounded-lg flex items-center justify-center">
+                                        <img src="images/expense.svg" class="h-5 w-5" alt="支出"/>
+                                    </div>
+                                    <div class="ml-4">
+                                        <p class="text-base font-medium text-[#0C161C]">@expense.Title</p>
+                                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                                            <span>@expense.TimeOnSpend.ToString("yyyy-MM-dd HH:mm")</span>
+                                            <span>·</span>
+                                            <span>@expense.Category</span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="ml-4">
-                                    <p class="text-base font-medium text-[#0C161C]">@expense.Title</p>
-                                    <p class="text-sm text-[#4C7C99]">$@expense.Amount.ToString("N2")</p>
-                                </div>
+                                <p class="text-base font-semibold text-[#0C161C]">¥@expense.Amount?.ToString("N2")</p>
                             </div>
                         </div>
                     }
@@ -202,21 +246,22 @@
 </FlexedPageComponent>
 
 @code {
-    [Parameter]
-    public int Id { get; set; }
+    [Parameter] public int Id { get; set; }
     private Travel _travel = new();
-    private List<Expense> Expenses { get; set; } = new();
+    private List<Expense> Expenses { get; set; } = [];
     private bool IsLoading { get; set; } = true;
-    private decimal TotalAmount => Expenses.Sum(e => e.Amount);
+    private double? TotalAmount => Expenses.Sum(e => e.Amount);
     private int ExpenseCount => Expenses.Count;
 
-    protected override async Task OnInitializedAsync()
-    {
+    protected override async Task OnInitializedAsync() {
         await base.OnInitializedAsync();
         try {
-            var res = await TravelService.GetTravelByIdAsync(Id);
+            var res = await TravelService.GetTravelByIdAsync(Id, includeExpenses: true);
             if (res.IsSuccess) {
-                if (res.Data != null) _travel = res.Data;
+                if (res.Data is not null) {
+                    _travel = res.Data;
+                    if (_travel.Expense is not null) Expenses = _travel.Expense;
+                }
                 else {
                     await BlazorMauiInterop.ShowAlertAsync("该旅行不存在");
                 }
@@ -224,20 +269,6 @@
             else {
                 await BlazorMauiInterop.ShowAlertAsync("服务器错误");
             }
-
-            // 模拟数据，实际项目中应该从服务获取
-            Expenses = new List<Expense>
-            {
-                new() { Title = "支出 1", Amount = 1200.00m },
-                new() { Title = "支出 2", Amount = 1200.00m },
-                new() { Title = "支出 3", Amount = 1200.00m },
-                new() { Title = "支出 3", Amount = 1200.00m },
-                new() { Title = "支出 3", Amount = 1200.00m },
-                new() { Title = "支出 3", Amount = 1200.00m },
-                new() { Title = "支出 3", Amount = 1200.00m },
-                new() { Title = "支出 3", Amount = 1200.00m },
-                new() { Title = "支出 3", Amount = 1200.00m },
-            };
         }
         catch (Exception e) {
             await BlazorMauiInterop.ShowAlertAsync("服务器错误");
@@ -247,16 +278,14 @@
             IsLoading = false;
         }
     }
-        
-    private async Task AddExpense()
-    {
+
+    private async Task AddExpense() {
         // 实现添加费用的逻辑
+        NavigationManager.NavigateTo($"/expense/add/{_travel.Id}");
     }
 
-    private string GetStatusClass()
-    {
-        return _travel.Status switch
-        {
+    private string GetStatusClass() {
+        return _travel.Status switch {
             TravelStatus.Planning => "bg-yellow-100 text-yellow-600",
             TravelStatus.Ongoing => "bg-blue-100 text-blue-600",
             TravelStatus.Completed => "bg-green-100 text-green-600",
@@ -265,17 +294,13 @@
         };
     }
 
-    public class Expense
-    {
-        public string Title { get; set; }
-        public decimal Amount { get; set; }
-    }
-    
+
     private void NavigateBack() {
-        NavigationManager.NavigateTo("/home",replace: true);
+        NavigationManager.NavigateTo("/home", replace: true);
     }
 
     private void NavigateToChart() {
         NavigationManager.NavigateTo($"/travel/chart/{Id}");
     }
+
 }
