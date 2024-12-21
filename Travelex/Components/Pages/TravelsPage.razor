@@ -4,6 +4,7 @@
 @using Syncfusion.Blazor.Popups
 @using Travelex.Components.Layout
 @using Travelex.Components.Controls.TravelPageControls
+@using SkeletonType = Syncfusion.Blazor.Notifications.SkeletonType
 @using Travelex.Utils
 @inject IJSRuntime JSRuntime
 @inject TravelService TravelService
@@ -27,7 +28,7 @@
                                 <SfSkeleton Width="70%" Height="14px" CssClass="mt-0.5"
                                             Effect=ShimmerEffect.Wave></SfSkeleton>
 
-                                <div class="flex items-center gap-2 mt-2">
+                                <div class="flex items-center gap-2 mt-q2">
                                     <SfSkeleton Shape=SkeletonType.Square Width="40px" Height="36px"
                                                 Effect=ShimmerEffect.Wave></SfSkeleton>
                                     <div>
@@ -90,7 +91,7 @@
     protected override async Task OnInitializedAsync() {
         await base.OnInitializedAsync();
         try {
-            var res = await TravelService.GetTripsAsync(includeExpenses:true);
+            var res = await TravelService.GetTravelsAsync(includeExpenses:true);
             if (res.IsSuccess) {
                 Trips = res.Data;
             }
@@ -122,6 +123,9 @@
                 var res = await TravelService.DeleteTravelAsync(TripToDelete.Id);
                 if (!res.IsSuccess) {
                     await BlazorMauiInterop.ShowAlertAsync("删除行程失败");
+                }
+                else {
+                await BlazorMauiInterop.ShowToastAsync("删除行程成功");
                 }
             }
             catch (Exception e) {

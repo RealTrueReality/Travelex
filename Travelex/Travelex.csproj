@@ -78,6 +78,7 @@
         <PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
         <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.10" />
         <PackageReference Include="Syncfusion.Blazor.Calendars" Version="28.1.33" />
+        <PackageReference Include="Syncfusion.Blazor.Charts" Version="28.1.33" />
         <PackageReference Include="Syncfusion.Blazor.DropDowns" Version="28.1.33" />
         <PackageReference Include="Syncfusion.Blazor.Notifications" Version="28.1.33" />
         <PackageReference Include="Syncfusion.Blazor.Popups" Version="28.1.33" />

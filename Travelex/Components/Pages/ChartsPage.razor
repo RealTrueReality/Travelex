@@ -1,6 +1,385 @@
-﻿@page "/charts"
-<h3>ChartsPage</h3>
+@page "/charts"
+@using Syncfusion.Blazor.Charts
+@using Travelex.Components.Layout
+@using Travelex.Entities
+@using Travelex.Services
+@inject ExpenseService ExpenseService
+@inject NavigationManager NavigationManager
+@inject TravelService TravelService
+@layout LayoutWithNavBar
+<FixedPageComponent>
+    <TopBarLeft>
+        <button @onclick="NavigateBack" class="p-2 text-[#252525]">
+            <i class="fas fa-arrow-left text-xl"></i>
+        </button>
+    </TopBarLeft>
+    <TopBarTitle>费用分析</TopBarTitle>
+    <PageBody>
+        <div class="flex space-x-4 px-4 border-b border-[#EFF2F4]">
+            <button class="@GetTabClass("monthly")" @onclick="@(() => SwitchTab("monthly"))">月度</button>
+            <button class="@GetTabClass("yearly")" @onclick="@(() => SwitchTab("yearly"))">年度</button>
+            <button class="@GetTabClass("alltime")" @onclick="@(() => SwitchTab("alltime"))">全部时间</button>
+        </div>
+
+        <div class="p-4">
+            <div class="text-lg font-medium text-[#111416] mb-4">总支出</div>
+            <div class="grid grid-cols-1 gap-4 mb-6">
+                <div class="bg-[#EFF2F4] rounded-xl p-6 flex items-center space-x-3 w-full">
+                    <span class="text-[#252525]">
+                        <img src="images/expense.svg" alt="支出"/>
+                    </span>
+                    <span class="text-xl font-semibold text-[#111416]">¥@GetTotalSpentData().ToString("N0")</span>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <div class="text-lg font-medium text-[#111416] mb-4">支出分布</div>
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                    <SfAccumulationChart EnableBorderOnMouseMove="false" Height="400px">
+                        <AccumulationChartTooltipSettings Enable="true" 
+                            Format="<b>${point.x}</b><br>支出占比: <b>${point.y}%</b>">
+                        </AccumulationChartTooltipSettings>
+                        <AccumulationChartLegendSettings Visible="true" Position="LegendPosition.Top" Height="100px" Width="100%">
+                        </AccumulationChartLegendSettings>
+                        <AccumulationChartSeriesCollection>
+                            <AccumulationChartSeries DataSource="@GetDonutChartData()" 
+                                XName="Category" YName="Percentage" 
+                                Radius="70%" InnerRadius="60%" 
+                                Name="支出">
+                                <AccumulationDataLabelSettings Visible="true" Name="DataLabelMappingName" Position="AccumulationLabelPosition.Outside">
+                                    <AccumulationChartConnector Type="ConnectorType.Curve" Length="20px">
+                                    </AccumulationChartConnector>
+                                    <AccumulationChartDataLabelFont FontWeight="600" Size="10px">
+                                    </AccumulationChartDataLabelFont>
+                                </AccumulationDataLabelSettings>
+                            </AccumulationChartSeries>
+                        </AccumulationChartSeriesCollection>
+                    </SfAccumulationChart>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <div class="text-lg font-medium text-[#111416] mb-4">分类统计</div>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <button class="@GetCategoryClass("all")" @onclick="@(() => SelectCategory("all"))">全部</button>
+                    @foreach (var category in _categories)
+                    {
+                        <button class="@GetCategoryClass(category.Name)" @onclick="() => SelectCategory(category.Name)">
+                            @GetCategoryDisplayName(category.Name)
+                        </button>
+                    }
+                </div>
+
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                    <SfChart @ref="_chart">
+                        <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category">
+                            <ChartAxisMajorGridLines Width="0"></ChartAxisMajorGridLines>
+                            @* <ChartAxisTitle Text="@GetXAxisTitle()"></ChartAxisTitle> *@
+                        </ChartPrimaryXAxis>
+                        <ChartPrimaryYAxis LabelFormat="@GetYAxisFormat()">
+                            <ChartAxisMajorGridLines Width="0.5" Color="#e0e0e0"></ChartAxisMajorGridLines>
+                            @* <ChartAxisTitle Text="@GetYAxisTitle()"></ChartAxisTitle> *@
+                            
+                        </ChartPrimaryYAxis>
+                        <ChartSeriesCollection>
+                            <ChartSeries DataSource="@GetChartData()" 
+                                XName="Month" YName="Amount" 
+                                Type="ChartSeriesType.Column"
+                                Fill="#119BED">
+                            </ChartSeries>
+                        </ChartSeriesCollection>
+                    </SfChart>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                @if (_selectedCategory == "all")
+                {
+                    @foreach (var expense in GetCategoryExpenses())
+                    {
+                        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                            <div class="grid grid-cols-[1fr,200px] gap-4 items-center">
+                                <div>
+                                    <div class="font-semibold text-[#111416]">@GetCategoryDisplayName(expense.Category)</div>
+                                    <div class="text-sm text-gray-500">@expense.TimeOnSpend.ToString("yyyy年MM月") 
+                                        <br/>
+                                        ¥@expense.Amount?.ToString("N0")</div>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-32 h-2 bg-[#EFF2F4] rounded-full overflow-hidden">
+                                        <div class="h-full bg-[#119BED]" style="width: @(GetPercentage(expense))%"></div>
+                                    </div>
+                                    <span class="min-w-[3rem] text-sm text-[#252525]">@GetPercentage(expense)%</span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    @foreach (var expense in GetExpensesByCategory(_selectedCategory))
+                    {
+                        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                            <div class="grid grid-cols-[1fr,200px] gap-4 items-center">
+                                <div>
+                                    <div class="font-semibold text-[#111416]">@expense.Title</div>
+                                    <div class="text-sm text-gray-500">
+                                        @GetTravelTitle(expense.TripId)
+                                        <br/>
+                                        @expense.TimeOnSpend.ToString("yyyy年MM月dd日")
+                                        <br/>
+                                        ¥@expense.Amount?.ToString("N0")
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-32 h-2 bg-[#EFF2F4] rounded-full overflow-hidden">
+                                        <div class="h-full bg-[#119BED]" style="width: @(GetExpensePercentageInCategory(expense))%"></div>
+                                    </div>
+                                    <span class="min-w-[3rem] text-sm text-[#252525]">@GetExpensePercentageInCategory(expense)%</span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </PageBody>
+</FixedPageComponent>
 
 @code {
-    
+    private string _currentTab = "monthly";
+    private string _selectedCategory = "all";
+    private List<ExpenseCategory> _categories = new() ;
+    private List<Expense> _expenses = new();
+    private List<ChartData> _chartDataSource = new();
+    private Dictionary<int, string> travelTitles = new();
+    private SfChart? _chart;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadExpenses();
+        var travels = await TravelService.GetTravelsAsync();
+        if (travels.IsSuccess)
+        {
+            travelTitles = travels.Data.ToDictionary(t => t.Id, t => t.Title);
+        }
+    }
+
+    private async Task LoadExpenses()
+    {
+        var expRes = await ExpenseService.GetExpensesAsync();
+        if (expRes.IsSuccess) {
+            if (expRes.Data != null) _expenses = expRes.Data;
+        }
+        var categoryRes= await ExpenseService.GetExpenseCategoriesAsync();
+        if (categoryRes.IsSuccess) {
+            if (categoryRes.Data != null) _categories = categoryRes.Data;
+        }
+        GetChartData();
+    }
+
+    private List<DonutChartData> GetDonutChartData()
+    {
+        var query = _expenses.AsQueryable();
+        
+        switch (_currentTab)
+        {
+            case "monthly":
+                query = query.Where(e => e.TimeOnSpend >= DateTime.Now.AddMonths(-1));
+                break;
+            case "yearly":
+                query = query.Where(e => e.TimeOnSpend >= DateTime.Now.AddYears(-1));
+                break;
+        }
+
+        var total = query.Sum(e => e.Amount ?? 0);
+        
+        return query.GroupBy(e => e.Category)
+            .Select(g => new DonutChartData
+            {
+                Category = GetCategoryDisplayName(g.Key),
+                Percentage = Math.Round((g.Sum(e => e.Amount ?? 0) / total) * 100, 0),
+                DataLabelMappingName = $"{Math.Round((g.Sum(e => e.Amount ?? 0) / total) * 100, 0)}%"
+            })
+            .OrderByDescending(d => d.Percentage)
+            .ToList();
+    }
+
+    private List<ChartData> GetChartData()
+    {
+        if (_selectedCategory == "all")
+        {
+            var query = _expenses.AsQueryable();
+            switch (_currentTab)
+            {
+                case "monthly":
+                    query = query.Where(e => e.TimeOnSpend >= DateTime.Now.AddMonths(-1));
+                    break;
+                case "yearly":
+                    query = query.Where(e => e.TimeOnSpend >= DateTime.Now.AddYears(-1));
+                    break;
+            }
+
+            var monthlyData = query.GroupBy(e => new { e.TimeOnSpend.Year, e.TimeOnSpend.Month })
+                .Select(g => new ChartData
+                {
+                    Month = $"{g.Key.Year}-{g.Key.Month:D2}",
+                    Amount = g.Sum(e => e.Amount ?? 0)
+                })
+                .OrderBy(d => d.Month)
+                .ToList();
+
+            return monthlyData;
+        }
+        else
+        {
+            var categoryExpenses = _expenses.Where(e => e.Category == _selectedCategory)
+                .OrderByDescending(e => e.Amount)
+                .Take(10)  // 只显示金额最高的10笔支出
+                .ToList();
+
+            var total = categoryExpenses.Sum(e => e.Amount ?? 0);
+            
+            return categoryExpenses.Select(e => new ChartData
+            {
+                Month = e.Title,  // 使用支出标题
+                Amount = Math.Round((e.Amount ?? 0) / total * 100, 0)  // 计算占比
+            }).ToList();
+        }
+    }
+
+    private string GetYAxisTitle()
+    {
+        return _selectedCategory == "all" ? "支出金额" : "占比 (%)";
+    }
+
+    private string GetXAxisTitle()
+    {
+        return _selectedCategory == "all" ? "月份" : "支出项目";
+    }
+
+    private double GetTotalSpentData()
+    {
+        var query = _expenses.AsQueryable();
+        
+        switch (_currentTab)
+        {
+            case "monthly":
+                return query.Where(e => e.TimeOnSpend >= DateTime.Now.AddMonths(-1)).Sum(e => e.Amount ?? 0);
+            case "yearly":
+                return  query.Where(e => e.TimeOnSpend >= DateTime.Now.AddYears(-1)).Sum(e => e.Amount ?? 0);
+            default:
+                return  query.Sum(e => e.Amount ?? 0);
+        }
+    }
+
+    private IEnumerable<Expense> GetCategoryExpenses()
+    {
+        var query = _expenses.AsQueryable();
+        
+        switch (_currentTab)
+        {
+            case "monthly":
+                query = query.Where(e => e.TimeOnSpend >= DateTime.Now.AddMonths(-1));
+                break;
+            case "yearly":
+                query = query.Where(e => e.TimeOnSpend >= DateTime.Now.AddYears(-1));
+                break;
+        }
+
+        return query.GroupBy(e => e.Category)
+            .Select(g => new Expense
+            {
+                Category = g.Key,
+                Amount = g.Sum(e => e.Amount ?? 0),
+                TimeOnSpend = g.Max(e => e.TimeOnSpend)
+            })
+            .OrderByDescending(e => e.Amount);
+    }
+
+    private double GetPercentage(Expense expense)
+    {
+        var total = GetTotalSpentData();
+        if (total == 0) return 0;
+        return Math.Round((expense.Amount ?? 0) / total * 100, 1);
+    }
+
+    private string GetTabClass(string tab)
+    {
+        return tab == _currentTab
+            ? "px-4 py-2 border-b-2 border-[#119BED] text-[#252525]"
+            : "px-4 py-2 text-gray-500 hover:text-gray-700";
+    }
+
+    private string GetCategoryClass(string category)
+    {
+        return category == _selectedCategory
+            ? "px-4 py-1 rounded-full bg-[#119BED] text-white"
+            : "px-4 py-1 rounded-full bg-[#EFF2F4] text-[#252525] hover:bg-gray-200";
+    }
+
+    private string GetCategoryDisplayName(string? category) {
+        return category ?? "未分类";
+    }
+
+    private async Task SwitchTab(string tab)
+    {
+        _currentTab = tab;
+        StateHasChanged();
+        await _chart?.RefreshAsync();  // 强制刷新图表
+    }
+
+    private async Task SelectCategory(string category)
+    {
+        _selectedCategory = category;
+        StateHasChanged();
+        await _chart?.RefreshAsync();  // 强制刷新图表
+    }
+
+    private async Task ExportData()
+    {
+        // TODO: 实现导出数据功能
+    }
+
+    private void NavigateBack()
+    {
+        NavigationManager.NavigateTo($"/home");
+    }
+
+    private string GetTravelTitle(int tripId)
+    {
+        return travelTitles.TryGetValue(tripId, out var title) ? title : "未知旅行";
+    }
+
+    private List<Expense> GetExpensesByCategory(string category)
+    {
+        return _expenses.Where(e => e.Category == category)
+            .OrderByDescending(e => e.TimeOnSpend)
+            .ToList();
+    }
+
+    private double GetExpensePercentageInCategory(Expense expense)
+    {
+        var categoryTotal = _expenses.Where(e => e.Category == expense.Category)
+            .Sum(e => e.Amount ?? 0);
+        return Math.Round((expense.Amount ?? 0) / categoryTotal * 100, 0);
+    }
+
+    private string GetYAxisFormat()
+    {
+        return _selectedCategory == "all" ? "¥{value}" : "{value}%";
+    }
+
+    private class ChartData
+    {
+        public string? Month { get; set; }
+        public double Amount { get; set; }
+    }
+
+    private class DonutChartData
+    {
+        public string? Category { get; set; }
+        public double Percentage { get; set; }
+        public string? DataLabelMappingName { get; set; }
+    }
 }

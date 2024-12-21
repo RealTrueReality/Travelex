@@ -69,7 +69,7 @@
 
     private void NavigateBack()
     {
-        NavigationManager.NavigateTo("/home", replace: true);
+        NavigationManager.NavigateTo($"/travel/details/{Id}", replace: true);
     }
 
     private async Task HandleSubmit(Travel travel)
@@ -80,6 +80,7 @@
             var result = await TravelService.UpdateTravelAsync(travel);
             if (result.IsSuccess)
             {
+                await BlazorMauiInterop.ShowToastAsync("更新行程成功");
                 NavigateBack();
             }
             else

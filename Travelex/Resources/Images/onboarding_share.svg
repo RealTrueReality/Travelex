@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background circle -->
+    <circle cx="200" cy="200" r="180" fill="#E3F2FF" opacity="0.3"/>
+    
+    <!-- Share nodes -->
+    <circle cx="200" cy="140" r="30" fill="#0085FF"/>
+    <circle cx="120" cy="240" r="30" fill="#0085FF"/>
+    <circle cx="280" cy="240" r="30" fill="#0085FF"/>
+    
+    <!-- Connection lines -->
+    <line x1="175" y1="160" x2="140" y2="215" stroke="#0085FF" stroke-width="4"/>
+    <line x1="225" y1="160" x2="260" y2="215" stroke="#0085FF" stroke-width="4"/>
+    <line x1="145" y1="240" x2="255" y2="240" stroke="#0085FF" stroke-width="4"/>
+    
+    <!-- Share icons -->
+    <path d="M190 140L210 130L210 150L190 140Z" fill="white"/>
+    <path d="M110 240L130 230L130 250L110 240Z" fill="white"/>
+    <path d="M270 240L290 230L290 250L270 240Z" fill="white"/>
+    
+    <!-- Photos -->
+    <rect x="160" y="280" width="80" height="60" rx="5" fill="#0085FF"/>
+    <circle cx="180" cy="300" r="8" fill="white"/>
+    <path d="M170 330L190 310L210 330H170Z" fill="white"/>
+</svg>

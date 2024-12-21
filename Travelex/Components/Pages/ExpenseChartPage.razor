@@ -1,0 +1,354 @@
+@page "/travel/chart/{TripId:int}"
+@using Syncfusion.Blazor.Charts
+@using Travelex.Services
+@using Travelex.Entities
+@using Syncfusion.Blazor.Notifications
+@using Syncfusion.Blazor.Popups
+@using Microsoft.JSInterop
+@using Travelex.Components.Controls.TravelPageControls
+@inject ExpenseService ExpenseService
+@inject TravelService TravelService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+
+<FlexedPageComponent>
+    <TopBarLeft>
+        <button @onclick="NavigateBack" class="p-2 text-[#252525]">
+            <i class="fas fa-arrow-left text-xl"></i>
+        </button>
+    </TopBarLeft>
+    <TopBarTitle>
+        支出图表
+    </TopBarTitle>
+    <TopBarRight>
+        <button @onclick="NavigateBack" class="p-2 text-[#252525]">
+            <i class="fas fa-robot text-xl"></i>
+        </button>
+    </TopBarRight>
+    <PageBody>
+        <div class="flex-1 overflow-auto p-4">
+            @if (IsLoading) {
+                <!-- 总支出金额 Shimmer -->
+                <div class="mb-6">
+                    <SfSkeleton Width="148px" Height="22px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                    <div class="mt-0.2">
+                        <SfSkeleton Width="198px" Height="34px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                    </div>
+                </div>
+
+                <!-- 分类支出条形图 Shimmer -->
+                <div class="mb-8">
+                    @for (int i = 0; i < 4; i++) {
+                        <div class="mb-4">
+                            <div class="flex justify-between text-sm mb-1">
+                                <SfSkeleton Width="100px" Height="16px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                                <SfSkeleton Width="80px" Height="16px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                            </div>
+                            <SfSkeleton Width="100%" Height="8px" Effect=ShimmerEffect.Wave
+                                        CssClass="rounded-full"></SfSkeleton>
+                        </div>
+                    }
+                </div>
+
+                <!-- 每日支出趋势 Shimmer -->
+                <div>
+                    <SfSkeleton Width="148px" Height="22px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                    <div class="mt-0.2">
+                        <SfSkeleton Width="128px" Height="34px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                    </div>
+                    <div class="flex items-center gap-1 mb-4">
+                        <SfSkeleton Width="118px" Height="18px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                    </div>
+                    <SfSkeleton Width="100%" Height="200px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                </div>
+
+                <!-- 支出列表 Shimmer -->
+                <div class="mt-8">
+                    <SfSkeleton Width="100px" Height="24px" Effect=ShimmerEffect.Wave CssClass="mb-4"></SfSkeleton>
+                    @for (int i = 0; i < 3; i++) {
+                        <div class="flex justify-between items-start mb-4 p-4 bg-[#F5F5F5] rounded-xl">
+                            <div class="flex-1 mr-4">
+                                <SfSkeleton Width="88px" Height="20px" Effect=ShimmerEffect.Wave
+                                            CssClass="mb-1"></SfSkeleton>
+                                <SfSkeleton Width="168px" Height="16px" Effect=ShimmerEffect.Wave
+                                            CssClass="mb-2"></SfSkeleton>
+                                <div class="flex items-center gap-2">
+                                    <SfSkeleton Width="40px" Height="24px" Effect=ShimmerEffect.Wave
+                                                CssClass="rounded-lg"></SfSkeleton>
+                                    <SfSkeleton Width="100px" Height="16px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                                </div>
+                            </div>
+                            <div class="flex flex-col items-end gap-2">
+                                <SfSkeleton Width="26px" Height="26px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                                <SfSkeleton Width="100px" Height="20px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else {
+                <!-- 总支出金额 -->
+                <div class="mb-6">
+                    <h2 class="text-xl font-bold text-[#111416] mb-2">支出按类别划分</h2>
+                    <p class="text-3xl font-semibold text-[#111416]">￥@TotalAmount</p>
+                </div>
+
+                <!-- 分类支出条形图 -->
+                <div class="mb-8">
+                    @foreach (var category in CategoryExpenses) {
+                        <div class="mb-4">
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-[#111416] text-base">@category.Category</span>
+                                <span class="text-[#111416] text-base">￥@category.Amount</span>
+                            </div>
+                            <div class="h-2 bg-[#F5F5F5] rounded-full">
+                                <div class="h-full bg-[#0085FF] rounded-full"
+                                     style="width: @(category.Percentage)%">
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- 每日支出趋势 -->
+                <div>
+                    <h2 class="text-xl font-bold text-[#111416] mb-2">每日消费趋势</h2>
+                    <div class="mb-1">
+                        <span class="text-3xl font-semibold text-[#111416]">￥@AverageDailySpend.ToString("F0")</span>
+                    </div>
+                    <div class="flex items-center gap-1 mb-4">
+                        <span class="text-lg text-[#111416]">@DaysCount 天</span>
+                        <span class="text-lg @(TrendPercentage.StartsWith("+") ? "text-[#4CAF50]" : "text-[#F44336]")">
+                        @TrendPercentage
+                    </span>
+                    </div>
+
+                    <SfChart Height="200px">
+                        <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.DateTime"
+                                           LabelFormat="MMM d"
+                                           EdgeLabelPlacement="EdgeLabelPlacement.Shift"
+                                           MajorGridLines="new ChartAxisMajorGridLines(){Width=0}">
+                        </ChartPrimaryXAxis>
+                        <ChartPrimaryYAxis LabelFormat="￥{value}"
+                                           Minimum="0"
+                                           RangePadding="ChartRangePadding.Auto"
+                                           Interval="@GetYAxisInterval()"
+                                           MaximumLabels="6"
+                                           MajorGridLines=@(new ChartAxisMajorGridLines() { Width = 0.5, DashArray = "5,5" })
+                                           MajorTickLines="new ChartAxisMajorTickLines(){Width=0}">
+                        </ChartPrimaryYAxis>
+                        <ChartSeriesCollection>
+                            <ChartSeries DataSource="@DailyExpenses"
+                                         XName="Date"
+                                         YName="Amount"
+                                         Type="ChartSeriesType.Spline"
+                                         Width="2"
+                                         Fill="#0085FF">
+                                <ChartMarker Visible="false">
+                                </ChartMarker>
+                            </ChartSeries>
+                        </ChartSeriesCollection>
+                    </SfChart>
+                </div>
+
+                <!-- 支出列表 -->
+                <div class="mt-8 mb-8">
+                    <h2 class="text-xl font-bold text-[#111416] mb-4">支出列表</h2>
+                    @foreach (var expense in Expenses) {
+                        <div class="flex justify-between items-start mb-4 p-4 bg-[#F5F5F5] rounded-xl">
+                            <div class="flex-1 mr-4">
+                                <h3 class="text-lg font-medium text-[#111416]">@expense.Title</h3>
+                                @if (!string.IsNullOrEmpty(expense.Description)) {
+                                    <p class="text-sm text-[#666666] mt-1">@expense.Description</p>
+                                }
+                                <div class="flex items-center gap-2 mt-2">
+                                    <span
+                                        class="text-xs text-[#666666] bg-white px-2 py-1 rounded">@expense.Category</span>
+                                    <span
+                                        class="text-xs text-[#666666]">@expense.TimeOnSpend.ToString("MM月dd日 HH:mm")</span>
+                                </div>
+                            </div>
+                            <div class="flex flex-col items-end gap-2">
+                                <button @onclick="() => EditExpense(expense.Id)" class="text-[#666666]">
+                                    <img src="images/editPen.png" class="p-2" alt="编辑"/>
+                                </button>
+                                <span class="text-lg font-medium text-[#111416]">￥@expense.Amount</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- 操作按钮 -->
+                <div class="bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+                    <div class="flex flex-col gap-3 max-w-md mx-auto">
+                        <button @onclick="NavigateToEdit" 
+                                class="flex items-center justify-center gap-2 w-full py-3 text-gray-600 active:bg-[#EFF2F4]">
+                            <i class="fas fa-edit"></i>
+                            <span>编辑旅行</span>
+                        </button>
+                        
+                        <button @onclick="ShowDeleteDialog"
+                                class="flex items-center justify-center gap-2 w-full py-3 text-gray-600 active:bg-[#EFF2F4]">
+                            <i class="fas fa-trash"></i>
+                            <span>删除旅行</span>
+                        </button>
+                        
+                    </div>
+                </div>
+            }
+        </div>
+    </PageBody>
+</FlexedPageComponent>
+
+<!-- 删除确认对话框 -->
+<DeleteConfirmationDialog @bind-IsVisible="@IsDeleteDialogVisible"
+                          OnConfirmed="DeleteTravel"
+                          OnCancelled="() => IsDeleteDialogVisible = false"/>
+
+
+@code {
+    [Parameter]
+    public int TripId { get; set; }
+    
+    private bool IsLoading { get; set; } = true;
+    private bool IsDeleteDialogVisible { get; set; }
+    private bool IsExportDialogVisible { get; set; }
+    private List<Expense> Expenses { get; set; } = new();
+    private List<CategoryExpense> CategoryExpenses { get; set; } = new();
+    private List<DailyExpense> DailyExpenses { get; set; } = new();
+    private double TotalAmount { get; set; }
+    private double AverageDailySpend { get; set; }
+    private string TrendPercentage { get; set; } = "";
+    private int DaysCount { get; set; }
+    private string TripTitle { get; set; } = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await ExpenseService.GetExpensesByTripIdAsync(TripId);
+        if (result.IsSuccess)
+        {
+            var travelResult = await TravelService.GetTravelByIdAsync(TripId);
+            if (travelResult.IsSuccess) {
+                if (travelResult.Data is not null) TripTitle = travelResult.Data.Title;
+            }
+
+            if (result.Data is not null) Expenses = result.Data;
+            await ProcessExpenseData();
+            await Task.Delay(1200);
+            IsLoading = false;
+        }
+    }
+
+    private void NavigateToEdit()
+    {
+        NavigationManager.NavigateTo($"/travel/edit/{TripId}");
+    }
+
+    private void ShowDeleteDialog()
+    {
+        IsDeleteDialogVisible = true;
+    }
+
+    private void ShowExportDialog()
+    {
+        IsExportDialogVisible = true;
+    }
+
+    private async Task DeleteTravel()
+    {
+        var result = await TravelService.DeleteTravelAsync(TripId);
+        if (result.IsSuccess)
+        {
+            NavigationManager.NavigateTo("/home");
+        }
+    }
+
+    private void NavigateBack()
+    {
+        NavigationManager.NavigateTo($"/travel/details/{TripId}");
+    }
+
+    private void EditExpense(long expenseId)
+    {
+        NavigationManager.NavigateTo($"/expense/edit/{expenseId}");
+    }
+
+    private async Task ProcessExpenseData()
+    {
+        if (Expenses.Any())
+        {
+            // 计算总金额
+            TotalAmount = Expenses.Sum(e => e.Amount ?? 0);
+
+            // 计算分类支出
+            var categoryGroups = Expenses.GroupBy(e => e.Category)
+                .Select(g => new CategoryExpense {
+                    Category = g.Key ?? "其他",
+                    Amount = g.Sum(e => e.Amount ?? 0)
+                })
+                .OrderByDescending(c => c.Amount)
+                .ToList();
+
+            // 计算百分比
+            foreach (var category in categoryGroups)
+            {
+                category.Percentage = (category.Amount / TotalAmount) * 100;
+            }
+
+            CategoryExpenses = categoryGroups;
+
+            // 计算每日支出
+            var dailyGroups = Expenses.GroupBy(e => e.TimeOnSpend.Date)
+                .Select(g => new DailyExpense {
+                    Date = g.Key,
+                    Amount = g.Sum(e => e.Amount ?? 0)
+                })
+                .OrderBy(d => d.Date)
+                .ToList();
+
+            DailyExpenses = dailyGroups;
+
+            // 计算天数和平均支出
+            if (dailyGroups.Any())
+            {
+                var startDate = dailyGroups.Min(d => d.Date);
+                var endDate = dailyGroups.Max(d => d.Date);
+                DaysCount = (endDate - startDate).Days + 1;
+                AverageDailySpend = TotalAmount / DaysCount;
+
+                // 计算趋势百分比
+                var firstDayAvg = dailyGroups.First().Amount;
+                var lastDayAvg = dailyGroups.Last().Amount;
+                var trend = ((lastDayAvg - firstDayAvg) / firstDayAvg) * 100;
+                TrendPercentage = trend >= 0 ? $"+{trend:F0}%" : $"{trend:F0}%";
+            }
+        }
+    }
+
+    private double GetYAxisInterval()
+    {
+        if (DailyExpenses == null || !DailyExpenses.Any())
+            return 200;
+
+        var maxAmount = DailyExpenses.Max(x => x.Amount);
+        // 根据最大值动态计算合适的间隔
+        if (maxAmount <= 1000) return 200;
+        if (maxAmount <= 5000) return 1000;
+        if (maxAmount <= 10000) return 2000;
+        if (maxAmount <= 50000) return 10000;
+        return Math.Ceiling(maxAmount / 5 / 1000) * 1000; // 确保Y轴最多显示5-6个刻度
+    }
+
+    private class CategoryExpense {
+        public string Category { get; set; } = "";
+        public double Amount { get; set; }
+        public double Percentage { get; set; }
+    }
+
+    private class DailyExpense {
+        public DateTime Date { get; set; }
+        public double Amount { get; set; }
+    }
+
+}
