@@ -11,7 +11,7 @@ public class TravelService {
         _db = db;
     }
     //获取所有旅行
-    public async Task<ResultDataModel<List<Travel>>> GetTripsAsync(bool includeExpenses=false) {
+    public async Task<ResultDataModel<List<Travel>>> GetTravelsAsync(bool includeExpenses=false) {
         var travels = await _db.GetTableAsync<Travel>();
         var filteredTravels = await travels.OrderByDescending(t=> t.AddedOn).ToListAsync();
         if (filteredTravels is null) {

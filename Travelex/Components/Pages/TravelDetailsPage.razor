@@ -4,6 +4,7 @@
 @using Travelex.Utils
 @using Travelex.Services
 @using Syncfusion.Blazor.Popups
+@using SkeletonType = Syncfusion.Blazor.Notifications.SkeletonType
 @inject TravelService TravelService;
 @inject NavigationManager NavigationManager;
 @inject BlazorMauiInterop BlazorMauiInterop;
@@ -11,7 +12,7 @@
 <FlexedPageComponent>
     <TopBarLeft>
         <button @onclick="NavigateBack" class="p-2 text-[#252525]">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24"
                  stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
@@ -20,7 +21,7 @@
     <TopBarTitle>旅行详情</TopBarTitle>
     <TopBarRight>
         <button @onclick="NavigateToChart" class="p-2 text-[#252525]">
-            <i class="fas fa-bar-chart text-gray-600"></i>
+            <i class="fas fa-bar-chart text-xl"></i>
         </button>
     </TopBarRight>
     <PageBody>
@@ -299,7 +300,8 @@
         NavigationManager.NavigateTo("/home", replace: true);
     }
 
-    private void NavigateToChart() {
+    private void NavigateToChart()
+    {
         NavigationManager.NavigateTo($"/travel/chart/{Id}");
     }
 

@@ -14,7 +14,7 @@ public class ExpenseService {
     }
 
 
-    public async Task<ResultDataModel<List<Expense>>> GetExpensesAsync() {
+    public async Task<ResultDataModel<List<Expense>?>> GetExpensesAsync() {
         var expenses = await _db.GetTableAsync<Expense>();
         var filteredExpenses = await expenses.OrderByDescending(t => t.TimeOnSpend).ToListAsync();
         if (filteredExpenses is null) {

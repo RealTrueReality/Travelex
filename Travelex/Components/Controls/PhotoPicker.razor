@@ -27,12 +27,18 @@
 @if (!string.IsNullOrEmpty(ImagePath))
 {
     <div class="mt-4 relative w-full aspect-[4/3] overflow-hidden rounded-xl">
-        <img src="data:image/jpeg;base64,@_imageBase64" alt="已选择的照片" 
-             class="w-full h-full object-contain" />
+        @if (ImagePath.StartsWith("images/")) {
+            <img src="@ImagePath" alt="已选择的照片"
+                 class="w-full h-full object-contain"/>
+        }
+        else if (File.Exists(ImagePath)) {
+            <img src="data:image/jpeg;base64,@_imageBase64" alt="已选择的照片"
+                 class="w-full h-full object-contain"/>
+        }
         <button @onclick="RemovePhoto" type="button"
                 class="absolute top-2 right-2 p-1 bg-white rounded-full shadow-lg hover:bg-gray-100">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
         </button>
     </div>

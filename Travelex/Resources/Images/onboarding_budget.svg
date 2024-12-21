@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background circle -->
+    <circle cx="200" cy="200" r="180" fill="#E3F2FF" opacity="0.3"/>
+    
+    <!-- Wallet -->
+    <path d="M280 140H120C110 140 100 150 100 160V240C100 250 110 260 120 260H280C290 260 300 250 300 240V160C300 150 290 140 280 140Z" fill="#0085FF"/>
+    <rect x="290" y="180" width="20" height="40" rx="5" fill="#0085FF"/>
+    
+    <!-- Money symbol -->
+    <path d="M190 170V230M180 180H200M180 220H200" stroke="white" stroke-width="8" stroke-linecap="round"/>
+    
+    <!-- Chart bars -->
+    <rect x="140" y="280" width="20" height="40" fill="#0085FF"/>
+    <rect x="180" y="260" width="20" height="60" fill="#0085FF"/>
+    <rect x="220" y="240" width="20" height="80" fill="#0085FF"/>
+    <rect x="260" y="220" width="20" height="100" fill="#0085FF"/>
+</svg>

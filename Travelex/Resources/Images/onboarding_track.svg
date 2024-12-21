@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background circle -->
+    <circle cx="200" cy="200" r="180" fill="#E3F2FF" opacity="0.3"/>
+    
+    <!-- Airplane -->
+    <path d="M320 200C320 190 310 185 300 185H250L210 145H190L210 185H160L140 170H120L135 200L120 230H140L160 215H210L190 255H210L250 215H300C310 215 320 210 320 200Z" fill="#0085FF"/>
+    
+    <!-- Hotel -->
+    <rect x="80" y="160" width="60" height="100" fill="#0085FF"/>
+    <rect x="95" y="180" width="10" height="10" fill="white"/>
+    <rect x="115" y="180" width="10" height="10" fill="white"/>
+    <rect x="95" y="200" width="10" height="10" fill="white"/>
+    <rect x="115" y="200" width="10" height="10" fill="white"/>
+    <rect x="95" y="220" width="10" height="10" fill="white"/>
+    <rect x="115" y="220" width="10" height="10" fill="white"/>
+    
+    <!-- Calendar -->
+    <rect x="260" y="240" width="60" height="60" rx="5" fill="#0085FF"/>
+    <rect x="270" y="260" width="10" height="10" fill="white"/>
+    <rect x="290" y="260" width="10" height="10" fill="white"/>
+    <rect x="270" y="280" width="10" height="10" fill="white"/>
+    <rect x="290" y="280" width="10" height="10" fill="white"/>
+</svg>
