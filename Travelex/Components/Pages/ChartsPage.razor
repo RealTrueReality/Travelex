@@ -149,49 +149,45 @@
 @code {
     private string _currentTab = "monthly";
     private string _selectedCategory = "all";
-    private List<ExpenseCategory> _categories = new() ;
-    private List<Expense> _expenses = new();
-    private List<ChartData> _chartDataSource = new();
-    private Dictionary<int, string> travelTitles = new();
+    private List<ExpenseCategory> _categories = [];
+    private List<Expense> _expenses = [];
+    private Dictionary<int, string> _travelTitles = new();
     private SfChart? _chart;
 
     protected override async Task OnInitializedAsync()
     {
         await LoadExpenses();
         var travels = await TravelService.GetTravelsAsync();
-        if (travels.IsSuccess)
-        {
-            travelTitles = travels.Data.ToDictionary(t => t.Id, t => t.Title);
-        }
+        if (travels is { IsSuccess: true, Data: not null }) _travelTitles = travels.Data.ToDictionary(t => t.Id, t => t.Title);
     }
 
     private async Task LoadExpenses()
     {
         var expRes = await ExpenseService.GetExpensesAsync();
-        if (expRes.IsSuccess) {
-            if (expRes.Data != null) _expenses = expRes.Data;
-        }
+        if (expRes is { IsSuccess: true, Data: not null }) _expenses = expRes.Data;
         var categoryRes= await ExpenseService.GetExpenseCategoriesAsync();
-        if (categoryRes.IsSuccess) {
-            if (categoryRes.Data != null) _categories = categoryRes.Data;
-        }
+        if (categoryRes is { IsSuccess: true, Data: not null }) _categories = categoryRes.Data;
         GetChartData();
+    }
+
+    private IQueryable<Expense> ApplyTimeFilter(IQueryable<Expense> query)
+    {
+        switch (_currentTab)
+        {
+            case "monthly":
+                return query.Where(e => e.TimeOnSpend >= DateTime.Now.AddMonths(-1));
+            case "yearly":
+                return query.Where(e => e.TimeOnSpend >= DateTime.Now.AddYears(-1));
+            case "alltime":
+                return query;
+            default:
+                return query;
+        }
     }
 
     private List<DonutChartData> GetDonutChartData()
     {
-        var query = _expenses.AsQueryable();
-        
-        switch (_currentTab)
-        {
-            case "monthly":
-                query = query.Where(e => e.TimeOnSpend >= DateTime.Now.AddMonths(-1));
-                break;
-            case "yearly":
-                query = query.Where(e => e.TimeOnSpend >= DateTime.Now.AddYears(-1));
-                break;
-        }
-
+        var query = ApplyTimeFilter(_expenses.AsQueryable());
         var total = query.Sum(e => e.Amount ?? 0);
         
         return query.GroupBy(e => e.Category)
@@ -209,16 +205,7 @@
     {
         if (_selectedCategory == "all")
         {
-            var query = _expenses.AsQueryable();
-            switch (_currentTab)
-            {
-                case "monthly":
-                    query = query.Where(e => e.TimeOnSpend >= DateTime.Now.AddMonths(-1));
-                    break;
-                case "yearly":
-                    query = query.Where(e => e.TimeOnSpend >= DateTime.Now.AddYears(-1));
-                    break;
-            }
+            var query = ApplyTimeFilter(_expenses.AsQueryable());
 
             var monthlyData = query.GroupBy(e => new { e.TimeOnSpend.Year, e.TimeOnSpend.Month })
                 .Select(g => new ChartData
@@ -233,7 +220,8 @@
         }
         else
         {
-            var categoryExpenses = _expenses.Where(e => e.Category == _selectedCategory)
+            var query = ApplyTimeFilter(_expenses.AsQueryable());
+            var categoryExpenses = query.Where(e => e.Category == _selectedCategory)
                 .OrderByDescending(e => e.Amount)
                 .Take(10)  // 只显示金额最高的10笔支出
                 .ToList();
@@ -248,44 +236,16 @@
         }
     }
 
-    private string GetYAxisTitle()
-    {
-        return _selectedCategory == "all" ? "支出金额" : "占比 (%)";
-    }
 
-    private string GetXAxisTitle()
-    {
-        return _selectedCategory == "all" ? "月份" : "支出项目";
-    }
 
     private double GetTotalSpentData()
     {
-        var query = _expenses.AsQueryable();
-        
-        switch (_currentTab)
-        {
-            case "monthly":
-                return query.Where(e => e.TimeOnSpend >= DateTime.Now.AddMonths(-1)).Sum(e => e.Amount ?? 0);
-            case "yearly":
-                return  query.Where(e => e.TimeOnSpend >= DateTime.Now.AddYears(-1)).Sum(e => e.Amount ?? 0);
-            default:
-                return  query.Sum(e => e.Amount ?? 0);
-        }
+        return ApplyTimeFilter(_expenses.AsQueryable()).Sum(e => e.Amount ?? 0);
     }
 
     private IEnumerable<Expense> GetCategoryExpenses()
     {
-        var query = _expenses.AsQueryable();
-        
-        switch (_currentTab)
-        {
-            case "monthly":
-                query = query.Where(e => e.TimeOnSpend >= DateTime.Now.AddMonths(-1));
-                break;
-            case "yearly":
-                query = query.Where(e => e.TimeOnSpend >= DateTime.Now.AddYears(-1));
-                break;
-        }
+        var query = ApplyTimeFilter(_expenses.AsQueryable());
 
         return query.GroupBy(e => e.Category)
             .Select(g => new Expense
@@ -295,6 +255,22 @@
                 TimeOnSpend = g.Max(e => e.TimeOnSpend)
             })
             .OrderByDescending(e => e.Amount);
+    }
+
+    private List<Expense> GetExpensesByCategory(string category)
+    {
+        var query = ApplyTimeFilter(_expenses.AsQueryable());
+        return query.Where(e => e.Category == category)
+            .OrderByDescending(e => e.TimeOnSpend)
+            .ToList();
+    }
+
+    private double GetExpensePercentageInCategory(Expense expense)
+    {
+        var query = ApplyTimeFilter(_expenses.AsQueryable());
+        var categoryTotal = query.Where(e => e.Category == expense.Category)
+            .Sum(e => e.Amount ?? 0);
+        return Math.Round((expense.Amount ?? 0) / categoryTotal * 100, 0);
     }
 
     private double GetPercentage(Expense expense)
@@ -325,21 +301,17 @@
     private async Task SwitchTab(string tab)
     {
         _currentTab = tab;
+        if (_chart != null) await _chart.RefreshAsync();
         StateHasChanged();
-        await _chart?.RefreshAsync();  // 强制刷新图表
     }
 
     private async Task SelectCategory(string category)
     {
         _selectedCategory = category;
+        if (_chart != null) await _chart.RefreshAsync();
         StateHasChanged();
-        await _chart?.RefreshAsync();  // 强制刷新图表
     }
-
-    private async Task ExportData()
-    {
-        // TODO: 实现导出数据功能
-    }
+    
 
     private void NavigateBack()
     {
@@ -348,21 +320,7 @@
 
     private string GetTravelTitle(int tripId)
     {
-        return travelTitles.TryGetValue(tripId, out var title) ? title : "未知旅行";
-    }
-
-    private List<Expense> GetExpensesByCategory(string category)
-    {
-        return _expenses.Where(e => e.Category == category)
-            .OrderByDescending(e => e.TimeOnSpend)
-            .ToList();
-    }
-
-    private double GetExpensePercentageInCategory(Expense expense)
-    {
-        var categoryTotal = _expenses.Where(e => e.Category == expense.Category)
-            .Sum(e => e.Amount ?? 0);
-        return Math.Round((expense.Amount ?? 0) / categoryTotal * 100, 0);
+        return _travelTitles.GetValueOrDefault(tripId, "未知旅行");
     }
 
     private string GetYAxisFormat()
