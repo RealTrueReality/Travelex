@@ -50,6 +50,9 @@ public static class MauiProgram {
         builder.Services.AddSingleton<BlazorMauiInterop>();   
         Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NMaF5cXmBCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWH1fc3RVRWFZVUJ0VkE=");
 
+        // 注册位置服务
+        builder.Services.AddScoped<ILocationService, LocationService>();
+
 #if DEBUG
         builder.Services.AddBlazorWebViewDeveloperTools();
         builder.Logging.AddDebug();

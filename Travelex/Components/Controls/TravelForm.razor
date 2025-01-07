@@ -159,11 +159,14 @@
         ShowMap = true;
     }
     
-    private void HandleLocationSelected((string Name, string Address, double Latitude, double Longitude) location) {
+    private void HandleLocationSelected((string Name, string Address, double Latitude, double Longitude) location)
+    {
+        Console.WriteLine($"Location selected: {location.Name}, {location.Address}, {location.Latitude}, {location.Longitude}");
         Travel.LocationName = location.Name;
         Latitude = location.Latitude;
         Longitude = location.Longitude;
         ShowMap = false;
+        StateHasChanged();
     }
     private async Task HandleValidSubmit() {
         if (Travel.CategoryName == "Other" && !string.IsNullOrWhiteSpace(CustomCategory)) {

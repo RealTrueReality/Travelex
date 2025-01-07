@@ -26,5 +26,14 @@ public class BlazorMauiInterop {
     //show toast async communityTool
     public async Task ShowToastAsync(string message) => await Toast.Make(message).Show();
     
-    
+    // OpenInLauncher
+    public async Task OpenInLauncher(string url) {
+        try {
+            await Launcher.Default.TryOpenAsync("https://www.baidu.com");
+        }
+        catch (Exception ex) {
+            await ShowAlertAsync(ex.Message);
+        }
+    }
 }
+    

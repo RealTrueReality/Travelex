@@ -5,7 +5,7 @@
 
 @code {
     protected override Task OnInitializedAsync() {
-        if (false) {
+        if (AuthService.IsUserLoggedIn) {
             NavigationManager.NavigateTo("/home",replace:true);
         }
         else {

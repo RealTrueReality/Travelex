@@ -1,4 +1,4 @@
-﻿using Travelex.Data;
+using Travelex.Data;
 using Travelex.Entities;
 using Travelex.Models;
 
@@ -6,15 +6,16 @@ namespace Travelex.Services;
 
 public class AuthService {
     private readonly DatabaseContext _db;
-    private readonly string LoggedInKey = "logged";
-
+    private const string LoggedInKey = "logged";
+    
 
     public AuthService(DatabaseContext db) {
         _db = db;
     }
 
-    public bool IsUserLoggedIn => Preferences.ContainsKey("logged");
-
+    public bool IsUserLoggedIn => Preferences.ContainsKey(LoggedInKey);
+    public LoggingModel? CurrentUser => LoggingModel.ParseFromJson(Preferences.Get(LoggedInKey,string.Empty));
+    
 
     public async Task<ResultModel> LogInAsync(LoggingModel loggingModel) {
         var usersFiltered = await _db.GetFileteredAsync<User>(u =>
@@ -31,7 +32,8 @@ public class AuthService {
     private void SetUserAsLoggedIn(User user) {
         var loggingModel = new LoggingModel() {
             UserName = user.UserName,
-            Password = user.Password
+            Password = user.Password,
+            Name = user.Name
         };
         Preferences.Set(LoggedInKey, loggingModel.ToJson());
     }
@@ -40,6 +42,7 @@ public class AuthService {
     public void LogdOut() => Preferences.Remove(LoggedInKey);
 
     public async Task<ResultModel> SignUpAsync(SignUpModel signUpModel) {
+        
         var user = new User() {
             Name = signUpModel.Name,
             UserName = signUpModel.UserName,
@@ -55,4 +58,85 @@ public class AuthService {
         return ResultModel.Failure("注册失败");
     }
     
+    public async Task ChangeNameAsync(string newName) {
+        var users = await _db.GetFileteredAsync<User>(u => u.UserName == CurrentUser!.UserName);
+        var user = users.FirstOrDefault();
+        if (user != null) {
+            user.Name = newName;
+            await _db.UpdateItemAsync(user);
+            SetUserAsLoggedIn(user);
+        }
+    }
+    
+    public async Task<ResultModel> ChangePasswordAsync(string currentPassword, string newPassword)
+    {
+        try
+        {
+            var users = await _db.GetFileteredAsync<User>(u => u.UserName == CurrentUser!.UserName);
+            var user = users.FirstOrDefault();
+            if (user == null)
+            {
+                return ResultModel.Failure("用户不存在");
+            }
+
+            // 验证当前密码
+            if (user.Password != currentPassword)
+            {
+                return ResultModel.Failure("当前密码错误");
+            }
+
+            // 更新密码
+            user.Password = newPassword;
+            var success = await _db.UpdateItemAsync(user);
+            if (success)
+            {
+                SetUserAsLoggedIn(user);
+                return ResultModel.Success();
+            }
+
+            return ResultModel.Failure("修改密码失败");
+        }
+        catch (Exception ex)
+        {
+            return ResultModel.Failure($"修改密码失败：{ex.Message}");
+        }
+    }
+    
+    public async Task<ResultModel> UpdateProfileImageAsync(string imageUrl)
+    {
+        try
+        {
+            var users = await _db.GetFileteredAsync<User>(u => u.UserName == CurrentUser!.UserName);
+            var user = users.FirstOrDefault();
+            if (user != null)
+            {
+                user.ProfileImageUrl = imageUrl;
+                var success = await _db.UpdateItemAsync(user);
+                if (success)
+                {
+                    SetUserAsLoggedIn(user);
+                    return ResultModel.Success();
+                }
+            }
+            return ResultModel.Failure("更新头像失败");
+        }
+        catch (Exception ex)
+        {
+            return ResultModel.Failure($"更新头像失败：{ex.Message}");
+        }
+    }
+    
+    public async Task<string?> GetProfileImageAsync()
+    {
+        try
+        {
+            var users = await _db.GetFileteredAsync<User>(u => u.UserName == CurrentUser!.UserName);
+            var user = users.FirstOrDefault();
+            return user?.ProfileImageUrl;
+        }
+        catch
+        {
+            return null;
+        }
+    }
 }

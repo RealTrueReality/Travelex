@@ -37,10 +37,14 @@
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
         <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
+        <AndroidPackageFormat>apk</AndroidPackageFormat> <!-- 或 apk -->
     </PropertyGroup>
     <PropertyGroup Condition="$(TargetFramework.Contains('-ios')) And $(Configuration.Contains('Release')) ">
         <UseInterpreter>true</UseInterpreter>
         <MtouchExtraArgs>--linkskip=Syncfusion.Blazor.Themes --linkskip=Syncfusion.Blazor.Inputs</MtouchExtraArgs>
+    </PropertyGroup>
+    <PropertyGroup>
+        <AndroidSdkDirectory>C:\Users\d\AppData\Local\Android\Sdk</AndroidSdkDirectory>
     </PropertyGroup>
 
     <ItemGroup>

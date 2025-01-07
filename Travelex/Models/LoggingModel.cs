@@ -13,9 +13,16 @@ public class LoggingModel {
     [DataType(DataType.Password)]
     [MinLength(6, ErrorMessage = "密码不能少于6个字符")]
     public string Password { get; set; } = string.Empty;
+
+    public string Name { get; set; } = string.Empty;
+
     //to json format
     public string ToJson()
     {
         return JsonSerializer.Serialize(this);
+    }
+    
+    public static LoggingModel? ParseFromJson(string json) {
+        return string.IsNullOrWhiteSpace(json) ? default: JsonSerializer.Deserialize<LoggingModel>(json);
     }
 }

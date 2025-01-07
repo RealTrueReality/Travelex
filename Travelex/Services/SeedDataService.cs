@@ -1,4 +1,4 @@
-﻿using Travelex.Data;
+using Travelex.Data;
 using Travelex.Entities;
 using Travelex.Models;
 
@@ -15,12 +15,13 @@ public class SeedDataService {
         // 检查并初始化 ExpenseCategory 表数据
         if (!await _db.TableExistsAsync<ExpenseCategory>()) {
             var expenseCategories = new List<ExpenseCategory> {
-                new() { Name = "交通" },
-                new() { Name = "餐饮" },
-                new() { Name = "住宿" },
-                new() { Name = "购物" },
-                new() { Name = "运动" },
-                new() { Name = "娱乐" },
+                new() { Name = "交通", Icon = "car" },
+                new() { Name = "餐饮", Icon = "restaurant" },
+                new() { Name = "住宿", Icon = "hotel" },
+                new() { Name = "购物", Icon = "store" },
+                new() { Name = "运动", Icon = "run" },
+                new() { Name = "娱乐", Icon = "joystick" },
+                new() { Name = "办公", Icon = "expense" },
             };
 
             foreach (var category in expenseCategories) await _db.AddItemAsync(category);
@@ -90,12 +91,12 @@ public class SeedDataService {
                     Status = TravelStatus.Planning,
                     Description = "一次特殊的旅行，前往小狼家探访乖小狼天壤，享受温馨的安心时光。",
                 },
-                
-                
+
+
             };
             foreach (var travel in travels) await _db.AddItemAsync(travel);
         }
-        
+
         // 检查并初始化 Expense 表数据
         if (!await _db.TableExistsAsync<Expense>()) {
 

@@ -1,0 +1,240 @@
+@page "/profile"
+@using Travelex.Components.Layout
+@using Travelex.Services
+@using Travelex.Entities
+@using Travelex.Models
+@inject NavigationManager NavigationManager
+@inject ExpenseService ExpenseService
+@inject AuthService AuthService
+@layout LayoutWithNavBar
+
+<FixedPageComponent>
+    <TopBarTitle>
+        我的
+    </TopBarTitle>
+    <PageBody>
+        @if (_currentUser != null)
+        {
+            <div class="p-4">
+                <div class="flex flex-col items-center mb-8">
+                    <div class="w-32 h-32 rounded-full overflow-hidden bg-[#E8F0F2]">
+                        @if (!string.IsNullOrEmpty(_profileImage))
+                        {
+                            @if (_profileImage.StartsWith("file://"))
+                            {
+                                var path = _profileImage[7..];
+                                @if (File.Exists(path) && !string.IsNullOrEmpty(_imageBase64))
+                                {
+                                    <img src="data:image/jpeg;base64,@_imageBase64" alt="头像" class="w-full h-full object-cover" />
+                                }
+                                else
+                                {
+                                    <div class="w-full h-full flex items-center justify-center">
+                                        <span class="text-4xl font-bold text-[#119BED]">@(_currentUser?.Name?.FirstOrDefault() ?? 'U')</span>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <img src="@_profileImage" alt="头像" class="w-full h-full object-cover" />
+                            }
+                        }
+                        else
+                        {
+                            <div class="w-full h-full flex items-center justify-center">
+                                <span class="text-4xl font-bold text-[#119BED]">@(_currentUser?.Name?.FirstOrDefault() ?? 'U')</span>
+                            </div>
+                        }
+                    </div>
+                    <div class="mt-4 text-2xl font-bold text-[#1C160C] text-left">@(_currentUser?.Name ?? "未登录")</div>
+                    <button @onclick="EditProfile" class="mt-4 px-8 py-2 bg-[#119BED] text-white font-bold rounded-full text-left">
+                        编辑资料
+                    </button>
+                </div>
+
+                <div class="px-4 pt-5 pb-3">
+                    <div class="text-2xl font-bold text-[#1C160C] text-left">账户与设置</div>
+                </div>
+
+                <div class="px-4 py-2">
+                    <button @onclick="NavigateToPrivacy" class="w-full flex items-center">
+                        <div class="w-12 h-12 bg-[#E8F0F2] rounded-lg flex items-center justify-center">
+                            <img src="images/profilePage/shield.svg" alt="隐私" class="w-6 h-6" />
+                        </div>
+                        <div class="ml-4 flex-1">
+                            <div class="text-base font-medium text-[#1C160C] text-left">隐私与安全</div>
+                            <div class="text-sm text-[#4C7C99] text-left">管理您的隐私设置</div>
+                        </div>
+                        <div class="w-6 h-6">
+                            <img src="images/profilePage/chevron-right.svg" alt="下一步" />
+                        </div>
+                    </button>
+                </div>
+
+                <div class="px-4 pt-5 pb-3">
+                    <div class="text-2xl font-bold text-[#1C160C] text-left">支出分类</div>
+                </div>
+
+                <div class="px-4 py-2 ">
+                    <button @onclick="CreateNewCategory" class="w-full flex items-center">
+                        <div class="w-12 h-12 bg-[#E8F0F2] rounded-lg flex items-center justify-center">
+                            <img src="images/profilePage/plus.svg" alt="添加" class="w-6 h-6" />
+                        </div>
+                        <div class="ml-4 flex-1">
+                            <div class="text-base font-medium text-[#1C160C] text-left">创建新分类</div>
+                            <div class="text-sm text-[#4C7C99] text-left">添加自定义支出分类</div>
+                        </div>
+                        <div class="w-6 h-6">
+                            <img src="images/profilePage/chevron-right.svg" alt="下一步" />
+                        </div>
+                    </button>
+                </div>
+
+                @foreach (var category in _categories)
+                {
+                    <div class="px-4 py-2 ">
+                        <button @onclick="() => ViewCategoryExpenses(category)" class="w-full flex items-center">
+                            <div class="w-12 h-12 bg-[#E8F0F2] rounded-lg flex items-center justify-center">
+                                <img src="@GetCategoryIcon(category.Name)" alt="@category.Name" class="w-6 h-6" />
+                            </div>
+                            <div class="ml-4 flex-1">
+                                <div class="text-base font-medium text-[#1C160C] text-left">@category.Name</div>
+                                <div class="text-sm text-[#4C7C99] text-left">¥@(GetCategoryTotal(category.Name).ToString("N0"))</div>
+                            </div>
+                            <div class="w-6 h-6">
+                                <img src="images/profilePage/chevron-right.svg" alt="下一步" />
+                            </div>
+                        </button>
+                    </div>
+                }
+
+                <div class="px-4 pt-5 pb-3">
+                    <div class="text-2xl font-bold text-[#1C160C] text-left">关于</div>
+                </div>
+
+                <div class="px-4 py-2">
+                    <button @onclick="NavigateToSupport" class="w-full flex items-center">
+                        <div class="w-12 h-12 bg-[#E8F0F2] rounded-lg flex items-center justify-center">
+                            <img src="images/profilePage/info.svg" alt="信息" class="w-6 h-6" />
+                        </div>
+                        <div class="ml-4 flex-1">
+                            <div class="text-base font-medium text-[#1C160C] text-left">关于我们</div>
+                            <div class="text-sm text-[#4C7C99] text-left">关于 Travelex</div>
+                        </div>
+                        <div class="w-6 h-6">
+                            <img src="images/profilePage/chevron-right.svg" alt="下一步" />
+                        </div>
+                    </button>
+                </div>
+
+                <div class="p-4">
+                    <button @onclick="LogOut" class="w-full py-3 bg-[#E8F0F2] text-[#1C160C] font-bold rounded-[20px]">
+                        退出登录
+                    </button>
+                </div>
+            </div>
+        }
+    </PageBody>
+</FixedPageComponent>
+
+@code {
+    private List<ExpenseCategory> _categories = [];
+    private Dictionary<string, double> _categoryTotals = new();
+    private string _profileImage = "";
+    private string _imageBase64 = "";
+    private LoggingModel? _currentUser;
+
+    protected override void OnInitialized()
+    {
+        _currentUser = AuthService.CurrentUser;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadExpenseData();
+        _profileImage = await AuthService.GetProfileImageAsync();
+        await LoadProfileImage();
+    }
+
+    private async Task LoadExpenseData()
+    {
+        var categoryRes = await ExpenseService.GetExpenseCategoriesAsync();
+        if (categoryRes is { IsSuccess: true, Data: not null })
+        {
+            _categories = categoryRes.Data;
+        }
+
+        var expRes = await ExpenseService.GetExpensesAsync();
+        if (expRes is { IsSuccess: true, Data: not null })
+        {
+            _categoryTotals = expRes.Data
+                .GroupBy(e => e.Category)
+                .ToDictionary(g => g.Key, g => g.Sum(e => e.Amount ?? 0));
+        }
+    }
+
+    private async Task LoadProfileImage()
+    {
+        if (!string.IsNullOrEmpty(_profileImage) && _profileImage.StartsWith("file://"))
+        {
+            try
+            {
+                var path = _profileImage[7..];
+                if (File.Exists(path))
+                {
+                    var bytes = await File.ReadAllBytesAsync(path);
+                    _imageBase64 = Convert.ToBase64String(bytes);
+                    StateHasChanged();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"加载头像失败：{ex.Message}");
+            }
+        }
+    }
+
+    private void NavigateToPrivacy()
+    {
+        NavigationManager.NavigateTo("/settings/privacy");
+    }
+
+    private void CreateNewCategory()
+    {
+        NavigationManager.NavigateTo("/categories/create");
+    }
+
+    private void ViewCategoryExpenses(ExpenseCategory category)
+    {
+        NavigationManager.NavigateTo($"/categories/expenses/{category.Name}");
+    }
+
+    private void NavigateToSupport()
+    {
+        NavigationManager.NavigateTo("/about");
+    }
+
+    private void LogOut()
+    {
+        AuthService.LogdOut();
+        NavigationManager.NavigateTo("/login", replace: true);
+    }
+
+    private string GetCategoryIcon(string categoryName)
+    {
+        var category = _categories.FirstOrDefault(c => c.Name == categoryName);
+        return category is not null
+            ? $"images/expenseCategory/{category.Icon}.svg"
+            : "images/expense.svg";
+    }
+
+    private double GetCategoryTotal(string categoryName)
+    {
+        return _categoryTotals.GetValueOrDefault(categoryName, 0);
+    }
+
+    private void EditProfile()
+    {
+        NavigationManager.NavigateTo("/profile/edit");
+    }
+}
