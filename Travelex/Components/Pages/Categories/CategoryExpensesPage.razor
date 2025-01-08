@@ -1,0 +1,112 @@
+@page "/categories/expenses/{categoryName}"
+@using Travelex.Components.Layout
+@using Travelex.Services
+@using Travelex.Entities
+@inject NavigationManager NavigationManager
+@inject ExpenseService ExpenseService
+
+<FixedPageComponent>
+    <TopBarLeft>
+        <button @onclick="NavigateBack" class="p-2 text-[#252525]">
+            <i class="fas fa-arrow-left text-xl"></i>
+        </button>
+    </TopBarLeft>
+    <TopBarTitle>
+        @if (_category != null)
+        {
+            @_category.Name
+        }
+    </TopBarTitle>
+    <TopBarRight>
+        <button @onclick="NavigateToEdit" class="p-2 text-[#252525]">
+            <i class="fas fa-edit text-xl"></i>
+        </button>
+    </TopBarRight>
+    <PageBody>
+        <div class="p-4">
+            @if (_expenses == null)
+            {
+                <div class="flex justify-center items-center h-32">
+                    <div class="text-[#4C7C99]">加载中...</div>
+                </div>
+            }
+            else if (!_expenses.Any())
+            {
+                <div class="flex flex-col items-center justify-center h-32 space-y-2">
+                    <i class="fas fa-inbox text-4xl text-[#4C7C99] opacity-50"></i>
+                    <div class="text-[#4C7C99]">暂无支出记录</div>
+                </div>
+            }
+            else
+            {
+                <!-- 总支出金额 -->
+                <div class="mb-6">
+                    <h2 class="text-xl font-bold text-[#111416] mb-2">总支出</h2>
+                    <p class="text-3xl font-semibold text-[#111416]">￥@(_expenses.Sum(e => e.Amount ?? 0).ToString("F2"))</p>
+                </div>
+
+                <!-- 支出列表 -->
+                <div class="mt-8 mb-8">
+                    <h2 class="text-xl font-bold text-[#111416] mb-4">支出列表</h2>
+                    @foreach (var expense in _expenses)
+                    {
+                        <div class="flex justify-between items-start mb-4 p-4 bg-[#F5F5F5] rounded-xl">
+                            <div class="flex-1 mr-4">
+                                <h3 class="text-lg font-medium text-[#111416]">@expense.Title</h3>
+                                @if (!string.IsNullOrEmpty(expense.Description))
+                                {
+                                    <p class="text-sm text-[#666666] mt-1">@expense.Description</p>
+                                }
+                                <div class="flex items-center gap-2 mt-2">
+                                    <span class="text-xs text-[#666666] bg-white px-2 py-1 rounded">@expense.Category</span>
+                                    <span class="text-xs text-[#666666]">@expense.TimeOnSpend.ToString("yyyy年MM月dd日 HH:mm")</span>
+                                </div>
+                            </div>
+                            <div class="flex flex-col items-end gap-2">
+                                <button @onclick="() => EditExpense(expense.Id)" class="text-[#666666]">
+                                    <i class="fas fa-pen text-lg p-2"></i>
+                                </button>
+                                <span class="text-lg font-medium text-[#111416]">￥@expense.Amount?.ToString("F2")</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </PageBody>
+</FixedPageComponent>
+
+@code {
+    [Parameter]
+    public string CategoryName { get; set; } = "";
+
+    private ExpenseCategory? _category;
+    private List<Expense>? _expenses;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var categories = await ExpenseService.GetExpenseCategoriesAsync();
+        _category = categories.Data?.FirstOrDefault(c => c.Name == CategoryName);
+
+        if (_category != null)
+        {
+            var expenses = await ExpenseService.GetExpensesByCategoryAsync(CategoryName);
+            _expenses = expenses.Data;
+        }
+    }
+
+    private void NavigateBack()
+    {
+        NavigationManager.NavigateTo("/profile");
+    }
+
+    private void NavigateToEdit()
+    {
+        NavigationManager.NavigateTo($"/categories/edit/{CategoryName}");
+    }
+
+    private void EditExpense(long expenseId)
+    {
+        NavigationManager.NavigateTo($"/travel/expense/edit/{expenseId}");
+    }
+}

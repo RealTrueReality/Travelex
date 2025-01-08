@@ -58,7 +58,7 @@ public class ExpenseService {
         }
     }
 
-    public async Task<ResultDataModel<Expense>> DeleteExpenseAsync(int expenseId) {
+    public async Task<ResultDataModel<Expense>> DeleteExpenseAsync(long expenseId) {
         try {
             var expense = await _db.GetItemByKeyAsync<Expense>(expenseId);
             if (expense is null) {
@@ -199,6 +199,21 @@ public class ExpenseService {
         catch (Exception ex)
         {
             return ResultDataModel<List<Expense>>.Failure(ex.Message);
+        }
+    }
+
+    public async Task<ResultDataModel<Expense>> GetExpenseByIdAsync(long expenseId)
+    {
+        try
+        {
+            var expense = await _db.GetItemByKeyAsync<Expense>(expenseId);
+            return expense is not null 
+                ? ResultDataModel<Expense>.Success(expense) 
+                : ResultDataModel<Expense>.Failure($"未找到支出记录：{expenseId}");
+        }
+        catch (Exception ex)
+        {
+            return ResultDataModel<Expense>.Failure(ex.Message);
         }
     }
 }

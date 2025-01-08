@@ -1,0 +1,263 @@
+@page "/travel/expense/edit/{ExpenseId:long}"
+@using Travelex.Entities
+@using Travelex.Services
+@using Travelex.Utils
+@using Syncfusion.Blazor.Popups
+@inject NavigationManager NavigationManager
+@inject ExpenseService ExpenseService
+@inject BlazorMauiInterop BlazorMauiInterop
+
+<FlexedPageComponent>
+    <TopBarLeft>
+        <button @onclick="NavigateBack" class="p-2 text-[#252525]">
+            <i class="fas fa-arrow-left text-xl"></i>
+        </button>
+    </TopBarLeft>
+    <TopBarTitle>编辑支出</TopBarTitle>
+    <TopBarRight>
+        <button @onclick="() => IsDeleteDialogVisible = true" class="p-2 text-[#252525]">
+            <i class="fas fa-trash text-xl"></i>
+        </button>
+    </TopBarRight>
+    <PageBody>
+        <div class="flex-1 overflow-auto">
+            @if (_expense == null)
+            {
+                <div class="flex justify-center items-center h-32">
+                    <div class="text-[#4C7C99]">加载中...</div>
+                </div>
+            }
+            else
+            {
+                <EditForm Model="@_expense" OnValidSubmit="HandleSubmit">
+                    <DataAnnotationsValidator/>
+
+                    <!-- 标题 -->
+                    <div class="px-4 py-3">
+                        <div class="mb-2">
+                            <label class="text-base font-medium text-[#111416]">标题</label>
+                        </div>
+                        <div class="relative">
+                            <InputText @bind-Value="_expense.Title"
+                                       class="w-full h-14 px-4 bg-[#F8FAFC] border border-[#DBE2E5] rounded-xl text-base text-[#607A89] focus:outline-none focus:border-[#119BED]"
+                                       placeholder="添加标题"/>
+                        </div>
+                        <ValidationMessage For="@(() => _expense.Title)" class="text-red-500 text-sm mt-1"/>
+                    </div>
+
+                    <!-- 金额 -->
+                    <div class="px-4 py-3">
+                        <div class="mb-2">
+                            <label class="text-base font-medium text-[#111416]">金额</label>
+                        </div>
+                        <div class="relative">
+                            <InputNumber @bind-Value="_expense.Amount"
+                                         step="0.01"
+                                         class="w-full h-14 px-4 bg-[#F8FAFC] border border-[#DBE2E5] rounded-xl text-base text-[#607A89] focus:outline-none focus:border-[#119BED]"
+                                         placeholder="$100"/>
+                        </div>
+                        <ValidationMessage For="@(() => _expense.Amount)" class="text-red-500 text-sm mt-1"/>
+                    </div>
+
+                    <!-- 类别 -->
+                    <div class="px-4 py-3">
+                        <div class="mb-2">
+                            <label class="text-base font-medium text-[#111416]">类别</label>
+                        </div>
+                        <div class="relative bg-[#F8FAFC]">
+                            <InputSelect @bind-Value="_expense.Category"
+                                         class="w-full h-14 px-4 bg-[#F8FAFC] border border-[#DBE2E5] rounded-xl text-base text-[#607A89] focus:outline-none focus:border-[#119BED]"
+                                         placeholder="例如：餐饮">
+                                <option value="" selected disabled>选择支出类别</option>
+                                @foreach (var category in _categories)
+                                {
+                                    <option value="@category.Name">@category.Name</option>
+                                }
+                                <option value="其他">其他</option>
+                            </InputSelect>
+                        </div>
+                        <ValidationMessage For="@(() => _expense.Category)" class="text-red-500 text-sm mt-1"/>
+                        @if (_expense.Category == "其他")
+                        {
+                            <div class="mt-2">
+                                <div class="relative bg-[#F8FAFC] rounded-xl">
+                                    <InputText @bind-Value="CustomCategory"
+                                               @onblur=@(() => BlazorMauiInterop.ShowToastAsync("输入的新类别将加入类别列表~"))
+                                               class="w-full h-14 px-4 bg-[#F8FAFC] text-lg text-gray-600 placeholder-gray-400 focus:outline-none"
+                                               placeholder="请输入自定义类别"/>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- 描述 -->
+                    <div class="px-4 py-3">
+                        <div class="mb-2">
+                            <label class="text-base font-medium text-[#111416]">描述</label>
+                        </div>
+                        <div class="relative">
+                            <InputTextArea @bind-Value="_expense.Description"
+                                           class="w-full min-h-[100px] p-4 bg-[#F8FAFC] border border-[#DBE2E5] rounded-xl text-base text-[#607A89] focus:outline-none focus:border-[#119BED] resize-none"
+                                           placeholder="添加描述"/>
+                        </div>
+                        <ValidationMessage For="@(() => _expense.Description)" class="text-red-500 text-sm mt-1"/>
+                    </div>
+
+                    <!-- 日期 -->
+                    <div class="px-4 py-3">
+                        <div class="mb-2">
+                            <label class="text-base font-medium text-[#111416]">日期</label>
+                        </div>
+                        <div class="relative bg-[#F8FAFC]">
+                            <input type="datetime-local"
+                                   class="w-full h-14 px-4 bg-[#F8FAFC] border border-[#DBE2E5] rounded-xl text-base text-[#607A89] focus:outline-none focus:border-[#119BED]"
+                                   value="@_expense.TimeOnSpend.ToString("yyyy-MM-ddTHH:mm")"
+                                   @onchange="@(e => OnDateTimeChanged(e))"/>
+                        </div>
+                    </div>
+
+                    <!-- 保存按钮 -->
+                    <div class="px-4 py-3">
+                        <button type="submit"
+                                class="w-full h-12 bg-[#119BED] text-white text-base font-bold rounded-[20px]">
+                            保存
+                        </button>
+                    </div>
+                </EditForm>
+            }
+        </div>
+    </PageBody>
+</FlexedPageComponent>
+
+<SfDialog Width="300px" IsModal="true" @bind-Visible="@IsDeleteDialogVisible">
+    <DialogTemplates>
+        <Header>
+            <div class="text-lg font-medium text-[#111416]">确认删除</div>
+        </Header>
+        <Content>
+            <div class="p-4">
+                <p class="text-base text-[#666666]">确定要删除这笔支出吗？</p>
+                <div class="flex justify-end gap-3 mt-6">
+                    <button @onclick="() => IsDeleteDialogVisible = false"
+                            class="px-4 py-2 text-[#666666] bg-[#F5F5F5] rounded-lg">
+                        取消
+                    </button>
+                    <button @onclick="DeleteExpense"
+                            class="px-4 py-2 text-white bg-[#FF3B30] rounded-lg">
+                        删除
+                    </button>
+                </div>
+            </div>
+        </Content>
+    </DialogTemplates>
+</SfDialog>
+
+@code {
+    [Parameter]
+    public long ExpenseId { get; set; }
+
+    private string CustomCategory { get; set; }
+    private List<ExpenseCategory> _categories = new();
+    private Expense _expense;
+    private bool IsDeleteDialogVisible { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var categoriesRes = await ExpenseService.GetExpenseCategoriesAsync();
+        if (categoriesRes is { IsSuccess: true, Data: not null })
+        {
+            _categories = categoriesRes.Data;
+        }
+        else
+        {
+            await BlazorMauiInterop.ShowAlertAsync("获取支出类别失败");
+        }
+
+        var expenseRes = await ExpenseService.GetExpenseByIdAsync(ExpenseId);
+        if (expenseRes is { IsSuccess: true, Data: not null })
+        {
+            _expense = expenseRes.Data;
+        }
+        else
+        {
+            await BlazorMauiInterop.ShowAlertAsync("获取支出信息失败");
+            NavigateBack();
+        }
+    }
+
+    private void NavigateBack()
+    {
+        NavigationManager.NavigateTo($"/travel/chart/{_expense?.TripId}", replace: true);
+    }
+
+    private void OnDateTimeChanged(ChangeEventArgs e)
+    {
+        if (DateTime.TryParse(e.Value?.ToString(), out DateTime dateTime))
+        {
+            _expense.TimeOnSpend = dateTime;
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        try
+        {
+            BlazorMauiInterop.ShowIndicator();
+            if (_expense.Category == "其他" && !string.IsNullOrWhiteSpace(CustomCategory))
+            {
+                _expense.Category = CustomCategory;
+                var res = await ExpenseService.AddExpenseCategoryAsync(new ExpenseCategory() { Name = CustomCategory });
+                if (!res.IsSuccess)
+                {
+                    await BlazorMauiInterop.ShowAlertAsync("添加支出类别失败");
+                }
+            }
+
+            var result = await ExpenseService.UpdateExpenseAsync(_expense);
+            if (result.IsSuccess)
+            {
+                await BlazorMauiInterop.ShowToastAsync("更新支出成功！");
+                NavigateBack();
+            }
+            else
+            {
+                await BlazorMauiInterop.ShowAlertAsync("更新支出失败");
+            }
+        }
+        catch (Exception)
+        {
+            await BlazorMauiInterop.ShowAlertAsync("更新支出失败");
+        }
+        finally
+        {
+            BlazorMauiInterop.HideIndicator();
+        }
+    }
+
+    private async Task DeleteExpense()
+    {
+        try
+        {
+            BlazorMauiInterop.ShowIndicator();
+            var result = await ExpenseService.DeleteExpenseAsync(_expense.Id);
+            if (result.IsSuccess)
+            {
+                await BlazorMauiInterop.ShowToastAsync("删除支出成功！");
+                NavigateBack();
+            }
+            else
+            {
+                await BlazorMauiInterop.ShowAlertAsync("删除支出失败");
+            }
+        }
+        catch (Exception)
+        {
+            await BlazorMauiInterop.ShowAlertAsync("删除支出失败");
+        }
+        finally
+        {
+            BlazorMauiInterop.HideIndicator();
+            IsDeleteDialogVisible = false;
+        }
+    }
+}

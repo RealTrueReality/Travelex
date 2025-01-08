@@ -1,0 +1,199 @@
+@page "/profile/edit"
+@using Travelex.Components.Layout
+@using Travelex.Services
+@using Travelex.Utils
+@inject NavigationManager NavigationManager
+@inject AuthService AuthService
+@inject BlazorMauiInterop BlazorMauiInterop
+
+<FixedPageComponent>
+    <TopBarTitle>
+        编辑个人资料
+    </TopBarTitle>
+    <PageBody>
+        <div class="p-4">
+            <div class="flex flex-col items-center mb-8">
+                <div class="relative">
+                    @if (!string.IsNullOrEmpty(_profileImage))
+                    {
+                        @if (_profileImage.StartsWith("file://"))
+                        {
+                            var path = _profileImage[7..];
+                            @if (File.Exists(path) && !string.IsNullOrEmpty(_imageBase64))
+                            {
+                                <img src="data:image/jpeg;base64,@_imageBase64" alt="头像" class="w-24 h-24 rounded-full object-cover" />
+                            }
+                            else
+                            {
+                                <div class="w-24 h-24 rounded-full bg-[#E8F0F2] flex items-center justify-center">
+                                    <span class="text-2xl font-bold text-[#119BED]">@(_displayName?.FirstOrDefault() ?? 'U')</span>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <img src="@_profileImage" alt="头像" class="w-24 h-24 rounded-full object-cover" />
+                        }
+                    }
+                    else
+                    {
+                        <div class="w-24 h-24 rounded-full bg-[#E8F0F2] flex items-center justify-center">
+                            <span class="text-2xl font-bold text-[#119BED]">@(_displayName?.FirstOrDefault() ?? 'U')</span>
+                        </div>
+                    }
+                    <button @onclick="SelectImage" class="absolute bottom-0 right-0 w-8 h-8 bg-[#119BED] rounded-full flex items-center justify-center">
+                        <img src="images/profilePage/camera.svg" alt="更换头像" class="w-4 h-4" />
+                    </button>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label for="username" class="block text-sm font-medium text-[#1C160C] mb-1">用户名</label>
+                    <input type="text" id="username" @bind="_username"
+                           class="w-full px-4 py-2 rounded-lg border border-[#E8F0F2] focus:outline-none focus:border-[#119BED]"
+                           placeholder="输入用户名" />
+                </div>
+
+                <div>
+                    <label for="displayName" class="block text-sm font-medium text-[#1C160C] mb-1">昵称</label>
+                    <input type="text" id="displayName" @bind="_displayName"
+                           class="w-full px-4 py-2 rounded-lg border border-[#E8F0F2] focus:outline-none focus:border-[#119BED]"
+                           placeholder="输入昵称" />
+                </div>
+            </div>
+
+            <div class="mt-8">
+                <button @onclick="SaveChanges" class="w-full py-3 bg-[#119BED] text-white font-bold rounded-[20px]">
+                    保存修改
+                </button>
+            </div>
+        </div>
+    </PageBody>
+</FixedPageComponent>
+
+@code {
+    private string? _username;
+    private string? _displayName;
+    private string? _profileImage;
+    private string? _imageBase64;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var currentUser = AuthService.CurrentUser;
+        if (currentUser != null)
+        {
+            _username = currentUser.UserName;
+            _displayName = currentUser.Name;
+            _profileImage = await AuthService.GetProfileImageAsync();
+            await LoadProfileImage();
+        }
+    }
+
+    private async Task LoadProfileImage()
+    {
+        if (!string.IsNullOrEmpty(_profileImage) && _profileImage.StartsWith("file://"))
+        {
+            try
+            {
+                var path = _profileImage[7..];
+                if (File.Exists(path))
+                {
+                    var bytes = await File.ReadAllBytesAsync(path);
+                    _imageBase64 = Convert.ToBase64String(bytes);
+                    StateHasChanged();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"加载头像失败：{ex.Message}");
+            }
+        }
+    }
+
+    private async Task SelectImage()
+    {
+        try
+        {
+            var status = await Permissions.CheckStatusAsync<Permissions.StorageRead>();
+            if (status != PermissionStatus.Granted)
+            {
+                status = await Permissions.RequestAsync<Permissions.StorageRead>();
+                if (status != PermissionStatus.Granted)
+                {
+                    await BlazorMauiInterop.ShowAlertAsync("需要存储权限才能访问相册");
+                    return;
+                }
+            }
+
+            var photo = await MediaPicker.Default.PickPhotoAsync(new MediaPickerOptions
+            {
+                Title = "选择头像"
+            });
+            
+            if (photo != null)
+            {
+                await ProcessPhoto(photo);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"选择照片出错: {ex.Message}");
+            await BlazorMauiInterop.ShowAlertAsync("选择照片失败，请重试");
+        }
+    }
+
+    private async Task ProcessPhoto(FileResult photo)
+    {
+        try
+        {
+            // 创建应用程序缓存目录
+            var cacheDir = Path.Combine(FileSystem.CacheDirectory, "Avatars");
+            Directory.CreateDirectory(cacheDir);
+
+            // 生成唯一的文件名
+            var fileName = $"avatar_{_username}_{Guid.NewGuid()}{Path.GetExtension(photo.FileName ?? "")}";
+            var targetPath = Path.Combine(cacheDir, fileName);
+
+            // 复制文件到缓存目录并转换为base64
+            using var sourceStream = await photo.OpenReadAsync();
+            using var memoryStream = new MemoryStream();
+            await sourceStream.CopyToAsync(memoryStream);
+            
+            // 转换为base64
+            _imageBase64 = Convert.ToBase64String(memoryStream.ToArray());
+
+            // 保存文件
+            memoryStream.Position = 0;
+            using var targetStream = File.Create(targetPath);
+            await memoryStream.CopyToAsync(targetStream);
+
+            // 更新用户头像
+            var imageUrl = $"file://{targetPath}";
+            var updateResult = await AuthService.UpdateProfileImageAsync(imageUrl);
+            if (updateResult.IsSuccess)
+            {
+                _profileImage = imageUrl;
+                StateHasChanged();
+            }
+            else
+            {
+                await BlazorMauiInterop.ShowAlertAsync("更新头像失败，请重试");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"处理照片出错: {ex.Message}");
+            await BlazorMauiInterop.ShowAlertAsync("处理照片失败，请重试");
+        }
+    }
+
+    private async Task SaveChanges()
+    {
+        if (string.IsNullOrWhiteSpace(_username) || string.IsNullOrWhiteSpace(_displayName))
+            return;
+
+        await AuthService.ChangeNameAsync(_displayName);
+        NavigationManager.NavigateTo("/profile");
+    }
+}

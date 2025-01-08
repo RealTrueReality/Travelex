@@ -1,0 +1,81 @@
+@page "/categories/create"
+@using Travelex.Components.Layout
+@using Travelex.Services
+@inject NavigationManager NavigationManager
+@inject ExpenseService ExpenseService
+
+<FixedPageComponent>
+    <TopBarLeft>
+    <button @onclick="NavigateBack" class="p-2 text-[#252525]">
+        <i class="fas fa-arrow-left text-xl"></i>
+    </button>
+    </TopBarLeft>
+    <TopBarTitle>
+        创建新分类
+    </TopBarTitle>
+    <PageBody>
+        <div class="p-4">
+            <div class="space-y-4">
+                <div>
+                    <label for="name" class="block text-sm font-medium text-[#1C160C] mb-1">分类名称</label>
+                    <input type="text" id="name" @bind="_categoryName"
+                           class="w-full px-4 py-2 rounded-lg border border-[#E8F0F2] focus:outline-none focus:border-[#119BED]"
+                           placeholder="输入分类名称"/>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-[#1C160C] mb-1">选择图标</label>
+                    <div class="grid grid-cols-4 gap-4">
+                        @foreach (var icon in _availableIcons) {
+                            <button @onclick="() => SelectIcon(icon)"
+                                    class="w-12 h-12 rounded-lg @(icon == _selectedIcon ? "bg-[#119BED]" : "bg-[#E8F0F2]") flex items-center justify-center">
+                                <img src="@($"images/expenseCategory/{icon}.svg")" alt="@icon" class="w-6 h-6"/>
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8">
+                <button @onclick="CreateCategory" class="w-full py-3 bg-[#119BED] text-white font-bold rounded-[20px]">
+                    创建分类
+                </button>
+            </div>
+        </div>
+    </PageBody>
+</FixedPageComponent>
+
+@code {
+    private string _categoryName = "";
+    private string _selectedIcon = "expense";
+
+    private readonly string[] _availableIcons = [
+        "car", "restaurant", "hotel", "store", "run", "joystick",
+        "beer", "book", "briefcase", "castle", "coffee", "dog", "home",
+        "movie", "music", "party", "plane", "shield", "ship", "steam",
+        "train", "wrench", "injection", "expense"
+    ];
+
+    private void SelectIcon(string icon) {
+        _selectedIcon = icon;
+    }
+
+    private async Task CreateCategory() {
+        if (string.IsNullOrWhiteSpace(_categoryName))
+            return;
+
+        // 创建新分类
+        var result = await ExpenseService.AddExpenseCategoryAsync(new() {
+            Name = _categoryName,
+            Icon = _selectedIcon
+        });
+
+        if (result.IsSuccess) {
+            NavigationManager.NavigateTo("/profile");
+        }
+    }
+    private void NavigateBack()
+    {
+        NavigationManager.NavigateTo("/profile");
+    }
+}
