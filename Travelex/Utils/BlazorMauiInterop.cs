@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Maui.Alerts;
 using Syncfusion.Blazor.Notifications;
 using Travelex.ViewModels;
 

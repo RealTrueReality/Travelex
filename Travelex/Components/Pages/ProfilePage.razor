@@ -3,6 +3,7 @@
 @using Travelex.Services
 @using Travelex.Entities
 @using Travelex.Models
+@using Travelex.Extensions
 @inject NavigationManager NavigationManager
 @inject ExpenseService ExpenseService
 @inject AuthService AuthService
@@ -206,7 +207,7 @@
 
     private void ViewCategoryExpenses(ExpenseCategory category)
     {
-        NavigationManager.NavigateTo($"/categories/expenses/{category.Name}");
+        NavigationManager.NavigateToSubPage($"/categories/expenses/{category.Name}");
     }
 
     private void NavigateToSupport()

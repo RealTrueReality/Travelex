@@ -1,6 +1,8 @@
 @page "/categories/create"
 @using Travelex.Components.Layout
 @using Travelex.Services
+@using Travelex.Entities
+@using Travelex.Extensions
 @inject NavigationManager NavigationManager
 @inject ExpenseService ExpenseService
 
@@ -76,6 +78,6 @@
     }
     private void NavigateBack()
     {
-        NavigationManager.NavigateTo("/profile");
+        NavigationManager.NavigateBack();
     }
 }

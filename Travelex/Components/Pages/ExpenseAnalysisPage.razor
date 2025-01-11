@@ -1,0 +1,190 @@
+@page "/travel/expense/analysis/{TripId:int}"
+@using Travelex.Components.Layout
+@using Travelex.Entities
+@using Travelex.Services
+@using Travelex.Extensions
+@using Syncfusion.Blazor.InteractiveChat
+@using Travelex.Models
+@using Markdig
+@inject NavigationManager NavigationManager
+@inject DashScopeService DashScopeService
+@inject TravelService TravelService
+@inject ExpenseService ExpenseService
+@inject AuthService AuthService
+
+<FlexedPageComponent>
+    <TopBarLeft>
+        <button @onclick="NavigateBack" class="p-2 text-gray-600">
+            <i class="fas fa-arrow-left text-xl"></i>
+        </button>
+    </TopBarLeft>
+    <TopBarTitle>AI 分析</TopBarTitle>
+    <PageBody>
+        <div class="flex-1 overflow-auto">
+            <SfAIAssistView 
+                Height="100%" 
+                Width="100%"
+                Prompts="@prompts"
+                PromptPlaceholder="输入您的问题..."
+                PromptSuggestions="@suggestions"
+                PromptSuggestionsHeader="您可以这样问我"
+                PromptRequested="@OnPromptRequest">
+                <AssistViews>
+                    <AssistView>
+                        <PromptItemTemplate>
+                            <div class="flex items-center gap-2 px-4 py-2">
+                                @if (!string.IsNullOrEmpty(_profileImage))
+                                {
+                                    @if (_profileImage.StartsWith("file://") && !string.IsNullOrEmpty(_imageBase64))
+                                    {
+                                        <img src="data:image/jpeg;base64,@_imageBase64" alt="头像" class="w-8 h-8 rounded-full object-cover" />
+                                    }
+                                    else
+                                    {
+                                        <img src="@_profileImage" alt="头像" class="w-8 h-8 rounded-full object-cover" />
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-blue-500 font-bold text-base">
+                                        <span>@(_currentUser?.Name?.FirstOrDefault() ?? 'U')</span>
+                                    </div>
+                                }
+                                <div class="flex flex-col">
+                                    <span class="text-sm text-gray-600">@(_currentUser?.Name ?? "用户")</span>
+                                    <div>@context.Prompt</div>
+                                </div>
+                            </div>
+                        </PromptItemTemplate>
+                        <ResponseItemTemplate>
+                            <div class="flex items-start gap-2 px-4 py-2">
+                                <img src="images/truereality.png" alt="AI助手" class="w-8 h-8 rounded-full object-cover" />
+                                <div class="flex flex-col">
+                                    <span class="text-sm text-gray-600">AI 助手</span>
+                                    <div>@((MarkupString)RenderMarkdown(context.Response))</div>
+                                </div>
+                            </div>
+                        </ResponseItemTemplate>
+                    </AssistView>
+                </AssistViews>
+            </SfAIAssistView>
+        </div>
+    </PageBody>
+</FlexedPageComponent>
+
+@code {
+    [Parameter]
+    public int TripId { get; set; }
+
+    private List<AssistViewPrompt> prompts = new();
+    private List<string> suggestions = new()
+    {
+        "请分析这次旅行的整体支出情况",
+        "这次旅行的总支出是多少？",
+        "哪个类别的支出最多？",
+        "有什么建议可以帮我节省开支？",
+        "这次旅行的支出是否合理？"
+    };
+
+    private LoggingModel? _currentUser;
+    private string? _profileImage;
+    private string _imageBase64;
+
+    private readonly MarkdownPipeline _pipeline = new MarkdownPipelineBuilder()
+        .UseAdvancedExtensions()
+        .Build();
+
+    private string RenderMarkdown(string markdown)
+    {
+        if (string.IsNullOrEmpty(markdown)) return string.Empty;
+        return Markdown.ToHtml(markdown, _pipeline);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // 获取用户信息
+        _currentUser = AuthService.CurrentUser;
+        if (_currentUser != null)
+        {
+            _profileImage = await AuthService.GetProfileImageAsync();
+            if (!string.IsNullOrEmpty(_profileImage) && _profileImage.StartsWith("file://"))
+            {
+                var path = _profileImage[7..];
+                if (File.Exists(path))
+                {
+                    var bytes = await File.ReadAllBytesAsync(path);
+                    _imageBase64 = Convert.ToBase64String(bytes);
+                }
+            }
+        }
+
+        // 添加欢迎消息
+        prompts.Add(new AssistViewPrompt 
+        { 
+            Prompt = "你好",
+            Response = @"欢迎使用 AI 分析助手！我可以帮您：
+
+1. 分析旅行总支出情况
+2. 查看各类别支出占比
+3. 提供节省建议
+4. 评估支出合理性
+
+请从下方的建议问题中选择，或直接输入您的问题。"
+        });
+    }
+
+    private async Task OnPromptRequest(AssistViewPromptRequestedEventArgs args)
+    {
+        try
+        {
+            var travelResult = await TravelService.GetTravelByIdAsync(TripId, true);
+            if (!travelResult.IsSuccess || travelResult.Data == null)
+            {
+                args.Response = "<div class='text-red-500'>获取旅行数据失败</div>";
+                return;
+            }
+
+            var travel = travelResult.Data;
+            var expenses = travel.Expense ?? new List<Expense>();
+
+            // 准备分析数据
+            var analysisData = new
+            {
+                Question = args.Prompt,
+                TravelTitle = travel.Title,
+                StartDate = travel.StartDate,
+                EndDate = travel.EndDate,
+                TotalExpense = expenses.Sum(e => e.Amount),
+                DaysCount = ((travel.EndDate ?? DateTime.Now) - (travel.StartDate ?? DateTime.Now)).Days + 1,
+                Expenses = expenses.Select(e => new
+                {
+                    e.Title,
+                    e.Amount,
+                    e.Category,
+                    e.Description,
+                    e.TimeOnSpend
+                }).ToList(),
+                CategorySummary = expenses.GroupBy(e => e.Category)
+                    .Select(g => new
+                    {
+                        Category = g.Key,
+                        TotalAmount = g.Sum(e => e.Amount),
+                        Count = g.Count()
+                    }).ToList()
+            };
+
+            // 调用AI分析
+            var analysis = await DashScopeService.AnalyzeTravelExpensesAsync(analysisData);
+            args.Response = analysis;
+        }
+        catch (Exception ex)
+        {
+            args.Response = $"<div class='text-red-500'>分析数据时出错: {ex.Message}</div>";
+        }
+    }
+
+    private void NavigateBack()
+    {
+        NavigationManager.NavigateBack();
+    }
+}

@@ -2,6 +2,7 @@
 @using Travelex.Components.Layout
 @using Travelex.Services
 @using Travelex.Entities
+@using Travelex.Extensions
 @inject NavigationManager NavigationManager
 @inject ExpenseService ExpenseService
 
@@ -76,7 +77,7 @@
 
     private void NavigateBack()
     {
-        NavigationManager.NavigateTo($"/categories/expenses/{CategoryName}");
+        NavigationManager.NavigateBack();
     }
 
     private void SelectIcon(string icon)

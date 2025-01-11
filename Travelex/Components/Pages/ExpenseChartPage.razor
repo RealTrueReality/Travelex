@@ -6,6 +6,8 @@
 @using Syncfusion.Blazor.Popups
 @using Microsoft.JSInterop
 @using Travelex.Components.Controls.TravelPageControls
+@using Travelex.Components.Layout
+@using Travelex.Extensions
 @inject ExpenseService ExpenseService
 @inject TravelService TravelService
 @inject NavigationManager NavigationManager
@@ -21,11 +23,16 @@
         支出图表
     </TopBarTitle>
     <TopBarRight>
-        <button @onclick="NavigateBack" class="p-2 text-[#252525]">
+        <button @onclick="NavigateToStreamingAnalysis" class="p-2 text-[#252525]">
             <i class="fas fa-robot text-xl"></i>
         </button>
     </TopBarRight>
     <PageBody>
+        <button @onclick="NavigateToAnalysis" class="p-2 text-[#252525]">
+            <i class="fas fa-robot text-xl"></i>
+        </button>
+        
+        
         <div class="flex-1 overflow-auto p-4">
             @if (IsLoading) {
                 <!-- 总支出金额 Shimmer -->
@@ -104,7 +111,7 @@
                             <div class="h-2 bg-[#F5F5F5] rounded-full">
                                 <div class="h-full bg-[#0085FF] rounded-full"
                                      style="width: @(category.Percentage)%">
-                                    
+
                                 </div>
                             </div>
                         </div>
@@ -120,16 +127,16 @@
                     <div class="flex items-center gap-1 mb-4">
                         <span class="text-lg text-[#111416]">@DaysCount 天</span>
                         <span class="text-lg @(TrendPercentage.StartsWith("+") ? "text-[#4CAF50]" : "text-[#F44336]")">
-                        @TrendPercentage
-                    </span>
+                            @TrendPercentage
+                        </span>
                     </div>
 
                     <SfChart Height="200px">
                         <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.DateTime"
                                            LabelFormat="MMM d"
                                            EdgeLabelPlacement="EdgeLabelPlacement.Shift"
-                                            
-                                           MajorGridLines="new ChartAxisMajorGridLines(){Width=0}">
+
+                                           MajorGridLines="new ChartAxisMajorGridLines() { Width = 0 }">
                         </ChartPrimaryXAxis>
                         <ChartPrimaryYAxis LabelFormat="￥{value}"
                                            Minimum="0"
@@ -137,7 +144,7 @@
                                            Interval="@GetYAxisInterval()"
                                            MaximumLabels="6"
                                            MajorGridLines=@(new ChartAxisMajorGridLines() { Width = 0.5, DashArray = "5,5" })
-                                           MajorTickLines="new ChartAxisMajorTickLines(){Width=0}">
+                                           MajorTickLines="new ChartAxisMajorTickLines() { Width = 0 }">
                         </ChartPrimaryYAxis>
                         <ChartSeriesCollection>
                             <ChartSeries DataSource="@DailyExpenses"
@@ -171,7 +178,7 @@
                                 </div>
                             </div>
                             <div class="flex flex-col items-end gap-2">
-                                <button @onclick="() => EditExpense(expense.Id)" class="text-[#666666]">
+                                <button @onclick="() => NavigateToExpenseEdit(expense.Id)" class="text-[#666666]">
                                     <img src="images/editPen.png" class="p-2" alt="编辑"/>
                                 </button>
                                 <span class="text-lg font-medium text-[#111416]">￥@expense.Amount</span>
@@ -183,18 +190,18 @@
                 <!-- 操作按钮 -->
                 <div class="bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
                     <div class="flex flex-col gap-3 max-w-md mx-auto">
-                        <button @onclick="NavigateToEdit" 
+                        <button @onclick="NavigateToExpenseAdd"
                                 class="flex items-center justify-center gap-2 w-full py-3 text-gray-600 active:bg-[#EFF2F4]">
                             <i class="fas fa-edit"></i>
-                            <span>编辑旅行</span>
+                            <span>添加支出</span>
                         </button>
-                        
+
                         <button @onclick="ShowDeleteDialog"
                                 class="flex items-center justify-center gap-2 w-full py-3 text-gray-600 active:bg-[#EFF2F4]">
                             <i class="fas fa-trash"></i>
                             <span>删除旅行</span>
                         </button>
-                        
+
                     </div>
                 </div>
             }
@@ -241,9 +248,28 @@
         }
     }
 
-    private void NavigateToEdit()
+    private void NavigateBack()
     {
-        NavigationManager.NavigateTo($"/travel/edit/{TripId}");
+        NavigationManager.NavigateBack();
+    }
+
+    private void NavigateToExpenseAdd()
+    {
+        NavigationManager.NavigateToSubPage($"/expense/add/{TripId}");
+    }
+
+    private void NavigateToExpenseEdit(long expenseId)
+    {
+        NavigationManager.NavigateToSubPage($"/travel/expense/edit/{expenseId}");
+    }
+
+    private async Task DeleteTravel()
+    {
+        var result = await TravelService.DeleteTravelAsync(TripId);
+        if (result.IsSuccess)
+        {
+            NavigationManager.NavigateTo("/home");
+        }
     }
 
     private void ShowDeleteDialog()
@@ -256,25 +282,14 @@
         IsExportDialogVisible = true;
     }
 
-    private async Task DeleteTravel()
+    private void NavigateToStreamingAnalysis()
     {
-        var result = await TravelService.DeleteTravelAsync(TripId);
-        if (result.IsSuccess)
-        {
-            NavigationManager.NavigateTo("/home");
-        }
+        NavigationManager.NavigateToSubPage($"/travel/expense/streaming/{TripId}");
     }
-
-    private void NavigateBack()
+    private void NavigateToAnalysis()
     {
-        NavigationManager.NavigateTo($"/travel/details/{TripId}");
+        NavigationManager.NavigateToSubPage($"/travel/expense/analysis/{TripId}");
     }
-
-    private void EditExpense(long expenseId)
-    {
-        NavigationManager.NavigateTo($"/travel/expense/edit/{expenseId}");
-    }
-
     private async Task ProcessExpenseData()
     {
         if (Expenses.Any())

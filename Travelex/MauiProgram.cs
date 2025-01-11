@@ -35,9 +35,10 @@ public static class MauiProgram {
         builder.Services.AddSyncfusionBlazor();
         builder.Services.AddSingleton<DatabaseContext>();
         builder.Services.AddTransient<SeedDataService>();
-        builder.Services.AddTransient<AuthService>();
-        builder.Services.AddTransient<TravelService>();
-        builder.Services.AddTransient<ExpenseService>();
+        builder.Services.AddScoped<AuthService>();
+        builder.Services.AddScoped<TravelService>();
+        builder.Services.AddScoped<ExpenseService>();
+        builder.Services.AddScoped<DashScopeService>();
         builder.Services.AddTransient<ActivityIndicatorViewModel>();
         
         // 注册应用程序核心服务

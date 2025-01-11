@@ -1,8 +1,9 @@
-@page "/travel/details/{Id:int}"
+@page "/travel/details/{TripId:int}"
 @using Travelex.Components.Controls
 @using Travelex.Entities
 @using Travelex.Utils
 @using Travelex.Services
+@using Travelex.Extensions
 @using Syncfusion.Blazor.Popups
 @using SkeletonType = Syncfusion.Blazor.Notifications.SkeletonType
 @inject TravelService TravelService;
@@ -247,7 +248,7 @@
 </FlexedPageComponent>
 
 @code {
-    [Parameter] public int Id { get; set; }
+    [Parameter] public int TripId { get; set; }
     private Travel _travel = new();
     private List<Expense> Expenses { get; set; } = [];
     private bool IsLoading { get; set; } = true;
@@ -257,7 +258,7 @@
     protected override async Task OnInitializedAsync() {
         await base.OnInitializedAsync();
         try {
-            var res = await TravelService.GetTravelByIdAsync(Id, includeExpenses: true);
+            var res = await TravelService.GetTravelByIdAsync(TripId, includeExpenses: true);
             if (res.IsSuccess) {
                 if (res.Data is not null) {
                     _travel = res.Data;
@@ -281,8 +282,7 @@
     }
 
     private async Task AddExpense() {
-        // 实现添加费用的逻辑
-        NavigationManager.NavigateTo($"/expense/add/{_travel.Id}");
+        NavigationManager.NavigateToSubPage($"/expense/add/{TripId}");
     }
 
     private string GetStatusClass() {
@@ -295,14 +295,12 @@
         };
     }
 
-
     private void NavigateBack() {
-        NavigationManager.NavigateTo("/home", replace: true);
+        NavigationManager.NavigateTo("/home", new NavigationOptions { ReplaceHistoryEntry = true });
     }
 
     private void NavigateToChart()
     {
-        NavigationManager.NavigateTo($"/travel/chart/{Id}");
+        NavigationManager.NavigateToSubPage($"/travel/chart/{TripId}");
     }
-
 }

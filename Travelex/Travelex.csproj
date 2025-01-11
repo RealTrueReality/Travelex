@@ -75,18 +75,20 @@
         <PackageReference Include="CommunityToolkit.Maui" Version="9.0.2" />
         <PackageReference Include="CommunityToolkit.Maui.Markup" Version="4.2.0" />
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0-preview3" />
+        <PackageReference Include="Markdig" Version="0.39.1" />
         <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.100" />
         <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.1" />
         <PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
         <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.10" />
-        <PackageReference Include="Syncfusion.Blazor.Calendars" Version="28.1.33" />
-        <PackageReference Include="Syncfusion.Blazor.Charts" Version="28.1.33" />
-        <PackageReference Include="Syncfusion.Blazor.DropDowns" Version="28.1.33" />
-        <PackageReference Include="Syncfusion.Blazor.Notifications" Version="28.1.33" />
-        <PackageReference Include="Syncfusion.Blazor.Popups" Version="28.1.33" />
-        <PackageReference Include="Syncfusion.Blazor.Themes" Version="28.1.33" />
+        <PackageReference Include="Syncfusion.Blazor.Calendars" Version="28.1.38" />
+        <PackageReference Include="Syncfusion.Blazor.Charts" Version="28.1.38" />
+        <PackageReference Include="Syncfusion.Blazor.DropDowns" Version="28.1.38" />
+        <PackageReference Include="Syncfusion.Blazor.InteractiveChat" Version="28.1.38" />
+        <PackageReference Include="Syncfusion.Blazor.Notifications" Version="28.1.38" />
+        <PackageReference Include="Syncfusion.Blazor.Popups" Version="28.1.38" />
+        <PackageReference Include="Syncfusion.Blazor.Themes" Version="28.1.38" />
     </ItemGroup>
 
     <ItemGroup>

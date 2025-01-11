@@ -2,6 +2,7 @@
 @using Travelex.Components.Layout
 @using Travelex.Services
 @using Travelex.Entities
+@using Travelex.Extensions
 @inject NavigationManager NavigationManager
 @inject ExpenseService ExpenseService
 
@@ -97,16 +98,16 @@
 
     private void NavigateBack()
     {
-        NavigationManager.NavigateTo("/profile");
+        NavigationManager.NavigateTo("/profile", new NavigationOptions { ReplaceHistoryEntry = true });
     }
 
     private void NavigateToEdit()
     {
-        NavigationManager.NavigateTo($"/categories/edit/{CategoryName}");
+        NavigationManager.NavigateToSubPage($"/categories/edit/{CategoryName}");
     }
 
     private void EditExpense(long expenseId)
     {
-        NavigationManager.NavigateTo($"/travel/expense/edit/{expenseId}");
+        NavigationManager.NavigateToSubPage($"/travel/expense/edit/{expenseId}");
     }
 }

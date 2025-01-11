@@ -3,6 +3,7 @@
 @using Travelex.Services
 @using Travelex.Utils
 @using Syncfusion.Blazor.Popups
+@using Travelex.Extensions
 @inject NavigationManager NavigationManager
 @inject ExpenseService ExpenseService
 @inject BlazorMauiInterop BlazorMauiInterop
@@ -187,7 +188,7 @@
 
     private void NavigateBack()
     {
-        NavigationManager.NavigateTo($"/travel/chart/{_expense?.TripId}", replace: true);
+        NavigationManager.NavigateBack();
     }
 
     private void OnDateTimeChanged(ChangeEventArgs e)
