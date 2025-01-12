@@ -28,9 +28,9 @@
         </button>
     </TopBarRight>
     <PageBody>
-        <button @onclick="NavigateToAnalysis" class="p-2 text-[#252525]">
-            <i class="fas fa-robot text-xl"></i>
-        </button>
+        @* <button @onclick="NavigateToAnalysis" class="p-2 text-[#252525]"> *@
+        @*     <i class="fas fa-robot text-xl"></i> *@
+        @* </button> *@
         
         
         <div class="flex-1 overflow-auto p-4">
@@ -286,10 +286,10 @@
     {
         NavigationManager.NavigateToSubPage($"/travel/expense/streaming/{TripId}");
     }
-    private void NavigateToAnalysis()
-    {
-        NavigationManager.NavigateToSubPage($"/travel/expense/analysis/{TripId}");
-    }
+    // private void NavigateToAnalysis()
+    // {
+    //     NavigationManager.NavigateToSubPage($"/travel/expense/analysis/{TripId}");
+    // }
     private async Task ProcessExpenseData()
     {
         if (Expenses.Any())

@@ -10,11 +10,6 @@
 @inject TravelService TravelService
 @layout LayoutWithNavBar
 <FixedPageComponent>
-    <TopBarLeft>
-        <button @onclick="NavigateBack" class="p-2 text-[#252525]">
-            <i class="fas fa-arrow-left text-xl"></i>
-        </button>
-    </TopBarLeft>
     <TopBarTitle>费用分析</TopBarTitle>
     <PageBody>
         <div class="flex space-x-4 px-4 border-b border-[#EFF2F4]">
@@ -356,11 +351,7 @@
         if (_chart != null) await _chart.RefreshAsync();
         StateHasChanged();
     }
-
-
-    private void NavigateBack() {
-        NavigationManager.NavigateTo($"/home");
-    }
+    
 
     private string GetTravelTitle(int tripId) {
         return _travelTitles.GetValueOrDefault(tripId, "未知旅行");
