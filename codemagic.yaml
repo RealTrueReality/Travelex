@@ -1,42 +1,46 @@
 ﻿workflows:
-  ios-development:
-    name: iOS Development Build (.NET 8)
+  maui-ios-development:
+    name: Dotnet MAUI iOS Development
     max_build_duration: 120
     instance_type: mac_mini_m2
     environment:
       ios_signing:
-        certificate: ios_adhoc_cert # 引用您的 .p12 证书
-        provisioning_profile: provision # 引用您的 Development 描述文件
-        distribution_type: development # 设置为 Development 分发类型
-        bundle_identifier: com.xianyu.zz # 使用您的实际 Bundle ID
+        distribution_type: development # Development 分发
+        bundle_identifier: com.xianyu.zz # 替换为您的实际 Bundle ID
       vars:
         DOTNET_PATH: $CM_BUILD_DIR/dotnet
         DOTNET_BIN: $CM_BUILD_DIR/dotnet/dotnet
     scripts:
-      - name: Install .NET SDK
+      - name: Install dotnet sdk
         script: |
-          wget https://dot.net/v1/dotnet-install.sh
           chmod +x dotnet-install.sh
           ./dotnet-install.sh --install-dir $DOTNET_PATH --channel 8.0
 
       - name: Install MAUI and iOS workloads
         script: |
           $DOTNET_BIN nuget locals all --clear 
-          $DOTNET_BIN workload install ios maui \
-            --source https://aka.ms/dotnet8/nuget/index.json \
-            --source https://api.nuget.org/v3/index.json
+          $DOTNET_BIN workload install ios maui --source https://aka.ms/dotnet8/nuget/index.json --source https://api.nuget.org/v3/index.json      
 
-      - name: Build the Development app
+      - name: Set Info.plist values
         script: |
+          PLIST=$CM_BUILD_DIR/src/WeatherTwentyOne/Platforms/iOS/Info.plist
+          PLIST_BUDDY=/usr/libexec/PlistBuddy
+          $PLIST_BUDDY -c "Add :ITSAppUsesNonExemptEncryption bool false" $PLIST
+
+      - name: Set build version and build the app
+        script: |
+          CERT_NAME=$(keychain list-certificates | jq -r '.[] | .common_name')
+          PROFILE_NAME=$(find ~/Library/MobileDevice/Provisioning\ Profiles -name "*.mobileprovision" -execdir sh -c '/usr/libexec/PlistBuddy -c "print :Name" /dev/stdin <<< $(security cms -D -i {})' \;)
+
           cd src
           $DOTNET_BIN publish -f net8.0-ios \
             -c Release \
             -p:BuildIpa=True \
-            -p:RuntimeIdentifier=ios-arm64 \
-            -p:CodesignKey="ios_adhoc_cert" \
-            -p:CodesignProvision="provision" \
             -p:ApplicationDisplayVersion="1.0.0" \
             -p:ApplicationVersion=1 \
+            -p:RuntimeIdentifier=ios-arm64 \
+            -p:CodesignKey="$CERT_NAME" \
+            -p:CodesignProvision="$PROFILE_NAME" \
             -o ../artifacts
 
     artifacts:
