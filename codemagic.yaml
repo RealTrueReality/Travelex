@@ -43,10 +43,10 @@
             -p:RuntimeIdentifier=ios-arm64 \
             -p:CodesignKey="$CERT_NAME" \
             -p:CodesignProvision="$PROFILE_NAME" \
-            -o ../artifacts
+            -o /Users/builder/artifacts
 
     artifacts:
-      - ./artifacts/*.ipa
+      - /Users/builder/artifacts/*.ipa
     publishing:
       email:
         recipients:
