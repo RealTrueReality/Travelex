@@ -47,3 +47,10 @@
 
     artifacts:
       - ./artifacts/*.ipa
+    publishing:
+      email:
+        recipients:
+          - truereality@foxmail.com # 替换为您的邮箱
+        notify:
+          success: true # 构建成功时发送通知
+          failure: false # 构建失败时不发送通知
