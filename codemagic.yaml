@@ -4,13 +4,25 @@
     max_build_duration: 120
     instance_type: mac_mini_m2
     environment:
-      ios_signing:
-        distribution_type: ad_hoc # Ad Hoc 分发
-        bundle_identifier: com.xianyu.zz # 使用您提供的 Bundle ID
       vars:
         DOTNET_PATH: $CM_BUILD_DIR/dotnet
         DOTNET_BIN: $CM_BUILD_DIR/dotnet/dotnet
     scripts:
+      - name: Decode and save signing files
+        script: |
+          # 解码 .p12 文件
+          echo $IOS_P12_BASE64 | base64 --decode > ios_cert.p12
+          
+          # 解码 .mobileprovision 文件
+          echo $IOS_PROVISION_BASE64 | base64 --decode > ios.mobileprovision
+          
+          # 安装证书
+          security import ios_cert.p12 -P $IOS_P12_PASSWORD -A -T /usr/bin/codesign
+          
+          # 安装描述文件
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          mv ios.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+
       - name: Install .NET SDK
         script: |
           wget https://dot.net/v1/dotnet-install.sh
@@ -26,18 +38,13 @@
 
       - name: Build the Ad Hoc app
         script: |
-          # 从上传的签名文件中获取证书名称和描述文件名称
-          CERT_NAME=$(keychain list-certificates | jq -r '.[] | .common_name')
-          PROFILE_NAME=$(find ~/Library/MobileDevice/Provisioning\ Profiles -name "*.mobileprovision" -execdir sh -c '/usr/libexec/PlistBuddy -c "print :Name" /dev/stdin <<< $(security cms -D -i {})' \;)
-
-          # 构建 iOS 应用并生成 .ipa 文件
           cd src
-          $DOTNET_BIN publish -f net8.0-ios \
+          $DOTNET_BIN publish -f net6.0-ios \
             -c Release \
             -p:BuildIpa=True \
             -p:RuntimeIdentifier=ios-arm64 \
-            -p:CodesignKey="$CERT_NAME" \
-            -p:CodesignProvision="$PROFILE_NAME" \
+            -p:CodesignKey="ios_cert.p12" \
+            -p:CodesignProvision="ios.mobileprovision" \
             -p:ApplicationDisplayVersion="1.0.0" \
             -p:ApplicationVersion=1 \
             -o ../artifacts
