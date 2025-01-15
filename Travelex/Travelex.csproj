@@ -25,7 +25,7 @@
         <ApplicationTitle>Travelex</ApplicationTitle>
 
         <!-- App Identifier -->
-        <ApplicationId>com.truereality.travelex</ApplicationId>
+        <ApplicationId>xianyu.zz_dev</ApplicationId>
 
         <!-- Versions -->
         <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
@@ -111,5 +111,5 @@
       <AndroidAsset Include="wwwroot\images\tripCategory\roadtrip.png" />
       <AndroidAsset Include="wwwroot\images\tripCategory\travels.png" />
     </ItemGroup>
-
+    
 </Project>

@@ -5,27 +5,22 @@
     instance_type: mac_mini_m2
     environment:
       ios_signing:
-        distribution_type: development # Development 分发
-        bundle_identifier: com.xianyu.zz # 替换为您的实际 Bundle ID
+        distribution_type: development
+        bundle_identifier: xianyu.zz_dev # 替换为与项目一致的 Bundle Identifier
       vars:
         DOTNET_PATH: $CM_BUILD_DIR/dotnet
         DOTNET_BIN: $CM_BUILD_DIR/dotnet/dotnet
     scripts:
       - name: Install dotnet sdk
         script: |
+          wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh
           chmod +x dotnet-install.sh
           ./dotnet-install.sh --install-dir $DOTNET_PATH --channel 8.0
 
       - name: Install MAUI and iOS workloads
         script: |
           $DOTNET_BIN nuget locals all --clear 
-          $DOTNET_BIN workload install ios maui --source https://aka.ms/dotnet8/nuget/index.json --source https://api.nuget.org/v3/index.json      
-
-      - name: Set Info.plist values
-        script: |
-          PLIST=$CM_BUILD_DIR/src/WeatherTwentyOne/Platforms/iOS/Info.plist
-          PLIST_BUDDY=/usr/libexec/PlistBuddy
-          $PLIST_BUDDY -c "Add :ITSAppUsesNonExemptEncryption bool false" $PLIST
+          $DOTNET_BIN workload install ios maui --source https://aka.ms/dotnet8/nuget/index.json --source https://api.nuget.org/v3/index.json
 
       - name: Set build version and build the app
         script: |
@@ -35,12 +30,12 @@
           $DOTNET_BIN publish -f net8.0-ios \
             -c Release \
             -p:BuildIpa=True \
-            -p:ApplicationDisplayVersion="1.0.0" \
-            -p:ApplicationVersion=1 \
             -p:RuntimeIdentifier=ios-arm64 \
             -p:CodesignKey="$CERT_NAME" \
             -p:CodesignProvision="$PROFILE_NAME" \
-            -o ../artifacts
+            -p:ApplicationDisplayVersion="1.0.0" \
+            -p:ApplicationVersion=1 \
+            -o ./artifacts
 
     artifacts:
       - ./artifacts/*.ipa
