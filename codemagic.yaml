@@ -1,25 +1,21 @@
 ﻿workflows:
-  ios-adhoc:
-    name: iOS Ad Hoc Build
+  ios-development:
+    name: iOS Development Build
     max_build_duration: 120
     instance_type: mac_mini_m2
     environment:
+      ios_signing:
+        distribution_type: development # 使用 Development 分发
+        bundle_identifier: com.xianyu.zz # 确保与 .mobileprovision 一致
       vars:
         DOTNET_PATH: $CM_BUILD_DIR/dotnet
         DOTNET_BIN: $CM_BUILD_DIR/dotnet/dotnet
     scripts:
       - name: Decode and save signing files
         script: |
-          # 解码 .p12 文件
           echo $IOS_P12_BASE64 | base64 --decode > ios_cert.p12
-          
-          # 解码 .mobileprovision 文件
           echo $IOS_PROVISION_BASE64 | base64 --decode > ios.mobileprovision
-          
-          # 安装证书
           security import ios_cert.p12 -P $IOS_P12_PASSWORD -A -T /usr/bin/codesign
-          
-          # 安装描述文件
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           mv ios.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
 
@@ -36,10 +32,10 @@
             --source https://aka.ms/dotnet6/nuget/index.json \
             --source https://api.nuget.org/v3/index.json
 
-      - name: Build the Ad Hoc app
+      - name: Build the Development app
         script: |
           cd src
-          $DOTNET_BIN publish -f net6.0-ios \
+          $DOTNET_BIN publish -f net8.0-ios \
             -c Release \
             -p:BuildIpa=True \
             -p:RuntimeIdentifier=ios-arm64 \
