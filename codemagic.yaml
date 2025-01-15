@@ -41,7 +41,6 @@
             -p:RuntimeIdentifier=ios-arm64 \
             -p:CodesignKey="$CERT_NAME" \
             -p:CodesignProvision="$PROFILE_NAME" \
-            -p:Exclude="package.json;package-lock.json" \
             -o ../artifacts
 
     artifacts:
