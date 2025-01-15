@@ -1,7 +1,7 @@
 @page "/about"
 @using Travelex.Components.Layout
 
-<FixedPageComponent>
+<FlexedPageComponent>
     <TopBarLeft>
         <button @onclick="NavigateBack" class="p-2 text-[#252525]">
             <i class="fas fa-arrow-left text-xl"></i>
@@ -83,7 +83,7 @@
             </div>
         </div>
     </PageBody>
-</FixedPageComponent>
+</FlexedPageComponent>
 
 @code {
     [Inject]
