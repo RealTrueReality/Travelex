@@ -25,7 +25,7 @@
         <ApplicationTitle>Travelex</ApplicationTitle>
 
         <!-- App Identifier -->
-        <ApplicationId>xianyu.zz_dev</ApplicationId>
+        <ApplicationId>com.xianyu.zz</ApplicationId>
 
         <!-- Versions -->
         <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>

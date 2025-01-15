@@ -35,6 +35,6 @@
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>此应用需要访问相册来保存旅行照片</string>
 	<key>CFBundleIdentifier</key>
-	<string>xianyu.zz_dev</string>
+	<string>com.xianyu.zz</string>
 </dict>
 </plist>
