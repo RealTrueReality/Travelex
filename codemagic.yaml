@@ -32,7 +32,6 @@
           CERT_NAME=$(keychain list-certificates | jq -r '.[] | .common_name')
           PROFILE_NAME=$(find ~/Library/MobileDevice/Provisioning\ Profiles -name "*.mobileprovision" -execdir sh -c '/usr/libexec/PlistBuddy -c "print :Name" /dev/stdin <<< $(security cms -D -i {})' \;)
 
-          cd src
           $DOTNET_BIN publish -f net8.0-ios \
             -c Release \
             -p:BuildIpa=True \
