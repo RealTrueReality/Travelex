@@ -4,7 +4,6 @@ let geocoder = null;
 let autoComplete = null;
 let dotNetHelper = null;
 let geolocation = null;
-let isSearchMode = false; // 新增：标记是否处于搜索模式
 
 // 初始化地图
 window.initAMap = async (helper) => {
@@ -38,11 +37,9 @@ window.initAMap = async (helper) => {
             position: map.getCenter(),
             draggable: true,
             cursor: 'move',
-            animation: 'AMAP_ANIMATION_BOUNCE',
-            offset: new AMap.Pixel(-13, -30), // 设置标记点的偏移量
+            animation: 'AMAP_ANIMATION_BOUNCE'
         });
 
-        // 确保标记添加到地图上
         marker.setMap(map);
 
         // 地图点击事件
@@ -62,17 +59,21 @@ window.initAMap = async (helper) => {
         autoComplete = new AMap.AutoComplete({
             city: '全国'
         });
-
-        // 确保地图和标记都已经加载
-        map.on('complete', () => {
-            if (marker && !marker.getMap()) {
-                marker.setMap(map);
-            }
-        });
     } catch (error) {
         console.error('Failed to initialize AMap:', error);
         await dotNetHelper.invokeMethodAsync('HandleMapError', 'Failed to initialize map');
     }
+};
+
+// 地图点击事件处理函数
+const handleMapClick = (e) => {
+    marker.setPosition(e.lnglat);
+    updateLocationInfo(e.lnglat);
+};
+
+// 标记拖拽结束事件处理函数
+const handleMarkerDragend = (e) => {
+    updateLocationInfo(e.lnglat);
 };
 
 // 搜索位置
@@ -85,7 +86,6 @@ window.searchLocation = (keyword) => {
                 latitude: tip.location?.lat || 0,
                 longitude: tip.location?.lng || 0
             }));
-            isSearchMode = true; // 设置为搜索模式
             dotNetHelper.invokeMethodAsync('UpdateSearchResults', locations);
         }
     });
@@ -95,63 +95,8 @@ window.searchLocation = (keyword) => {
 window.setMapCenter = (lat, lng) => {
     const position = new AMap.LngLat(lng, lat);
     map.setCenter(position);
-    
-    // 确保标记存在并显示在地图上
-    if (!marker.getMap()) {
-        marker.setMap(map);
-    }
-    
-    // 重新设置标记位置并确保可见
-    marker.show();
     marker.setPosition(position);
-    isSearchMode = true;
     updateLocationInfo(position);
-};
-
-// 定位成功回调
-async function onLocationComplete(data) {
-    try {
-        console.log('Location success:', data);
-        if (data.accuracy > 2000) {
-            console.warn('定位精度较低，但仍继续使用');
-        }
-
-        const position = [data.position.lng, data.position.lat];
-        map.setCenter(position);
-
-        // 如果不是搜索模式，或者是通过定位按钮触发的，则更新标记位置
-        if (!isSearchMode || data.isButtonClick) {
-            // 确保标记存在
-            if (!marker.getMap()) {
-                marker.setMap(map);
-            }
-            marker.show(); // 确保标记可见
-            marker.setPosition(position);
-            isSearchMode = false;
-            await updateLocationInfo(new AMap.LngLat(position[0], position[1]));
-        }
-    } catch (error) {
-        onLocationError(error);
-    }
-}
-
-// 地图点击事件处理函数
-const handleMapClick = (e) => {
-    // 确保标记存在并可见
-    if (!marker.getMap()) {
-        marker.setMap(map);
-    }
-    marker.show();
-    marker.setPosition(e.lnglat);
-    isSearchMode = true;
-    updateLocationInfo(e.lnglat);
-};
-
-// 标记拖拽结束事件处理函数
-const handleMarkerDragend = (e) => {
-    marker.show(); // 确保标记可见
-    isSearchMode = true;
-    updateLocationInfo(e.lnglat);
 };
 
 // 获取当前位置信息
@@ -275,10 +220,111 @@ async function checkLocationPermission() {
     }
 }
 
+// 初始化定位插件
+function initGeolocation() {
+    return new Promise((resolve, reject) => {
+        AMap.plugin('AMap.Geolocation', () => {
+            geolocation = new AMap.Geolocation({
+                enableHighAccuracy: true,    // 使用高精度定位
+                timeout: 20000,              // 超时时间
+                buttonPosition: 'RB',        // 定位按钮位置
+                buttonOffset: [10, 20],      // 定位按钮偏移量，改用数组而不是Pixel对象
+                showButton: true,            // 显示定位按钮
+                showMarker: true,            // 显示定位点
+                showCircle: true,            // 显示精度圈
+                panToLocation: true,         // 定位成功后将定位到定位点
+                GeoLocationFirst: false,     // 禁用浏览器定位
+                useNative: false,            // 禁用安卓定位sdk
+                noIpLocate: 0,              // 是否禁止使用IP定位，0为不禁止
+                getCityWhenFail: true,      // 定位失败后，是否返回基本城市定位信息
+                needAddress: true,           // 是否需要将定位结果进行逆地理编码操作
+                extensions: 'all'            // 返回基本+详细定位信息
+            });
+
+            map.addControl(geolocation);
+
+            // 直接使用高德定位服务
+            geolocation.getCurrentPosition((status, result) => {
+                console.log('Initial location attempt:', status, JSON.stringify(result, null, 2));
+                if (status === 'complete') {
+                    onLocationComplete(result);
+                } else {
+                    // 如果精确定位失败，尝试使用IP定位
+                    if (result.info === 'FAILED') {
+                        AMap.plugin('AMap.CitySearch', function () {
+                            var citySearch = new AMap.CitySearch();
+                            citySearch.getLocalCity(function (status, result) {
+                                console.log('City search result:', status, JSON.stringify(result, null, 2));
+                                if (status === 'complete' && result.info === 'OK') {
+                                    // 使用城市中心点作为定位结果
+                                    const coords = result.rectangle.split(';')[0].split(',');
+                                    onLocationComplete({
+                                        position: {
+                                            lng: parseFloat(coords[0]),
+                                            lat: parseFloat(coords[1])
+                                        },
+                                        formattedAddress: result.city,
+                                        addressComponent: {
+                                            city: result.city,
+                                            province: result.province
+                                        }
+                                    });
+                                } else {
+                                    onLocationError(result);
+                                }
+                            });
+                        });
+                    } else {
+                        onLocationError(result);
+                    }
+                }
+            });
+
+            // 监听定位按钮点击事件
+            geolocation.on('complete', data => {
+                console.log('Location complete event:', JSON.stringify(data, null, 2));
+                onLocationComplete(data);
+            });
+            geolocation.on('error', data => {
+                console.log('Location error event:', JSON.stringify(data, null, 2));
+                onLocationError(data);
+            });
+
+            resolve();
+        });
+    });
+}
+
+// 定位成功回调
+async function onLocationComplete(data) {
+    try {
+        console.log('Location success:', JSON.stringify(data, null, 2));
+        // 放宽精度限制到2000米
+        if (data.accuracy > 2000) {
+            console.warn('定位精度较低，但仍继续使用');
+        }
+
+        if (!data.position || typeof data.position.lng === 'undefined' || typeof data.position.lat === 'undefined') {
+            console.error('Invalid position data:', data);
+            throw new Error('无效的位置数据');
+        }
+
+        const position = [data.position.lng, data.position.lat];
+        map.setCenter(position);
+        if (marker) {
+            marker.setPosition(position);
+            await updateLocationInfo(new AMap.LngLat(position[0], position[1]));
+        }
+    } catch (error) {
+        console.error('Error in onLocationComplete:', error);
+        onLocationError(error);
+    }
+}
+
 // 定位失败回调
 async function onLocationError(error) {
     console.error('Location error details:', {
-        error: error,
+        error: JSON.stringify(error, null, 2),
         message: error.message || error.info,
         code: error.code,
         info: error.info,
@@ -289,22 +335,22 @@ async function onLocationError(error) {
     let errorMessage = '获取位置失败';
 
     try {
-        if (error.code) {
-            // HTML5 Geolocation 错误
-            switch(error.code) {
-                case 1: // PERMISSION_DENIED
-                    errorMessage = '请允许使用位置信息';
-                    break;
-                case 2: // POSITION_UNAVAILABLE
-                    errorMessage = '无法获取当前位置，请确保GPS已开启';
-                    break;
-                case 3: // TIMEOUT
-                    errorMessage = '获取位置超时，请检查网络连接';
-                    break;
-            }
-        } else if (error.info) {
+        if (error.info) {
             if (error.info.indexOf('FAILED') > -1) {
-                errorMessage = '定位失败，请检查GPS是否开启并确保在室外开阔场地';
+                // 尝试使用IP定位
+                AMap.plugin('AMap.CitySearch', function () {
+                    var citySearch = new AMap.CitySearch();
+                    citySearch.getLocalCity(function (status, result) {
+                        console.log('Fallback city search:', status, JSON.stringify(result, null, 2));
+                        if (status === 'complete' && result.info === 'OK') {
+                            errorMessage = `已定位到城市：${result.city}`;
+                        } else {
+                            errorMessage = '定位失败，请检查网络连接';
+                        }
+                        dotNetHelper?.invokeMethodAsync('HandleMapError', errorMessage);
+                    });
+                });
+                return;
             } else if (error.info.indexOf('TIMEOUT') > -1) {
                 errorMessage = '定位超时，请检查网络连接并重试';
             } else {
@@ -313,12 +359,8 @@ async function onLocationError(error) {
         } else if (error.message) {
             errorMessage = error.message;
         }
-
-        // 检查是否是权限问题
-        if (errorMessage.includes('权限') || error.message?.includes('permission')) {
-            await checkLocationPermission();
-        }
     } catch (permError) {
+        console.error('Error in error handling:', permError);
         errorMessage = permError.message;
     }
 
@@ -408,53 +450,5 @@ function loadAMapScript() {
         script.onload = () => resolve();
         script.onerror = () => reject();
         document.head.appendChild(script);
-    });
-}
-
-// 初始化定位插件
-function initGeolocation() {
-    return new Promise((resolve, reject) => {
-        AMap.plugin('AMap.Geolocation', () => {
-            geolocation = new AMap.Geolocation({
-                enableHighAccuracy: true,    // 使用高精度定位
-                timeout: 20000,              // 超时时间
-                buttonPosition: 'RB',        // 定位按钮位置
-                buttonOffset: new AMap.Pixel(10, 20), // 定位按钮偏移量
-                showButton: true,            // 显示定位按钮
-                showMarker: false,           // 不显示定位点（我们使用自己的标记）
-                showCircle: false,           // 不显示精度圈
-                panToLocation: true,         // 定位成功后将定位到定位点
-                GeoLocationFirst: true,      // 优先使用浏览器定位
-                useNative: true              // 使用安卓定位sdk
-            });
-
-            map.addControl(geolocation);
-            
-            // 先检查权限
-            checkLocationPermission().then(() => {
-                // 立即尝试定位
-                geolocation.getCurrentPosition((status, result) => {
-                    console.log('Initial location attempt:', status, result);
-                    if (status === 'complete') {
-                        result.isButtonClick = false; // 标记不是通过按钮点击触发的
-                        onLocationComplete(result);
-                    } else {
-                        onLocationError(result);
-                    }
-                });
-
-                // 监听定位按钮点击事件
-                geolocation.on('complete', (result) => {
-                    result.isButtonClick = true; // 标记是通过按钮点击触发的
-                    onLocationComplete(result);
-                });
-                geolocation.on('error', onLocationError);
-            }).catch(error => {
-                console.error('Permission check failed:', error);
-                onLocationError(error);
-            });
-
-            resolve();
-        });
     });
 }

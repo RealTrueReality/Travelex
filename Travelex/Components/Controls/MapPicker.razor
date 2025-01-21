@@ -84,7 +84,6 @@
     private DotNetObjectReference<MapPicker>? _dotNetRef;
     private bool _hasError = false;
     private string _errorMessage = "";
-    private LocationResult? _selectedLocation;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -111,33 +110,36 @@
     private async Task SelectSearchResult(LocationResult result)
     {
         _searchResults.Clear();
-        _searchKeyword = "";
-        await JSRuntime.InvokeVoidAsync("setMapCenter", 
-            result.Latitude, 
-            result.Longitude,
-            result.Name,
-            result.Address);
-        await UpdateSelectedLocation(result);
-    }
-
-    [JSInvokable]
-    public async Task UpdateSelectedLocation(LocationResult location)
-    {
-        _selectedLocation = location;
-        StateHasChanged();
+        await JSRuntime.InvokeVoidAsync("setMapCenter", result.Latitude, result.Longitude);
     }
 
     private async Task ConfirmLocation()
     {
-        if (_selectedLocation != null)
+        try 
         {
-            await OnLocationSelected.InvokeAsync(
-                (_selectedLocation.Name,
-                 _selectedLocation.Address,
-                 _selectedLocation.Latitude,
-                 _selectedLocation.Longitude));
+            var hasPermission = await CheckLocationPermission();
+            if (!hasPermission) return;
+
+            var location = await JSRuntime.InvokeAsync<LocationResult>("getCurrentLocation");
+            if (location == null)
+            {
+                _hasError = true;
+                _errorMessage = "无法获取位置信息，请重试";
+                StateHasChanged();
+                return;
+            }
+
+            Console.WriteLine($"Selected location: {location.Name}, {location.Address}, {location.Latitude}, {location.Longitude}");
+            await OnLocationSelected.InvokeAsync((location.Name, location.Address, location.Latitude, location.Longitude));
+            await Close();
         }
-        await Close();
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in ConfirmLocation: {ex.Message}");
+            _hasError = true;
+            _errorMessage = "获取位置信息失败，请稍后重试";
+            StateHasChanged();
+        }
     }
 
     [JSInvokable]
