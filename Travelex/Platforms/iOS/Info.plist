@@ -34,6 +34,10 @@
 	<string>此应用需要访问相册来选择旅行照片</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>此应用需要访问相册来保存旅行照片</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>此应用需要访问位置信息来显示您当前的位置</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>此应用需要访问位置信息来显示您当前的位置</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.xianyu.zz</string>
 </dict>

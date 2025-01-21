@@ -142,44 +142,32 @@
         }
     }
 
-    private async Task Close()
-    {
-        await OnClose.InvokeAsync();
-    }
-
-    [JSInvokable("CheckLocationPermission")]
+    [JSInvokable]
     public async Task<bool> CheckLocationPermission()
     {
         try
         {
-            var hasPermission = await LocationService.CheckAndRequestLocationPermission();
-            if (!hasPermission)
-            {
-                HandleMapError("请在系统设置中允许应用使用位置信息");
-            }
-            return hasPermission;
+            return await LocationService.CheckAndRequestLocationPermission();
         }
         catch (Exception ex)
         {
-            HandleMapError("获取位置权限时出错");
+            _errorMessage = "获取位置权限失败";
+            await InvokeAsync(StateHasChanged);
             return false;
         }
     }
 
-    [JSInvokable("HandleMapError")]
-    public void HandleMapError(string message)
+    [JSInvokable]
+    public async Task HandleMapError(string error)
     {
+        _errorMessage = error;
         _hasError = true;
-        _errorMessage = message;
-        StateHasChanged();
-        
-        // 3秒后自动隐藏错误信息
-        Task.Delay(3000).ContinueWith(_ =>
-        {
-            _hasError = false;
-            _errorMessage = string.Empty;
-            InvokeAsync(StateHasChanged);
-        });
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task Close()
+    {
+        await OnClose.InvokeAsync();
     }
 
     public void Dispose()

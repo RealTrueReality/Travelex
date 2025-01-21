@@ -200,34 +200,22 @@ async function checkLocationPermission() {
         throw new Error('您的设备不支持地理定位');
     }
 
-    // 通过 .NET MAUI 检查和请求权限
-    if (dotNetHelper) {
-        const hasPermission = await dotNetHelper.invokeMethodAsync('CheckLocationPermission');
-        if (!hasPermission) {
-            throw new Error('未获得位置权限');
-        }
+    // 检查网络连接
+    if (!navigator.onLine) {
+        throw new Error('请检查网络连接');
     }
 
-    // 检查GPS是否开启（仅适用于Android）
-    if (navigator.userAgent.toLowerCase().indexOf('android') > -1) {
+    // 通过 .NET MAUI 检查和请求权限
+    if (dotNetHelper) {
         try {
-            const result = await new Promise((resolve) => {
-                AMap.plugin('AMap.Geolocation', () => {
-                    const tempGeo = new AMap.Geolocation({
-                        enableHighAccuracy: true,
-                        timeout: 2000
-                    });
-                    tempGeo.getCurrentPosition((status, data) => {
-                        resolve({ status, data });
-                    });
-                });
-            });
-
-            if (result.status === 'error' && result.data && result.data.message && result.data.message.indexOf('定位失败') > -1) {
-                throw new Error('请开启GPS定位服务');
+            const hasPermission = await dotNetHelper.invokeMethodAsync('CheckLocationPermission');
+            console.log('Location permission check result:', hasPermission);
+            if (!hasPermission) {
+                throw new Error('未获得位置权限，请在系统设置中允许使用位置信息');
             }
         } catch (error) {
-            throw new Error('请开启GPS定位服务');
+            console.error('Error checking permission:', error);
+            throw new Error('检查位置权限失败');
         }
     }
 }
@@ -237,25 +225,39 @@ function initGeolocation() {
     return new Promise((resolve, reject) => {
         AMap.plugin('AMap.Geolocation', () => {
             geolocation = new AMap.Geolocation({
-                enableHighAccuracy: true, // 使用高精度定位
-                timeout: 10000,          // 超时时间
-                offset: [10, 20],        // 偏移量
-                zoomToAccuracy: true,    // 定位成功后调整地图视野范围
-                position: 'RB',          // 定位按钮位置
-                buttonPosition: 'RB',     // 定位按钮位置
+                enableHighAccuracy: true,    // 使用高精度定位
+                timeout: 20000,              // 增加超时时间到20秒
+                buttonPosition: 'RB',        // 定位按钮位置
                 buttonOffset: new AMap.Pixel(10, 20), // 定位按钮偏移量
-                showButton: true,        // 显示定位按钮
-                showMarker: false,       // 不显示定位点
-                showCircle: false,       // 不显示精度圈
-                panToLocation: true,     // 定位成功后将定位到定位点
-                GeoLocationFirst: true   // 优先使用浏览器定位
+                showButton: true,            // 显示定位按钮
+                showMarker: true,            // 显示定位点
+                showCircle: true,            // 显示精度圈
+                panToLocation: true,         // 定位成功后将定位到定位点
+                GeoLocationFirst: true,      // 优先使用浏览器定位
+                useNative: true              // 使用安卓定位sdk
             });
 
             map.addControl(geolocation);
+            
+            // 先检查权限
+            checkLocationPermission().then(() => {
+                // 立即尝试定位
+                geolocation.getCurrentPosition((status, result) => {
+                    console.log('Initial location attempt:', status, result);
+                    if (status === 'complete') {
+                        onLocationComplete(result);
+                    } else {
+                        onLocationError(result);
+                    }
+                });
 
-            // 监听定位按钮点击事件
-            geolocation.on('complete', onLocationComplete);
-            geolocation.on('error', onLocationError);
+                // 监听定位按钮点击事件
+                geolocation.on('complete', onLocationComplete);
+                geolocation.on('error', onLocationError);
+            }).catch(error => {
+                console.error('Permission check failed:', error);
+                onLocationError(error);
+            });
 
             resolve();
         });
@@ -266,9 +268,9 @@ function initGeolocation() {
 async function onLocationComplete(data) {
     try {
         console.log('Location success:', data);
-        // 检查定位精度
-        if (data.accuracy > 1000) { // 精度超过1000米
-            throw new Error('定位精度较低，请检查GPS信号');
+        // 放宽精度限制到2000米
+        if (data.accuracy > 2000) {
+            console.warn('定位精度较低，但仍继续使用');
         }
 
         const position = [data.position.lng, data.position.lat];
@@ -284,51 +286,53 @@ async function onLocationComplete(data) {
 
 // 定位失败回调
 async function onLocationError(error) {
-    console.error('Location error:', error);
+    console.error('Location error details:', {
+        error: error,
+        message: error.message || error.info,
+        code: error.code,
+        info: error.info,
+        type: error.type,
+        status: error.status
+    });
+
     let errorMessage = '获取位置失败';
 
     try {
-        // 检查定位条件
-        await checkLocationPermission();
-        
-        // 如果权限检查通过，但仍然失败，可能是其他原因
-        if (error.info) {
-            // AMap 错误
+        if (error.code) {
+            // HTML5 Geolocation 错误
+            switch(error.code) {
+                case 1: // PERMISSION_DENIED
+                    errorMessage = '请允许使用位置信息';
+                    break;
+                case 2: // POSITION_UNAVAILABLE
+                    errorMessage = '无法获取当前位置，请确保GPS已开启';
+                    break;
+                case 3: // TIMEOUT
+                    errorMessage = '获取位置超时，请检查网络连接';
+                    break;
+            }
+        } else if (error.info) {
             if (error.info.indexOf('FAILED') > -1) {
-                errorMessage = '定位失败，请检查GPS是否开启';
+                errorMessage = '定位失败，请检查GPS是否开启并确保在室外开阔场地';
             } else if (error.info.indexOf('TIMEOUT') > -1) {
-                errorMessage = '定位超时，请检查网络连接';
+                errorMessage = '定位超时，请检查网络连接并重试';
             } else {
                 errorMessage = error.info;
             }
-        } else if (error.code) {
-            // HTML5 Geolocation 错误
-            switch(error.code) {
-                case error.PERMISSION_DENIED:
-                    errorMessage = '请允许使用位置信息';
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    errorMessage = '无法获取当前位置';
-                    break;
-                case error.TIMEOUT:
-                    errorMessage = '获取位置超时';
-                    break;
-                default:
-                    errorMessage = '定位失败，请稍后重试';
-            }
+        } else if (error.message) {
+            errorMessage = error.message;
+        }
+
+        // 检查是否是权限问题
+        if (errorMessage.includes('权限') || error.message?.includes('permission')) {
+            await checkLocationPermission();
         }
     } catch (permError) {
         errorMessage = permError.message;
     }
 
-    try {
-        if (dotNetHelper) {
-            await dotNetHelper.invokeMethodAsync('HandleMapError', errorMessage);
-        }
-    } catch (invokeError) {
-        console.error('Failed to invoke HandleMapError:', invokeError);
-        // 如果调用失败，使用alert作为后备方案
-        alert(errorMessage);
+    if (dotNetHelper) {
+        await dotNetHelper.invokeMethodAsync('HandleMapError', errorMessage);
     }
 }
 
