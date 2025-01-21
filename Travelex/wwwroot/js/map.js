@@ -84,7 +84,9 @@ window.searchLocation = (keyword) => {
                 name: tip.name,
                 address: tip.district + tip.address,
                 latitude: tip.location?.lat || 0,
-                longitude: tip.location?.lng || 0
+                longitude: tip.location?.lng || 0,
+                district: tip.district || '',
+                adcode: tip.adcode || ''
             }));
             dotNetHelper.invokeMethodAsync('UpdateSearchResults', locations);
         }
@@ -92,11 +94,36 @@ window.searchLocation = (keyword) => {
 };
 
 // 设置地图中心点
-window.setMapCenter = (lat, lng) => {
+window.setMapCenter = async (lat, lng) => {
     const position = new AMap.LngLat(lng, lat);
-    map.setCenter(position);
-    marker.setPosition(position);
-    updateLocationInfo(position);
+    
+    // 确保标记存在
+    if (!marker) {
+        marker = new AMap.Marker({
+            position: position,
+            draggable: true,
+            cursor: 'move',
+            animation: 'AMAP_ANIMATION_BOUNCE'
+        });
+        marker.setMap(map);
+        
+        // 标记拖拽结束事件
+        marker.on('dragend', handleMarkerDragend);
+    } else {
+        // 如果标记已存在，更新位置并添加动画
+        marker.setPosition(position);
+        marker.setAnimation('AMAP_ANIMATION_BOUNCE');
+        setTimeout(() => marker.setAnimation(null), 3500); // 3.5秒后停止动画
+    }
+
+    // 设置地图中心点并缩放
+    map.setZoomAndCenter(15, position, false, 1000); // 使用动画过渡
+    
+    // 确保标记可见
+    marker.show();
+    
+    // 更新位置信息
+    await updateLocationInfo(position);
 };
 
 // 获取当前位置信息
@@ -337,35 +364,64 @@ async function onLocationError(error) {
 }
 
 // 更新位置信息
-function updateLocationInfo(lnglat) {
-    geocoder.getAddress([lnglat.getLng(), lnglat.getLat()], (status, result) => {
-        if (status === 'complete' && result.regeocode) {
-            const pois = result.regeocode.pois || [];
-            let locationName = '';
-            if (pois.length > 0) {
-                locationName = pois[0].name;
-            }
-
-            // 如果没有POI，则使用简化的地址
-            if (!locationName) {
-                const addressComponent = result.regeocode.addressComponent;
-                const components = [];
-                if (addressComponent.district) components.push(addressComponent.district);
-                if (addressComponent.township) components.push(addressComponent.township);
-                if (addressComponent.street) components.push(addressComponent.street);
-                if (addressComponent.streetNumber) components.push(addressComponent.streetNumber);
-                locationName = components.join('');
-            }
-
-            const locationResult = {
-                name: locationName || result.regeocode.formattedAddress,
-                address: result.regeocode.formattedAddress,
-                latitude: lnglat.getLat(),
-                longitude: lnglat.getLng()
-            };
-            console.log('Location result:', locationResult);
+async function updateLocationInfo(lnglat) {
+    try {
+        if (!geocoder) {
+            console.warn('Geocoder not initialized');
+            return;
         }
-    });
+
+        return new Promise((resolve, reject) => {
+            geocoder.getAddress([lnglat.getLng(), lnglat.getLat()], (status, result) => {
+                if (status === 'complete' && result.regeocode) {
+                    const addressComponent = result.regeocode.addressComponent;
+                    const pois = result.regeocode.pois || [];
+                    
+                    // 优先使用最近的POI名称
+                    let locationName = '';
+                    if (pois.length > 0) {
+                        locationName = pois[0].name;
+                    }
+
+                    // 如果没有POI，则使用简化的地址
+                    if (!locationName) {
+                        const components = [];
+                        if (addressComponent.district) components.push(addressComponent.district);
+                        if (addressComponent.township) components.push(addressComponent.township);
+                        if (addressComponent.street) components.push(addressComponent.street);
+                        if (addressComponent.streetNumber) components.push(addressComponent.streetNumber);
+                        locationName = components.join('');
+                    }
+
+                    const locationInfo = {
+                        name: locationName || result.regeocode.formattedAddress,
+                        address: result.regeocode.formattedAddress,
+                        latitude: lnglat.getLat(),
+                        longitude: lnglat.getLng()
+                    };
+
+                    console.log('Updated location info:', locationInfo);
+                    resolve(locationInfo);
+                } else {
+                    console.warn('Failed to get address');
+                    resolve({
+                        name: '未知地点',
+                        address: `${lnglat.getLat().toFixed(6)}, ${lnglat.getLng().toFixed(6)}`,
+                        latitude: lnglat.getLat(),
+                        longitude: lnglat.getLng()
+                    });
+                }
+            });
+        });
+    } catch (error) {
+        console.error('Error updating location info:', error);
+        return {
+            name: '未知地点',
+            address: `${lnglat.getLat().toFixed(6)}, ${lnglat.getLng().toFixed(6)}`,
+            latitude: lnglat.getLat(),
+            longitude: lnglat.getLng()
+        };
+    }
 }
 
 // 清理地图资源
