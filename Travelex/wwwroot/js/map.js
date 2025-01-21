@@ -38,8 +38,12 @@ window.initAMap = async (helper) => {
             position: map.getCenter(),
             draggable: true,
             cursor: 'move',
-            animation: 'AMAP_ANIMATION_BOUNCE'
+            animation: 'AMAP_ANIMATION_BOUNCE',
+            offset: new AMap.Pixel(-13, -30), // 设置标记点的偏移量
         });
+
+        // 确保标记添加到地图上
+        marker.setMap(map);
 
         // 地图点击事件
         map.on('click', handleMapClick);
@@ -57,6 +61,13 @@ window.initAMap = async (helper) => {
         // 初始化搜索服务
         autoComplete = new AMap.AutoComplete({
             city: '全国'
+        });
+
+        // 确保地图和标记都已经加载
+        map.on('complete', () => {
+            if (marker && !marker.getMap()) {
+                marker.setMap(map);
+            }
         });
     } catch (error) {
         console.error('Failed to initialize AMap:', error);
@@ -90,8 +101,10 @@ window.setMapCenter = (lat, lng) => {
         marker.setMap(map);
     }
     
+    // 重新设置标记位置并确保可见
+    marker.show();
     marker.setPosition(position);
-    isSearchMode = true; // 设置为搜索模式
+    isSearchMode = true;
     updateLocationInfo(position);
 };
 
@@ -108,12 +121,13 @@ async function onLocationComplete(data) {
 
         // 如果不是搜索模式，或者是通过定位按钮触发的，则更新标记位置
         if (!isSearchMode || data.isButtonClick) {
-            if (marker.getMap()) {
-                marker.setMap(null); // 移除现有标记
+            // 确保标记存在
+            if (!marker.getMap()) {
+                marker.setMap(map);
             }
+            marker.show(); // 确保标记可见
             marker.setPosition(position);
-            marker.setMap(map);
-            isSearchMode = false; // 重置搜索模式
+            isSearchMode = false;
             await updateLocationInfo(new AMap.LngLat(position[0], position[1]));
         }
     } catch (error) {
@@ -121,67 +135,22 @@ async function onLocationComplete(data) {
     }
 }
 
-// 初始化定位插件
-function initGeolocation() {
-    return new Promise((resolve, reject) => {
-        AMap.plugin('AMap.Geolocation', () => {
-            geolocation = new AMap.Geolocation({
-                enableHighAccuracy: true,    // 使用高精度定位
-                timeout: 20000,              // 超时时间
-                buttonPosition: 'RB',        // 定位按钮位置
-                buttonOffset: new AMap.Pixel(10, 20), // 定位按钮偏移量
-                showButton: true,            // 显示定位按钮
-                showMarker: false,           // 不显示定位点（我们使用自己的标记）
-                showCircle: false,           // 不显示精度圈
-                panToLocation: true,         // 定位成功后将定位到定位点
-                GeoLocationFirst: true,      // 优先使用浏览器定位
-                useNative: true              // 使用安卓定位sdk
-            });
-
-            map.addControl(geolocation);
-            
-            // 先检查权限
-            checkLocationPermission().then(() => {
-                // 立即尝试定位
-                geolocation.getCurrentPosition((status, result) => {
-                    console.log('Initial location attempt:', status, result);
-                    if (status === 'complete') {
-                        result.isButtonClick = false; // 标记不是通过按钮点击触发的
-                        onLocationComplete(result);
-                    } else {
-                        onLocationError(result);
-                    }
-                });
-
-                // 监听定位按钮点击事件
-                geolocation.on('complete', (result) => {
-                    result.isButtonClick = true; // 标记是通过按钮点击触发的
-                    onLocationComplete(result);
-                });
-                geolocation.on('error', onLocationError);
-            }).catch(error => {
-                console.error('Permission check failed:', error);
-                onLocationError(error);
-            });
-
-            resolve();
-        });
-    });
-}
-
 // 地图点击事件处理函数
 const handleMapClick = (e) => {
+    // 确保标记存在并可见
     if (!marker.getMap()) {
         marker.setMap(map);
     }
+    marker.show();
     marker.setPosition(e.lnglat);
-    isSearchMode = true; // 设置为搜索模式
+    isSearchMode = true;
     updateLocationInfo(e.lnglat);
 };
 
 // 标记拖拽结束事件处理函数
 const handleMarkerDragend = (e) => {
-    isSearchMode = true; // 设置为搜索模式
+    marker.show(); // 确保标记可见
+    isSearchMode = true;
     updateLocationInfo(e.lnglat);
 };
 
@@ -439,5 +408,53 @@ function loadAMapScript() {
         script.onload = () => resolve();
         script.onerror = () => reject();
         document.head.appendChild(script);
+    });
+}
+
+// 初始化定位插件
+function initGeolocation() {
+    return new Promise((resolve, reject) => {
+        AMap.plugin('AMap.Geolocation', () => {
+            geolocation = new AMap.Geolocation({
+                enableHighAccuracy: true,    // 使用高精度定位
+                timeout: 20000,              // 超时时间
+                buttonPosition: 'RB',        // 定位按钮位置
+                buttonOffset: new AMap.Pixel(10, 20), // 定位按钮偏移量
+                showButton: true,            // 显示定位按钮
+                showMarker: false,           // 不显示定位点（我们使用自己的标记）
+                showCircle: false,           // 不显示精度圈
+                panToLocation: true,         // 定位成功后将定位到定位点
+                GeoLocationFirst: true,      // 优先使用浏览器定位
+                useNative: true              // 使用安卓定位sdk
+            });
+
+            map.addControl(geolocation);
+            
+            // 先检查权限
+            checkLocationPermission().then(() => {
+                // 立即尝试定位
+                geolocation.getCurrentPosition((status, result) => {
+                    console.log('Initial location attempt:', status, result);
+                    if (status === 'complete') {
+                        result.isButtonClick = false; // 标记不是通过按钮点击触发的
+                        onLocationComplete(result);
+                    } else {
+                        onLocationError(result);
+                    }
+                });
+
+                // 监听定位按钮点击事件
+                geolocation.on('complete', (result) => {
+                    result.isButtonClick = true; // 标记是通过按钮点击触发的
+                    onLocationComplete(result);
+                });
+                geolocation.on('error', onLocationError);
+            }).catch(error => {
+                console.error('Permission check failed:', error);
+                onLocationError(error);
+            });
+
+            resolve();
+        });
     });
 }
