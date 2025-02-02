@@ -29,6 +29,16 @@ public class MainPage : BaseContentPage<ActivityIndicatorViewModel> {
         if (window != null)
         {
             window.BackgroundColor = UIKit.UIColor.White;
+            if (window.RootViewController != null)
+            {
+                window.RootViewController.View.BackgroundColor = UIKit.UIColor.White;
+                if (window.RootViewController.TabBarController != null)
+                {
+                    window.RootViewController.TabBarController.TabBar.BackgroundColor = UIKit.UIColor.White;
+                    window.RootViewController.TabBarController.TabBar.BarTintColor = UIKit.UIColor.White;
+                    window.RootViewController.TabBarController.TabBar.UnselectedItemTintColor = UIKit.UIColor.DarkGray;
+                }
+            }
         }
 #endif
         Content = new Grid {
