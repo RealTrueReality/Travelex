@@ -3,8 +3,6 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Travelex</title>
     <base href="/" />
     <link rel="stylesheet" href="css/app.min.css" />
@@ -22,25 +20,12 @@
             animation: spin 1s linear infinite;
         }
         
-        /* Prevent text selection and touch behaviors on all mobile devices */
-        * {
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-text-size-adjust: none;
-            touch-action: manipulation;
-        }
-        
-        /* Allow text selection in input fields and textareas */
-        input, textarea {
-            -webkit-user-select: text !important;
-            -moz-user-select: text !important;
-            -ms-user-select: text !important;
-            user-select: text !important;
-            touch-action: auto !important;
+        /* Remove focus styles */
+        *:focus {
+            outline: none !important;
+            -webkit-focus-ring-color: transparent !important;
+            box-shadow: none !important;
+            background-color: transparent !important;
         }
     </style>
 </head>
