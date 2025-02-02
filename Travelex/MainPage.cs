@@ -25,9 +25,14 @@ public class MainPage : BaseContentPage<ActivityIndicatorViewModel> {
         Microsoft.Maui.ApplicationModel.Platform.CurrentActivity.Window.SetNavigationBarColor(Android.Graphics.Color.White);
         Microsoft.Maui.ApplicationModel.Platform.CurrentActivity.Window.NavigationBarContrastEnforced = false;
 #elif IOS
-        UIKit.UINavigationBar.Appearance.BarTintColor = UIKit.UIColor.White;
-        UIKit.UINavigationBar.Appearance.TintColor = UIKit.UIColor.DarkText;
-        UIKit.UINavigationBar.Appearance.Translucent = false;
+        if (UIKit.UIApplication.SharedApplication.KeyWindow != null)
+        {
+            UIKit.UIApplication.SharedApplication.KeyWindow.BackgroundColor = UIKit.UIColor.White;
+        }
+        if (UIKit.UIApplication.SharedApplication.Windows[0].RootViewController != null)
+        {
+            UIKit.UIApplication.SharedApplication.Windows[0].RootViewController.View.BackgroundColor = UIKit.UIColor.White;
+        }
 #endif
         Content = new Grid {
             Children = {
