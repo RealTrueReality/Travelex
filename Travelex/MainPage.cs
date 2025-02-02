@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Maui.Behaviors;
+using CommunityToolkit.Maui.Behaviors;
 using CommunityToolkit.Maui.Core;
 using CommunityToolkit.Maui.Markup;
 using Microsoft.AspNetCore.Components.WebView.Maui;
@@ -20,6 +20,15 @@ public class MainPage : BaseContentPage<ActivityIndicatorViewModel> {
             StatusBarStyle = StatusBarStyle.DarkContent
         });
 #pragma warning restore CA1416
+
+#if ANDROID
+        Microsoft.Maui.ApplicationModel.Platform.CurrentActivity.Window.SetNavigationBarColor(Android.Graphics.Color.White);
+        Microsoft.Maui.ApplicationModel.Platform.CurrentActivity.Window.NavigationBarContrastEnforced = false;
+#elif IOS
+        UIKit.UINavigationBar.Appearance.BarTintColor = UIKit.UIColor.White;
+        UIKit.UINavigationBar.Appearance.TintColor = UIKit.UIColor.DarkText;
+        UIKit.UINavigationBar.Appearance.Translucent = false;
+#endif
         Content = new Grid {
             Children = {
                 new BlazorWebView {
@@ -39,5 +48,6 @@ public class MainPage : BaseContentPage<ActivityIndicatorViewModel> {
                         setter: (ActivityIndicatorViewModel vm, bool value) => vm.IsLoading = !value)
             }
         };
+
     }
 }
