@@ -55,7 +55,7 @@
         <MauiFont Include="wwwroot\fonts\PlusJakartaSans-Bold.ttf" />
         <MauiFont Include="wwwroot\fonts\PlusJakartaSans-Medium.ttf" />
         <MauiFont Include="wwwroot\fonts\PlusJakartaSans-Regular.ttf" />
-        <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
+        <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#8AC6E6" />
 
         <!-- Splash Screen -->
         <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
