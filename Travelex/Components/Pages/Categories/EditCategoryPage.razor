@@ -6,7 +6,7 @@
 @inject NavigationManager NavigationManager
 @inject ExpenseService ExpenseService
 
-<FixedPageComponent>
+<FlexedPageComponent>
     <TopBarLeft>
         <button @onclick="NavigateBack" class="p-2 text-[#252525]">
             <i class="fas fa-arrow-left text-xl"></i>
@@ -48,7 +48,7 @@
             </div>
         </div>
     </PageBody>
-</FixedPageComponent>
+</FlexedPageComponent>
 
 @code {
     [Parameter]
@@ -99,7 +99,7 @@
         
         if (result.IsSuccess)
         {
-            NavigationManager.NavigateTo("/profile");
+            NavigationManager.NavigateTo("/profile",replace:true);
         }
     }
 
@@ -108,7 +108,7 @@
         var result = await ExpenseService.DeleteExpenseCategoryAsync(CategoryName);
         if (result.IsSuccess)
         {
-            NavigationManager.NavigateTo("/profile");
+            NavigationManager.NavigateTo("/profile",replace:true);
         }
     }
 }

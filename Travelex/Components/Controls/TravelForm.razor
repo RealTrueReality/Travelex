@@ -10,7 +10,7 @@
     <div class="mb-4">
         <div class="relative bg-[#F8FAFC] rounded-xl">
             <InputText @bind-Value="Travel.Title"
-                      class="w-full h-14 px-4 pr-12 bg-transparent text-lg text-gray-600 placeholder-gray-400 focus:outline-none"
+                      class="w-full h-14 px-4 pr-12 bg-transparent text-base text-gray-600 placeholder-gray-400 focus:outline-none"
                       placeholder="输入行程名称"/>
             <div class="absolute right-4 top-1/2 -translate-y-1/2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#64748B]" fill="none"
@@ -27,7 +27,7 @@
     <div class="mb-4">
         <div class="relative bg-[#F8FAFC] rounded-xl">
             <InputTextArea @bind-Value="Travel.Description"
-                          class="w-full min-h-[100px] p-4 bg-transparent text-lg text-gray-600 placeholder-gray-400 focus:outline-none resize-none"
+                          class="w-full min-h-[100px] p-4 bg-transparent text-base text-gray-600 placeholder-gray-400 focus:outline-none resize-none"
                           placeholder="添加行程描述"/>
         </div>
     </div>
@@ -53,7 +53,7 @@
     <div class="mb-4">
         <div class="relative bg-[#F8FAFC] rounded-xl">
             <InputText @bind-Value="Travel.LocationName"
-                      class="w-full h-14 px-4 pr-12 bg-transparent text-lg text-gray-600 placeholder-gray-400 focus:outline-none"
+                      class="w-full h-14 px-4 pr-12 bg-transparent text-base text-gray-600 placeholder-gray-400 focus:outline-none"
                       placeholder="添加目的地"/>
             <button @onclick="OpenMap" type="button" class="absolute right-4 top-1/2 -translate-y-1/2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#64748B]" fill="none"
@@ -72,7 +72,7 @@
     <div class="mb-4">
         <div class="relative bg-[#F8FAFC] rounded-xl">
             <InputSelect @bind-Value="Travel.CategoryName"
-                        class="w-full h-14 px-4 pr-12 bg-transparent text-lg text-gray-600 appearance-none focus:outline-none">
+                        class="w-full h-14 px-4 pr-12 bg-transparent text-base text-gray-600 appearance-none focus:outline-none">
                 <option value="" selected disabled>选择行程类别</option>
                 @foreach (var category in Categories) {
                     <option value="@category.CategoryName">@category.CategoryName</option>
@@ -91,7 +91,7 @@
             <div class="mt-2">
                 <div class="relative bg-[#F8FAFC] rounded-xl">
                     <InputText @bind-Value="CustomCategory"
-                             class="w-full h-14 px-4 bg-transparent text-lg text-gray-600 placeholder-gray-400 focus:outline-none"
+                             class="w-full h-14 px-4 bg-transparent text-base text-gray-600 placeholder-gray-400 focus:outline-none"
                              placeholder="请输入自定义类别"/>
                 </div>
             </div>
@@ -102,7 +102,7 @@
     <div class="mb-4">
         <div class="relative bg-[#F8FAFC] rounded-xl">
             <InputSelect @bind-Value="Travel.Status"
-                        class="w-full h-14 px-4 pr-12 bg-transparent text-lg text-gray-600 appearance-none focus:outline-none">
+                        class="w-full h-14 px-4 pr-12 bg-transparent text-base text-gray-600 appearance-none focus:outline-none">
                 <option value="@TravelStatus.Planning">计划中</option>
                 <option value="@TravelStatus.Ongoing">进行中</option>
                 <option value="@TravelStatus.Completed">已完成</option>

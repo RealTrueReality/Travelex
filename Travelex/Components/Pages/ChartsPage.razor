@@ -9,7 +9,7 @@
 @inject NavigationManager NavigationManager
 @inject TravelService TravelService
 @layout LayoutWithNavBar
-<FixedPageComponent>
+<FlexedPageComponent>
     <TopBarTitle>费用分析</TopBarTitle>
     <PageBody>
         <div class="flex space-x-4 px-4 border-b border-[#EFF2F4]">
@@ -203,7 +203,7 @@
             </div>
         </div>
     </PageBody>
-</FixedPageComponent>
+</FlexedPageComponent>
 
 @code {
     private string _currentTab = "monthly";

@@ -6,7 +6,7 @@
 @inject NavigationManager NavigationManager
 @inject ExpenseService ExpenseService
 
-<FixedPageComponent>
+<FlexedPageComponent>
     <TopBarLeft>
         <button @onclick="NavigateBack" class="p-2 text-[#252525]">
             <i class="fas fa-arrow-left text-xl"></i>
@@ -51,7 +51,7 @@
                     <h2 class="text-xl font-bold text-[#111416] mb-4">支出列表</h2>
                     @foreach (var expense in _expenses)
                     {
-                        <div class="flex justify-between items-start mb-4 p-4 bg-[#F5F5F5] rounded-xl">
+                        <div class="flex justify-between items-start mb-4 p-4 bg-[#F5F5F5] rounded-xl" @onclick="() => EditExpense(expense.Id)">
                             <div class="flex-1 mr-4">
                                 <h3 class="text-lg font-medium text-[#111416]">@expense.Title</h3>
                                 @if (!string.IsNullOrEmpty(expense.Description))
@@ -75,7 +75,7 @@
             }
         </div>
     </PageBody>
-</FixedPageComponent>
+</FlexedPageComponent>
 
 @code {
     [Parameter]

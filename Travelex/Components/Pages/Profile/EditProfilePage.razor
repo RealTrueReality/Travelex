@@ -6,7 +6,12 @@
 @inject AuthService AuthService
 @inject BlazorMauiInterop BlazorMauiInterop
 
-<FixedPageComponent>
+<FlexedPageComponent>
+    <TopBarLeft>
+        <button @onclick="NavigateBack" class="p-2 text-[#252525]">
+            <i class="fas fa-arrow-left text-xl"></i>
+        </button>
+    </TopBarLeft>
     <TopBarTitle>
         编辑个人资料
     </TopBarTitle>
@@ -14,35 +19,29 @@
         <div class="p-4">
             <div class="flex flex-col items-center mb-8">
                 <div class="relative">
-                    @if (!string.IsNullOrEmpty(_profileImage))
-                    {
-                        @if (_profileImage.StartsWith("file://"))
-                        {
+                    @if (!string.IsNullOrEmpty(_profileImage)) {
+                        @if (_profileImage.StartsWith("file://")) {
                             var path = _profileImage[7..];
-                            @if (File.Exists(path) && !string.IsNullOrEmpty(_imageBase64))
-                            {
-                                <img src="data:image/jpeg;base64,@_imageBase64" alt="头像" class="w-24 h-24 rounded-full object-cover" />
+                            @if (File.Exists(path) && !string.IsNullOrEmpty(_imageBase64)) {
+                                <img src="data:image/jpeg;base64,@_imageBase64" alt="头像" class="w-24 h-24 rounded-full object-cover"/>
                             }
-                            else
-                            {
+                            else {
                                 <div class="w-24 h-24 rounded-full bg-[#E8F0F2] flex items-center justify-center">
                                     <span class="text-2xl font-bold text-[#119BED]">@(_displayName?.FirstOrDefault() ?? 'U')</span>
                                 </div>
                             }
                         }
-                        else
-                        {
-                            <img src="@_profileImage" alt="头像" class="w-24 h-24 rounded-full object-cover" />
+                        else {
+                            <img src="@_profileImage" alt="头像" class="w-24 h-24 rounded-full object-cover"/>
                         }
                     }
-                    else
-                    {
+                    else {
                         <div class="w-24 h-24 rounded-full bg-[#E8F0F2] flex items-center justify-center">
                             <span class="text-2xl font-bold text-[#119BED]">@(_displayName?.FirstOrDefault() ?? 'U')</span>
                         </div>
                     }
                     <button @onclick="SelectImage" class="absolute bottom-0 right-0 w-8 h-8 bg-[#119BED] rounded-full flex items-center justify-center">
-                        <img src="images/profilePage/camera.svg" alt="更换头像" class="w-4 h-4" />
+                        <img src="images/profilePage/camera.svg" alt="更换头像" class="w-4 h-4"/>
                     </button>
                 </div>
             </div>
@@ -52,14 +51,14 @@
                     <label for="username" class="block text-sm font-medium text-[#1C160C] mb-1">用户名</label>
                     <input type="text" id="username" @bind="_username"
                            class="w-full px-4 py-2 rounded-lg border border-[#E8F0F2] focus:outline-none focus:border-[#119BED]"
-                           placeholder="输入用户名" />
+                           placeholder="输入用户名"/>
                 </div>
 
                 <div>
                     <label for="displayName" class="block text-sm font-medium text-[#1C160C] mb-1">昵称</label>
                     <input type="text" id="displayName" @bind="_displayName"
                            class="w-full px-4 py-2 rounded-lg border border-[#E8F0F2] focus:outline-none focus:border-[#119BED]"
-                           placeholder="输入昵称" />
+                           placeholder="输入昵称"/>
                 </div>
             </div>
 
@@ -70,7 +69,7 @@
             </div>
         </div>
     </PageBody>
-</FixedPageComponent>
+</FlexedPageComponent>
 
 @code {
     private string? _username;
@@ -195,5 +194,10 @@
 
         await AuthService.ChangeNameAsync(_displayName);
         NavigationManager.NavigateTo("/profile");
+    }
+    
+    private void NavigateBack()
+    {
+        NavigationManager.NavigateTo("/profile", replace:true);
     }
 }

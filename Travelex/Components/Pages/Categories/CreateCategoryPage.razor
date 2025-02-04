@@ -6,7 +6,7 @@
 @inject NavigationManager NavigationManager
 @inject ExpenseService ExpenseService
 
-<FixedPageComponent>
+<FlexedPageComponent>
     <TopBarLeft>
     <button @onclick="NavigateBack" class="p-2 text-[#252525]">
         <i class="fas fa-arrow-left text-xl"></i>
@@ -30,8 +30,8 @@
                     <div class="grid grid-cols-4 gap-4">
                         @foreach (var icon in _availableIcons) {
                             <button @onclick="() => SelectIcon(icon)"
-                                    class="w-12 h-12 rounded-lg @(icon == _selectedIcon ? "bg-[#119BED]" : "bg-[#E8F0F2]") flex items-center justify-center">
-                                <img src="@($"images/expenseCategory/{icon}.svg")" alt="@icon" class="w-6 h-6"/>
+                                    class="w-12 h-12 rounded-lg border border-[#E8F0F2] hover:bg-[#F5F5F5] transition-colors duration-200 flex items-center justify-center @(icon == _selectedIcon ? "bg-[#E8F0F2]" : "bg-white")">
+                                <img src="@($"images/expenseCategory/{icon}.svg")" alt="@icon" class="w-6 h-6 @(icon == _selectedIcon ? "" : "opacity-60")"/>
                             </button>
                         }
                     </div>
@@ -45,7 +45,7 @@
             </div>
         </div>
     </PageBody>
-</FixedPageComponent>
+</FlexedPageComponent>
 
 @code {
     private string _categoryName = "";
@@ -73,11 +73,11 @@
         });
 
         if (result.IsSuccess) {
-            NavigationManager.NavigateTo("/profile");
+            NavigationManager.NavigateTo("/profile",replace:true);
         }
     }
     private void NavigateBack()
     {
-        NavigationManager.NavigateBack();
+        NavigationManager.NavigateTo("/profile",replace:true);
     }
 }
