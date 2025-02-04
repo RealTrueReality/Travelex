@@ -40,7 +40,7 @@
                         </div>
                         <div class="relative">
                             <InputText @bind-Value="_expense.Title"
-                                       class="w-full h-14 px-4 bg-[#F8FAFC]  rounded-xl text-base text-gray-600 focus:outline-none focus:border-[#119BED]"
+                                       class="w-full h-14 px-4 bg-[#F8FAFC] rounded-xl text-base text-gray-600 focus:outline-none focus:border-[#119BED]"
                                        placeholder="添加标题"/>
                         </div>
                         <ValidationMessage For="@(() => _expense.Title)" class="text-red-500 text-sm mt-1"/>
@@ -67,7 +67,7 @@
                         </div>
                         <div class="relative bg-[#F8FAFC] rounded-xl">
                             <InputSelect @bind-Value="_expense.Category"
-                                         class="w-full h-14 px-4 bg-[#F8FAFC]  text-base text-gray-600 focus:outline-none focus:border-[#119BED]"
+                                         class="w-full h-14 px-4 bg-[#F8FAFC] rounded-xl text-base text-gray-600 focus:outline-none focus:border-[#119BED]"
                                          placeholder="例如：餐饮">
                                 <option value="" selected disabled>选择支出类别</option>
                                 @foreach (var category in _categories)
@@ -84,7 +84,7 @@
                                 <div class="relative bg-[#F8FAFC] rounded-xl">
                                     <InputText @bind-Value="CustomCategory"
                                                @onblur=@(() => BlazorMauiInterop.ShowToastAsync("输入的新类别将加入类别列表~"))
-                                               class="w-full h-14 px-4 bg-[#F8FAFC] text-lg text-gray-600 placeholder-gray-400 focus:outline-none"
+                                               class="w-full h-14 px-4 bg-[#F8FAFC] text-lg rounded-xl text-gray-600 placeholder-gray-400 focus:outline-none"
                                                placeholder="请输入自定义类别"/>
                                 </div>
                             </div>
@@ -96,9 +96,9 @@
                         <div class="mb-2">
                             <label class="text-base font-medium text-[#111416]">描述</label>
                         </div>
-                        <div class="relative">
+                        <div class="relative rounded-xl">
                             <InputTextArea @bind-Value="_expense.Description"
-                                           class="w-full min-h-[100px] p-4 bg-[#F8FAFC] text-base text-gray-600 focus:outline-none focus:border-[#119BED] resize-none"
+                                           class="w-full min-h-[100px] p-4 bg-[#F8FAFC] rounded-xl text-base text-gray-600 focus:outline-none focus:border-[#119BED] resize-none"
                                            placeholder="添加描述"/>
                         </div>
                         <ValidationMessage For="@(() => _expense.Description)" class="text-red-500 text-sm mt-1"/>
@@ -111,7 +111,7 @@
                         </div>
                         <div class="relative bg-[#F8FAFC] rounded-xl">
                             <input type="datetime-local"
-                                   class="w-full h-14 px-4 bg-[#F8FAFC] text-base text-gray-600 focus:outline-none focus:border-[#119BED]"
+                                   class="w-full h-14 px-4 bg-[#F8FAFC] rounded-xl text-base text-gray-600 focus:outline-none focus:border-[#119BED]"
                                    value="@_expense.TimeOnSpend.ToString("yyyy-MM-ddTHH:mm")"
                                    @onchange="@(e => OnDateTimeChanged(e))"/>
                         </div>

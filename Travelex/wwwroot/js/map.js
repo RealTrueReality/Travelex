@@ -311,6 +311,7 @@ async function onLocationComplete(data) {
 
         const position = [data.position.lng, data.position.lat];
         map.setCenter(position);
+        map.setZoom(17);  // 定位成功后设置缩放等级为17
         if (marker) {
             marker.setPosition(position);
             await updateLocationInfo(new AMap.LngLat(position[0], position[1]));
