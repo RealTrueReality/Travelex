@@ -1,10 +1,15 @@
 using CommunityToolkit.Maui.Behaviors;
 using CommunityToolkit.Maui.Core;
 using CommunityToolkit.Maui.Markup;
+using Microsoft.AspNetCore.Components.WebView;
 using Microsoft.AspNetCore.Components.WebView.Maui;
+using Microsoft.Maui.Controls;
+using Microsoft.Maui.Platform;
 using Travelex.Pages;
 using Travelex.ViewModels;
-
+#if ANDROID
+using AndroidX.Activity;
+#endif
 namespace Travelex;
 
 public class MainPage : BaseContentPage<ActivityIndicatorViewModel> {
@@ -45,5 +50,31 @@ public class MainPage : BaseContentPage<ActivityIndicatorViewModel> {
             }
         };
 
+        blazorWebView.BlazorWebViewInitialized += BlazorWebViewInitialized;
+        blazorWebView.BlazorWebViewInitializing += BlazorWebViewInitializing;
+    }
+
+    private void BlazorWebViewInitialized(object? sender, BlazorWebViewInitializedEventArgs e)
+    {
+#if ANDROID
+        if (e.WebView.Context?.GetActivity() is not ComponentActivity activity)
+        {
+            throw new InvalidOperationException($"The permission-managing WebChromeClient requires that the current activity be a '{nameof(ComponentActivity)}'.");
+        }
+
+        e.WebView.Settings.JavaScriptEnabled = true;
+        e.WebView.Settings.AllowFileAccess = true;
+        e.WebView.Settings.SetGeolocationEnabled(true);
+        e.WebView.Settings.SetGeolocationDatabasePath(e.WebView.Context?.FilesDir?.Path);
+        e.WebView.SetWebChromeClient(new PermissionManagingBlazorWebChromeClient(e.WebView.WebChromeClient!, activity));
+#endif
+    }
+
+    private void BlazorWebViewInitializing(object? sender, BlazorWebViewInitializingEventArgs e)
+    {
+#if IOS || MACCATALYST                   
+        e.Configuration.AllowsInlineMediaPlayback = true;
+        e.Configuration.MediaTypesRequiringUserActionForPlayback = WebKit.WKAudiovisualMediaTypes.None;
+#endif
     }
 }
