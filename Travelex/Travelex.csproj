@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
         <TargetFrameworks>net8.0-android;net8.0-ios;net8.0-maccatalyst</TargetFrameworks>
@@ -58,8 +58,7 @@
         <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#8AC6E6" />
 
         <!-- Splash Screen -->
-        <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
-
+        <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#FFFFFF"/>
         <!-- Images -->
         <MauiImage Include="Resources\Images\*" />
         <MauiImage Update="Resources\Images\dotnet_bot.svg" BaseSize="168,208" />
@@ -115,5 +114,6 @@
       <AndroidAsset Include="wwwroot\images\tripCategory\roadtrip.png" />
       <AndroidAsset Include="wwwroot\images\tripCategory\travels.png" />
     </ItemGroup>
+    
     
 </Project>
