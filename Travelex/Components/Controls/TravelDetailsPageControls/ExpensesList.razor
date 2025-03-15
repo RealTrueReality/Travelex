@@ -1,0 +1,68 @@
+@using Syncfusion.Blazor.Notifications
+@using ShimmerEffect = Syncfusion.Blazor.Notifications.ShimmerEffect
+@using SkeletonType = Syncfusion.Blazor.Notifications.SkeletonType
+@using Travelex.Entities
+
+<div class="mt-4">
+    @if (IsLoading)
+    {
+        @for (int i = 0; i < 4; i++)
+        {
+            <div class="px-4 py-2">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <SfSkeleton Shape=SkeletonType.Square Width="46px" Height="46px"
+                                    Effect=ShimmerEffect.Wave CssClass="rounded-lg"></SfSkeleton>
+                        <div class="ml-4">
+                            <SfSkeleton Width="116px" Height="16px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                            <div class="flex items-center gap-2 mt-1">
+                                <SfSkeleton Width="142px" Height="12px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                            </div>
+                        </div>
+                    </div>
+                    <SfSkeleton Width="78px" Height="16px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        @foreach (var expense in Expenses)
+        {
+            <div class="px-4 py-2">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-[#E8EFF2] rounded-lg flex items-center justify-center">
+                            <img src="images/expense.svg" class="h-5 w-5" alt="支出"/>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-base font-medium text-[#0C161C]">@expense.Title</p>
+                            <div class="flex items-center gap-2 text-sm text-gray-500">
+                                <span>@expense.TimeOnSpend.ToString("yyyy-MM-dd HH:mm")</span>
+                                <span>·</span>
+                                <span>@expense.Category</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-base font-semibold text-[#0C161C]">¥@expense.Amount?.ToString("N2")</p>
+                </div>
+            </div>
+        }
+    }
+    
+    @if (!IsLoading)
+    {
+        <!-- Add Expense Button -->
+        <div class="p-4">
+            <button @onclick="OnAddExpenseClick" class="w-full bg-[#119BED] text-white h-12 rounded-[20px] text-base font-bold">
+                + 添加一笔支出
+            </button>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public bool IsLoading { get; set; }
+    [Parameter] public List<Expense> Expenses { get; set; } = [];
+    [Parameter] public EventCallback OnAddExpenseClick { get; set; }
+}

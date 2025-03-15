@@ -1,0 +1,135 @@
+@page "/profile"
+@using Travelex.Components.Layout
+@using Travelex.Services
+@using Travelex.Entities
+@using Travelex.Models
+@using Travelex.Extensions
+@using Travelex.Components.Controls.ProfilePageControls
+@inject NavigationManager NavigationManager
+@inject ExpenseService ExpenseService
+@inject AuthService AuthService
+@layout LayoutWithNavBar
+
+<FixedPageComponent>
+    <TopBarTitle>
+        我的
+    </TopBarTitle>
+    <PageBody>
+        @if (_currentUser != null)
+        {
+            <div class="p-4">
+                <!-- 用户资料头部 -->
+                <ProfileHeader 
+                    ProfileImage="@_profileImage" 
+                    ImageBase64="@_imageBase64" 
+                    UserName="@_currentUser.Name" 
+                    OnEditProfile="@EditProfile" />
+
+                <!-- 账户与设置 -->
+                <SettingsSection OnPrivacyClick="@NavigateToPrivacy" />
+
+                <!-- 支出分类 -->
+                <CategoryList 
+                    Categories="@_categories" 
+                    CategoryTotals="@_categoryTotals" 
+                    OnCreateCategory="@CreateNewCategory" 
+                    OnViewCategory="@ViewCategoryExpenses" />
+
+                <!-- 关于我们 -->
+                <AboutSection OnAboutClick="@NavigateToSupport" />
+
+                <!-- 退出登录 -->
+                <LogoutButton OnLogout="@LogOut" />
+            </div>
+        }
+    </PageBody>
+</FixedPageComponent>
+
+@code {
+    private List<ExpenseCategory> _categories = [];
+    private Dictionary<string, double> _categoryTotals = new();
+    private string _profileImage = "";
+    private string _imageBase64 = "";
+    private LoggingModel? _currentUser;
+
+    protected override void OnInitialized()
+    {
+        _currentUser = AuthService.CurrentUser;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadExpenseData();
+        _profileImage = await AuthService.GetProfileImageAsync();
+        await LoadProfileImage();
+    }
+
+    private async Task LoadExpenseData()
+    {
+        var categoryRes = await ExpenseService.GetExpenseCategoriesAsync();
+        if (categoryRes is { IsSuccess: true, Data: not null })
+        {
+            _categories = categoryRes.Data;
+        }
+
+        var expRes = await ExpenseService.GetExpensesAsync();
+        if (expRes is { IsSuccess: true, Data: not null })
+        {
+            _categoryTotals = expRes.Data
+                .GroupBy(e => e.Category)
+                .ToDictionary(g => g.Key, g => g.Sum(e => e.Amount ?? 0));
+        }
+    }
+
+    private async Task LoadProfileImage()
+    {
+        if (!string.IsNullOrEmpty(_profileImage) && _profileImage.StartsWith("file://"))
+        {
+            try
+            {
+                var path = _profileImage[7..];
+                if (File.Exists(path))
+                {
+                    var bytes = await File.ReadAllBytesAsync(path);
+                    _imageBase64 = Convert.ToBase64String(bytes);
+                    StateHasChanged();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"加载头像失败：{ex.Message}");
+            }
+        }
+    }
+
+    private void NavigateToPrivacy()
+    {
+        NavigationManager.NavigateTo("/settings/privacy");
+    }
+
+    private void CreateNewCategory()
+    {
+        NavigationManager.NavigateTo("/categories/create");
+    }
+
+    private void ViewCategoryExpenses(ExpenseCategory category)
+    {
+        NavigationManager.NavigateToSubPage($"/categories/expenses/{category.Name}");
+    }
+
+    private void NavigateToSupport()
+    {
+        NavigationManager.NavigateTo("/about");
+    }
+
+    private void LogOut()
+    {
+        AuthService.LogdOut();
+        NavigationManager.NavigateTo("/login", replace: true);
+    }
+
+    private void EditProfile()
+    {
+        NavigationManager.NavigateTo("/profile/edit");
+    }
+}

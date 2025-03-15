@@ -1,4 +1,6 @@
-﻿namespace Travelex.Models;
+﻿using Travelex.Entities;
+
+namespace Travelex.Models;
 
 public class ResultDataModel<T>(bool isSuccess, string? message, T? data) {
     public bool IsSuccess { get; } = isSuccess;

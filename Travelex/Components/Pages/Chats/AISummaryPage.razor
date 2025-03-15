@@ -1,0 +1,541 @@
+@page "/ai-summary"
+@using Travelex.Components.Layout
+@using Travelex.Entities
+@using Travelex.Services
+@using Travelex.Extensions
+@using Travelex.Models
+@using System.Text.Json
+@using Travelex.Utils
+@using Markdig
+@inject NavigationManager NavigationManager
+@inject DashScopeService DashScopeService
+@inject TravelService TravelService
+@inject ExpenseService ExpenseService
+@inject AuthService AuthService
+@inject IJSRuntime JSRuntime
+@inject BlazorMauiInterop BlazorMauiInterop
+
+<FlexedPageComponent>
+    <TopBarLeft>
+        <button @onclick="NavigateBack" class="p-2 text-gray-600">
+            <i class="fas fa-arrow-left text-lg"></i>
+        </button>
+    </TopBarLeft>
+    <TopBarTitle>AI助手</TopBarTitle>
+    <TopBarRight>
+        <button @onclick="NewConversation" class="p-2 text-gray-600">
+            <i class="fas fa-plus text-lg"></i>
+        </button>
+    </TopBarRight>
+    <PageBody>
+        <div class="flex-1 overflow-auto px-4 py-2" id="chatContainer">
+            @if (_messages.Count == 0) {
+                <div class="flex flex-col items-center justify-center h-full">
+                    <div
+                        class="w-full max-w-2xl bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg">
+                        <h2 class="text-xl font-semibold mb-4">欢迎使用 天壤AI 分析助手！</h2>
+                        <div class="space-y-2 mb-6">
+                            <p class="flex items-center gap-2">
+                                <i class="fas fa-chart-line"></i>
+                                <span>分析所有旅行的总支出趋势</span>
+                            </p>
+                            <p class="flex items-center gap-2">
+                                <i class="fas fa-chart-pie"></i>
+                                <span>查看整体支出类别分布</span>
+                            </p>
+                            <p class="flex items-center gap-2">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>了解旅行时间规律</span>
+                            </p>
+                            <p class="flex items-center gap-2">
+                                <i class="fas fa-map-marked-alt"></i>
+                                <span>分析旅行地点分布</span>
+                            </p>
+                        </div>
+                        <p class="text-sm text-blue-100">请从下方的建议问题中选择，或直接输入您的问题</p>
+                    </div>
+                </div>
+            }
+            @foreach (var message in _messages) {
+                @if (message.IsUser) {
+                    <div class="flex items-start gap-2 mb-4 justify-end">
+                        <div class="flex flex-col items-end">
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm text-gray-600">@(_currentUser?.Name ?? "用户")</span>
+                            </div>
+                            <div
+                                class="mt-1 px-3 py-2 bg-blue-500 text-white rounded-2xl rounded-tr-sm prose prose-sm max-w-[80%]">
+                                @message.Content
+                            </div>
+                            <div class="flex items-center gap-2 mt-1">
+                                <button @onclick="() => EditMessage(message)"
+                                        class="p-1 text-gray-400 hover:text-blue-500 transition-colors">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button @onclick="() => CopyMessage(message.Content)"
+                                        class="p-1 text-gray-400 hover:text-blue-500 transition-colors">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                        @if (!string.IsNullOrEmpty(_profileImage)) {
+                            @if (_profileImage.StartsWith("file://") && !string.IsNullOrEmpty(_imageBase64)) {
+                                <img src="data:image/jpeg;base64,@_imageBase64" alt="头像"
+                                     class="w-8 h-8 rounded-full object-cover"/>
+                            }
+                            else {
+                                <img src="@_profileImage" alt="头像" class="w-8 h-8 rounded-full object-cover"/>
+                            }
+                        }
+                        else {
+                            <div
+                                class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-blue-500 font-bold">
+                                <span>@(_currentUser?.Name?.FirstOrDefault() ?? 'U')</span>
+                            </div>
+                        }
+                    </div>
+                }
+                else {
+                    <div class="flex items-start gap-2 mb-4">
+                        <img src="images/truereality.png" alt="AI助手" class="w-8 h-8 rounded-full object-cover"/>
+                        <div class="flex flex-col flex-1">
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm text-gray-600">AI 助手</span>
+                            </div>
+                            <div
+                                class="mt-1 px-3 py-2 bg-gray-100 rounded-2xl rounded-tl-sm prose prose-sm max-w-[80%]">
+                                @((MarkupString)RenderMarkdown(message.Content))
+                            </div>
+                            <div class="flex items-center gap-2 mt-1">
+                                <button @onclick="() => CopyMessage(message.Content)"
+                                        class="p-1 text-gray-400 hover:text-blue-500 transition-colors">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                                <button @onclick="() => RegenerateResponse(message)"
+                                        class="p-1 text-gray-400 hover:text-blue-500 transition-colors"
+                                        disabled="@_isStreaming">
+                                    <i class="fas fa-redo-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            @if (_isStreaming) {
+                <div class="flex items-start gap-2 mb-4">
+                    <img src="images/truereality.png" alt="AI助手" class="w-8 h-8 rounded-full object-cover"/>
+                    <div class="flex flex-col flex-1">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-gray-600">AI 助手</span>
+                        </div>
+                        <div class="mt-1 px-3 py-2 bg-gray-100 rounded-2xl rounded-tl-sm prose prose-sm max-w-[80%]">
+                            @((MarkupString)RenderMarkdown(_streamingContent))
+                            <div class="animate-pulse">▊</div>
+                        </div>
+                        <div class="flex justify-center mt-2">
+                            <button @onclick="StopStreaming"
+                                    class="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-[20px] hover:bg-red-600 transition-colors">
+                                <i class="fas fa-stop"></i>
+                                <span>停止生成</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="flex-none p-4 border-t">
+            @if (_suggestionsVisible) {
+                <div class="mb-4 flex flex-wrap gap-2">
+                    @foreach (var suggestion in _suggestions) {
+                        <button @onclick="() => SendMessage(suggestion)"
+                                class="flex-1 min-w-[45%] px-3 py-2 bg-gray-100 text-gray-600 rounded-lg transition-all duration-200 active:bg-blue-500 active:text-white flex items-center gap-2">
+                            <i class="fas fa-lightbulb text-yellow-400"></i>
+                            <span class="text-left text-sm">@suggestion</span>
+                        </button>
+                    }
+                </div>
+            }
+
+            <div class="flex gap-2">
+                @if (_editingMessage != null) {
+                    <div class="flex-1 flex items-center gap-2">
+                        <input @bind="_editingMessage.Content"
+                               @bind:event="oninput"
+                               @onkeyup="HandleEditKeyPress"
+                               class="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"/>
+                        <button @onclick="() => SaveEdit()"
+                                disabled="@(string.IsNullOrWhiteSpace(_editingMessage.Content) || _isStreaming)"
+                                class="px-4 py-2 bg-blue-500 text-white rounded-lg transition-all duration-200 active:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed">
+                            发送
+                        </button>
+                        <button @onclick="() => CancelEdit()"
+                                class="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg transition-all duration-200 active:bg-gray-200">
+                            取消
+                        </button>
+                    </div>
+                }
+                else {
+                    <input @bind="_currentMessage"
+                           @bind:event="oninput"
+                           @onkeyup="HandleKeyPress"
+                           id="messageInput"
+                           placeholder="输入您的问题..."
+                           class="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"/>
+                    <button @onclick="() => SendMessage(_currentMessage)"
+                            disabled="@(string.IsNullOrWhiteSpace(_currentMessage) || _isStreaming || _editingMessage != null)"
+                            class="px-4 py-2 bg-blue-500 text-white rounded-lg transition-all duration-200 active:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed">
+                        发送
+                    </button>
+                }
+            </div>
+        </div>
+    </PageBody>
+</FlexedPageComponent>
+
+@code {
+    private List<ChatMessage> _messages = new();
+    private string _currentMessage = "";
+    private bool _isStreaming;
+    private string _streamingContent = "";
+    private bool _suggestionsVisible = true;
+    private ChatMessage? _editingMessage;
+    private CancellationTokenSource? _streamingCts;
+
+    private LoggingModel? _currentUser;
+    private string? _profileImage;
+    private string _imageBase64;
+
+    private readonly List<string> _suggestions = new() {
+        "分析我的所有旅行支出趋势",
+        "统计各类别支出的总体占比",
+        "我最常去哪些地方旅行",
+        "分析我的旅行时间规律"
+    };
+
+    private readonly MarkdownPipeline _pipeline = new MarkdownPipelineBuilder()
+        .UseAdvancedExtensions()
+        .Build();
+
+    private string RenderMarkdown(string markdown) {
+        if (string.IsNullOrEmpty(markdown)) return string.Empty;
+        return Markdown.ToHtml(markdown, _pipeline);
+    }
+
+    protected override async Task OnInitializedAsync() {
+        // 获取用户信息
+        _currentUser = AuthService.CurrentUser;
+        if (_currentUser != null) {
+            _profileImage = await AuthService.GetProfileImageAsync();
+            if (!string.IsNullOrEmpty(_profileImage) && _profileImage.StartsWith("file://")) {
+                var path = _profileImage[7..];
+                if (File.Exists(path)) {
+                    var bytes = await File.ReadAllBytesAsync(path);
+                    _imageBase64 = Convert.ToBase64String(bytes);
+                }
+            }
+        }
+    }
+
+    private async Task SendMessage(string message) {
+        if (string.IsNullOrWhiteSpace(message) || _isStreaming) return;
+
+        // 清空输入框并隐藏建议
+        _currentMessage = "";
+        _suggestionsVisible = false;
+
+        // 添加用户消息
+        _messages.Add(new ChatMessage { IsUser = true, Content = message });
+        StateHasChanged();
+        await ScrollToBottom();
+
+        try {
+            _isStreaming = true;
+            _streamingContent = "";
+            _streamingCts = new CancellationTokenSource();
+            StateHasChanged();
+
+            var travelsResult = await TravelService.GetTravelsAsync(true);
+            if (!travelsResult.IsSuccess || travelsResult.Data == null) {
+                _messages.Add(new ChatMessage {
+                    IsUser = false,
+                    Content = "<div class='text-red-500'>获取旅行数据失败</div>"
+                });
+                return;
+            }
+
+            var travels = travelsResult.Data;
+            var allExpenses = travels.SelectMany(t => t.Expense ?? new List<Expense>()).ToList();
+
+            // 准备分析数据
+            var analysisData = new {
+                Question = message,
+                TotalTravels = travels.Count,
+                Travels = travels.Select(t => new {
+                    t.Title,
+                    t.LocationName,
+                    t.StartDate,
+                    t.EndDate,
+                    t.CategoryName,
+                    TotalExpense = t.Expense?.Sum(e => e.Amount) ?? 0,
+                    DaysCount = ((t.EndDate ?? DateTime.Now) - (t.StartDate ?? DateTime.Now)).Days + 1
+                }).ToList(),
+                TotalExpense = allExpenses.Sum(e => e.Amount),
+                CategorySummary = allExpenses.GroupBy(e => e.Category)
+                    .Select(g => new {
+                        Category = g.Key,
+                        TotalAmount = g.Sum(e => e.Amount),
+                        Count = g.Count()
+                    }).ToList(),
+                LocationSummary = travels.GroupBy(t => t.LocationName)
+                    .Select(g => new {
+                        Location = g.Key,
+                        Count = g.Count(),
+                        TotalExpense = g.Sum(t => t.Expense?.Sum(e => e.Amount) ?? 0)
+                    }).ToList(),
+                TimeSummary = travels.GroupBy(t => t.StartDate?.Month)
+                    .Select(g => new {
+                        Month = g.Key,
+                        Count = g.Count(),
+                        TotalExpense = g.Sum(t => t.Expense?.Sum(e => e.Amount) ?? 0)
+                    }).ToList()
+            };
+
+            // 调用AI分析并处理流式响应
+            await foreach (var chunk in DashScopeService.AnalyzeTravelExpensesStreamAsync(analysisData)
+                               .WithCancellation(_streamingCts.Token)) {
+                _streamingContent += chunk;
+                StateHasChanged();
+                await ScrollToBottom();
+            }
+
+            // 将完整响应添加到消息列表
+            _messages.Add(new ChatMessage {
+                IsUser = false,
+                Content = _streamingContent
+            });
+            // 显示建议问题
+            _suggestionsVisible = true;
+        }
+        catch (OperationCanceledException) {
+            // 用户取消了生成
+            _messages.Add(new ChatMessage {
+                IsUser = false,
+                Content = "_已停止生成_"
+            });
+            _suggestionsVisible = true;
+        }
+        catch (Exception ex) {
+            _messages.Add(new ChatMessage {
+                IsUser = false,
+                Content = $"<div class='text-red-500'>分析数据时出错: {ex.Message}</div>"
+            });
+        }
+        finally {
+            _isStreaming = false;
+            _streamingContent = "";
+            _streamingCts?.Dispose();
+            _streamingCts = null;
+            _suggestionsVisible = true;
+            StateHasChanged();
+            await ScrollToBottom();
+        }
+    }
+
+    private async Task HandleKeyPress(KeyboardEventArgs e) {
+        if (e.Key == "Enter" && !string.IsNullOrWhiteSpace(_currentMessage)) {
+            await SendMessage(_currentMessage);
+        }
+    }
+
+    private async Task HandleEditKeyPress(KeyboardEventArgs e) {
+        if (e.Key == "Enter" && _editingMessage != null) {
+            // 保存原始消息的索引位置
+            var index = _messages.IndexOf(_editingMessage);
+            if (index >= 0) {
+                // 删除该消息及其之后的所有消息（包括AI的回复）
+                _messages.RemoveRange(index, _messages.Count - index);
+                // 发送编辑后的消息
+                await SendMessage(_editingMessage.Content);
+            }
+
+            _editingMessage = null;
+        }
+        else if (e.Key == "Escape") {
+            _editingMessage = null;
+            StateHasChanged();
+        }
+    }
+
+    private async Task ScrollToBottom() {
+        await JSRuntime.InvokeVoidAsync("scrollToBottom", "chatContainer");
+    }
+
+    private void NavigateBack() {
+        NavigationManager.NavigateBack();
+    }
+
+    private void NewConversation() {
+        _messages.Clear();
+        _currentMessage = "";
+        _isStreaming = false;
+        _streamingContent = "";
+        _suggestionsVisible = true;
+        _editingMessage = null;
+        _streamingCts?.Cancel();
+        _streamingCts?.Dispose();
+        _streamingCts = null;
+    }
+
+    private async Task EditMessage(ChatMessage message) {
+        if (!message.IsUser) return;
+        _editingMessage = message;
+    }
+
+    private async Task SaveEdit() {
+        if (_editingMessage == null) return;
+
+        // 保存原始消息的索引位置
+        var index = _messages.IndexOf(_editingMessage);
+        if (index >= 0) {
+            // 删除该消息及其之后的所有消息（包括AI的回复）
+            _messages.RemoveRange(index, _messages.Count - index);
+            // 发送编辑后的消息
+            await SendMessage(_editingMessage.Content);
+        }
+
+        _editingMessage = null;
+    }
+
+    private async Task CancelEdit() {
+        _editingMessage = null;
+    }
+
+    private async Task CopyMessage(string content) {
+        var success = await JSRuntime.InvokeAsync<bool>("copyToClipboard", content);
+        if (success) {
+            await BlazorMauiInterop.ShowToastAsync("已复制到剪贴板");
+        }
+    }
+
+    private async Task StopStreaming() {
+        if (_streamingCts != null) {
+            try {
+                await _streamingCts.CancelAsync();
+            }
+            catch (ObjectDisposedException) {
+                // CancellationTokenSource 可能已经被处理了，忽略这个异常
+            }
+        }
+
+        _suggestionsVisible = true;
+    }
+
+    private async Task RegenerateResponse(ChatMessage aiMessage) {
+        // 找到AI消息的索引
+        var index = _messages.IndexOf(aiMessage);
+        if (index <= 0) return; // 确保有前一条用户消息
+
+        // 获取前一条用户消息
+        var userMessage = _messages[index - 1];
+        if (!userMessage.IsUser) return;
+
+        try {
+            _isStreaming = true;
+            _streamingContent = "";
+            _streamingCts = new CancellationTokenSource();
+            StateHasChanged();
+
+            var travelsResult = await TravelService.GetTravelsAsync(true);
+            if (!travelsResult.IsSuccess || travelsResult.Data == null) {
+                _messages.Add(new ChatMessage {
+                    IsUser = false,
+                    Content = "<div class='text-red-500'>获取旅行数据失败</div>"
+                });
+                return;
+            }
+
+            var travels = travelsResult.Data;
+            var allExpenses = travels.SelectMany(t => t.Expense ?? new List<Expense>()).ToList();
+
+            // 准备分析数据
+            var analysisData = new {
+                Question = userMessage.Content,
+                TotalTravels = travels.Count,
+                Travels = travels.Select(t => new {
+                    t.Title,
+                    t.LocationName,
+                    t.StartDate,
+                    t.EndDate,
+                    t.CategoryName,
+                    TotalExpense = t.Expense?.Sum(e => e.Amount) ?? 0,
+                    DaysCount = ((t.EndDate ?? DateTime.Now) - (t.StartDate ?? DateTime.Now)).Days + 1
+                }).ToList(),
+                TotalExpense = allExpenses.Sum(e => e.Amount),
+                CategorySummary = allExpenses.GroupBy(e => e.Category)
+                    .Select(g => new {
+                        Category = g.Key,
+                        TotalAmount = g.Sum(e => e.Amount),
+                        Count = g.Count()
+                    }).ToList(),
+                LocationSummary = travels.GroupBy(t => t.LocationName)
+                    .Select(g => new {
+                        Location = g.Key,
+                        Count = g.Count(),
+                        TotalExpense = g.Sum(t => t.Expense?.Sum(e => e.Amount) ?? 0)
+                    }).ToList(),
+                TimeSummary = travels.GroupBy(t => t.StartDate?.Month)
+                    .Select(g => new {
+                        Month = g.Key,
+                        Count = g.Count(),
+                        TotalExpense = g.Sum(t => t.Expense?.Sum(e => e.Amount) ?? 0)
+                    }).ToList()
+            };
+
+            // 删除当前AI消息及其后的所有消息
+            _messages.RemoveRange(index, _messages.Count - index);
+            StateHasChanged();
+
+            // 调用AI分析并处理流式响应
+            await foreach (var chunk in DashScopeService.AnalyzeTravelExpensesStreamAsync(analysisData)
+                               .WithCancellation(_streamingCts.Token)) {
+                _streamingContent += chunk;
+                StateHasChanged();
+                await ScrollToBottom();
+            }
+
+            // 将完整响应添加到消息列表
+            _messages.Add(new ChatMessage {
+                IsUser = false,
+                Content = _streamingContent
+            });
+        }
+        catch (OperationCanceledException) {
+            // 用户取消了生成
+            _messages.Add(new ChatMessage {
+                IsUser = false,
+                Content = "_已停止生成_"
+            });
+        }
+        catch (Exception ex) {
+            _messages.Add(new ChatMessage {
+                IsUser = false,
+                Content = $"<div class='text-red-500'>分析数据时出错: {ex.Message}</div>"
+            });
+        }
+        finally {
+            _isStreaming = false;
+            _streamingContent = "";
+            _streamingCts?.Dispose();
+            _streamingCts = null;
+            StateHasChanged();
+            await ScrollToBottom();
+        }
+    }
+
+    private class ChatMessage {
+        public bool IsUser { get; set; }
+        public string Content { get; set; } = "";
+    }
+
+}

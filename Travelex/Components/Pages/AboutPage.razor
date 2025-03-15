@@ -1,5 +1,7 @@
 @page "/about"
 @using Travelex.Components.Layout
+@using Travelex.Utils
+@inject BlazorMauiInterop BlazorMauiInterop
 
 <FlexedPageComponent>
     <TopBarLeft>
@@ -75,6 +77,15 @@
                     </div>
                 </div>
 
+                <!-- GitHub链接 -->
+                <div>
+                    <h2 class="text-xl font-bold text-[#111416] mb-3">项目源码</h2>
+                    <button @onclick="OpenGitHubRepo" class="flex items-center justify-center w-full p-3 bg-[#24292E] text-white rounded-lg hover:bg-[#2F363D] transition-colors">
+                        <i class="fab fa-github text-xl mr-2"></i>
+                        <span>在GitHub上查看源码</span>
+                    </button>
+                </div>
+
                 <div class="pt-4">
                     <p class="text-center text-sm text-[#666666]">
                         版本 1.0.0 · Made with <i class="fas fa-heart text-red-500"></i> by TrueReality
@@ -92,5 +103,18 @@
     private void NavigateBack()
     {
         NavigationManager.NavigateTo("/profile",replace:true);
+    }
+
+    private async Task OpenGitHubRepo()
+    {
+        try 
+        {
+            string repoUrl = "https://github.com/RealTrueReality/Travelex";
+            await BlazorMauiInterop.OpenInLauncher(repoUrl);
+        }
+        catch (Exception ex)
+        {
+            await BlazorMauiInterop.ShowToastAsync("无法打开GitHub仓库，请检查网络连接。");
+        }
     }
 }

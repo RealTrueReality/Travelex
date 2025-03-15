@@ -1,0 +1,19 @@
+@using Travelex.Models
+
+<div>
+    <div class="px-4 pt-5 pb-3">
+        <div class="text-2xl font-bold text-[#1C160C] text-left">关于</div>
+    </div>
+
+    <div class="px-4 py-2">
+        <ProfileMenuItem 
+            IconPath="images/profilePage/info.svg"
+            Title="关于我们"
+            Description="关于 Travelex"
+            OnClick="OnAboutClick" />
+    </div>
+</div>
+
+@code {
+    [Parameter] public EventCallback OnAboutClick { get; set; }
+}

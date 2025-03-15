@@ -3,8 +3,11 @@
 @using Travelex.Services
 @using Travelex.Entities
 @using Travelex.Extensions
+@using Travelex.Utils
+@using Travelex.Components.Controls.TravelsPageControls
 @inject NavigationManager NavigationManager
 @inject ExpenseService ExpenseService
+@inject BlazorMauiInterop BlazorMauiInterop
 
 <FlexedPageComponent>
     <TopBarLeft>
@@ -31,7 +34,8 @@
                         @foreach (var icon in _availableIcons) {
                             <button @onclick="() => SelectIcon(icon)"
                                     class="w-12 h-12 rounded-lg border border-[#E8F0F2] hover:bg-[#F5F5F5] transition-colors duration-200 flex items-center justify-center @(icon == _selectedIcon ? "bg-[#E8F0F2]" : "bg-white")">
-                                <img src="@($"images/expenseCategory/{icon}.svg")" alt="@icon" class="w-6 h-6 @(icon == _selectedIcon ? "" : "opacity-60")"/>
+                                <img src="@($"images/expenseCategory/{icon}.svg")" alt="@icon"
+                                     class="w-6 h-6 @(icon == _selectedIcon ? "" : "opacity-60")"/>
                             </button>
                         }
                     </div>
@@ -42,7 +46,8 @@
                 <button @onclick="SaveChanges" class="w-full py-3 bg-[#119BED] text-white font-bold rounded-[20px]">
                     保存修改
                 </button>
-                <button @onclick="DeleteCategory" class="w-full py-3 bg-[#E8F0F2] text-[#FF3B30] font-bold rounded-[20px]">
+                <button @onclick="ShowDeleteConfirmation"
+                        class="w-full py-3 bg-[#E8F0F2] text-[#FF3B30] font-bold rounded-[20px]">
                     删除分类
                 </button>
             </div>
@@ -50,65 +55,124 @@
     </PageBody>
 </FlexedPageComponent>
 
+<!-- 删除确认对话框 -->
+<DeleteConfirmationDialog Message="确定要删除这个类别吗？此操作无法撤销。"
+    @bind-IsVisible="@_showDeleteConfirmation"
+    OnConfirmed="DeleteCategory"
+    OnCancelled="CancelDelete"/>
+
+<DeleteConfirmationDialog Message="该类别下存在支出记录，是否一并删除所有相关支出记录？此操作无法撤销。"
+                          @bind-IsVisible="@_showDeleteWithExpensesConfirmation"
+                          OnConfirmed="DeleteCategoryWithExpenses"
+                          OnCancelled="CancelDeleteWithExpenses"/>
+
 @code {
-    [Parameter]
-    public string CategoryName { get; set; } = "";
+    [Parameter] public string CategoryName { get; set; } = "";
 
     private string _categoryName = "";
     private string _selectedIcon = "expense";
+    private bool _showDeleteConfirmation = false;
+    private bool _showDeleteWithExpensesConfirmation = false;
+
     private readonly string[] _availableIcons = [
-        "car", "restaurant", "hotel", "store", "run", "joystick", 
+        "car", "restaurant", "hotel", "store", "run", "joystick",
         "beer", "book", "briefcase", "castle", "coffee", "dog", "home",
         "movie", "music", "party", "plane", "shield", "ship", "steam",
-        "train", "wrench","expense"
+        "train", "wrench", "expense"
     ];
 
-    protected override async Task OnInitializedAsync()
-    {
+    protected override async Task OnInitializedAsync() {
         _categoryName = CategoryName;
         // 加载分类信息
         var result = await ExpenseService.GetExpenseCategoryAsync(CategoryName);
-        if (result is { IsSuccess: true, Data: not null })
-        {
+        if (result is { IsSuccess: true, Data: not null }) {
             _categoryName = result.Data.Name;
             _selectedIcon = result.Data.Icon;
         }
     }
 
-    private void NavigateBack()
-    {
+    private void NavigateBack() {
         NavigationManager.NavigateBack();
     }
 
-    private void SelectIcon(string icon)
-    {
+    private void SelectIcon(string icon) {
         _selectedIcon = icon;
     }
 
-    private async Task SaveChanges()
-    {
+    private async Task SaveChanges() {
         if (string.IsNullOrWhiteSpace(_categoryName))
             return;
+        try {
+            // 更新分类
+            var result = await ExpenseService.UpdateExpenseCategoryAsync(CategoryName, new ExpenseCategory {
+                Name = _categoryName,
+                Icon = _selectedIcon
+            });
 
-        // 更新分类
-        var result = await ExpenseService.UpdateExpenseCategoryAsync(CategoryName, new ExpenseCategory 
-        { 
-            Name = _categoryName,
-            Icon = _selectedIcon
-        });
-        
-        if (result.IsSuccess)
-        {
-            NavigationManager.NavigateTo("/profile",replace:true);
+            if (result.IsSuccess) {
+                await BlazorMauiInterop.ShowToastAsync($"更新{_categoryName}类别成功！");
+                NavigationManager.NavigateTo("/profile", replace: true);
+            }
+            else {
+                await BlazorMauiInterop.ShowAlertAsync($"{result.Message}");
+            }
+        }
+        catch (Exception e) {
+            await BlazorMauiInterop.ShowAlertAsync($"{e.Message}");
         }
     }
 
-    private async Task DeleteCategory()
-    {
-        var result = await ExpenseService.DeleteExpenseCategoryAsync(CategoryName);
-        if (result.IsSuccess)
-        {
-            NavigationManager.NavigateTo("/profile",replace:true);
+    private void ShowDeleteConfirmation() {
+        _showDeleteConfirmation = true;
+    }
+
+    private void CancelDelete() {
+        // 用户取消删除，不做任何操作
+    }
+
+    private async Task DeleteCategory() {
+        try {
+            var result = await ExpenseService.DeleteExpenseCategoryAsync(CategoryName);
+            if (result.IsSuccess) {
+                await BlazorMauiInterop.ShowToastAsync($"删除{_categoryName}类别成功！");
+                NavigationManager.NavigateTo("/profile", replace: true);
+            }
+            else {
+                // 如果删除失败原因是因为存在关联的支出记录，则显示二次确认对话框
+                if (result.Message != null && result.Message.Contains("该类别下有支出记录")) {
+                    _showDeleteWithExpensesConfirmation = true;
+                }
+                else {
+                    await BlazorMauiInterop.ShowAlertAsync($"{result.Message}");
+                }
+            }
+        }
+        catch (Exception e) {
+            await BlazorMauiInterop.ShowAlertAsync($"{e.Message}");
         }
     }
+
+    private void CancelDeleteWithExpenses() {
+        _showDeleteWithExpensesConfirmation = false;
+    }
+
+    private async Task DeleteCategoryWithExpenses() {
+        try {
+            var result = await ExpenseService.DeleteExpenseCategoryWithExpensesAsync(CategoryName);
+            if (result.IsSuccess) {
+                await BlazorMauiInterop.ShowToastAsync($"删除{_categoryName}类别及相关支出记录成功！");
+                NavigationManager.NavigateTo("/profile", replace: true);
+            }
+            else {
+                await BlazorMauiInterop.ShowAlertAsync($"{result.Message}");
+            }
+        }
+        catch (Exception e) {
+            await BlazorMauiInterop.ShowAlertAsync($"{e.Message}");
+        }
+        finally {
+            _showDeleteWithExpensesConfirmation = false;
+        }
+    }
+
 }

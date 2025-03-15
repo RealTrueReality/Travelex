@@ -1,0 +1,71 @@
+@page "/travel/add"
+@using Travelex.Entities
+@using Travelex.Services
+@using Travelex.Components.Controls
+@using Travelex.Utils
+@using Travelex.Components.Controls.TravelAddPageControls
+@inject NavigationManager NavigationManager
+@inject TravelService TravelService
+@inject BlazorMauiInterop BlazorMauiInterop
+
+<FlexedPageComponent>
+    <TopBarLeft>
+        <button @onclick="NavigateBack" class="p-2 text-[#252525]">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+    </TopBarLeft>
+    <TopBarTitle>
+        创建行程
+    </TopBarTitle>
+    <PageBody>
+        <div class="flex-1 p-4 overflow-auto">
+            <TravelForm
+                Travel="@_travel"
+                Categories="@_categories"
+                SubmitButtonText="创建行程"
+                OnSubmit="HandleSubmit"/>
+        </div>
+    </PageBody>
+</FlexedPageComponent>
+
+@code {
+    private Travel _travel = new();
+    private List<TravelCategory> _categories = new();
+    protected override async Task OnInitializedAsync() {
+        _travel.Status = TravelStatus.Planning;
+        var categoriesRes = await TravelService.GetTravelCategoriesAsync();
+        if (categoriesRes is { IsSuccess: true, Data: not null }) _categories = categoriesRes.Data;
+        else {
+            await BlazorMauiInterop.ShowAlertAsync("获取行程类别失败");
+        }
+    }
+
+    private void NavigateBack() {
+        NavigationManager.NavigateTo("/home", replace: true);
+    }
+
+    private async Task HandleSubmit(Travel travel) {
+        travel.AddedOn = DateTime.Now;
+        BlazorMauiInterop.ShowIndicator();
+        try {
+            var res = await TravelService.AddTravelAsync(_travel);
+            if (res.IsSuccess) {
+                await BlazorMauiInterop.ShowToastAsync("添加行程成功！");
+                NavigationManager.NavigateTo("/home", replace: true);
+            }
+            else {
+                await BlazorMauiInterop.ShowAlertAsync("创建行程失败");
+            }
+        }
+        catch (Exception) {
+            await BlazorMauiInterop.ShowAlertAsync("创建行程失败");
+        }
+        finally {
+            BlazorMauiInterop.HideIndicator();
+        }
+    }
+
+}
