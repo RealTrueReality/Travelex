@@ -1,0 +1,21 @@
+@using Travelex.Models
+
+<button @onclick="OnClick" class="w-full flex items-center">
+    <div class="w-12 h-12 bg-[#E8F0F2] rounded-lg flex items-center justify-center">
+        <img src="@IconPath" alt="@Title" class="w-6 h-6" />
+    </div>
+    <div class="ml-4 flex-1">
+        <div class="text-base font-medium text-[#1C160C] text-left">@Title</div>
+        <div class="text-sm text-[#4C7C99] text-left">@Description</div>
+    </div>
+    <div class="w-6 h-6">
+        <img src="images/profilePage/chevron-right.svg" alt="下一步" />
+    </div>
+</button>
+
+@code {
+    [Parameter] public string IconPath { get; set; } = "";
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public string Description { get; set; } = "";
+    [Parameter] public EventCallback OnClick { get; set; }
+}

@@ -1,0 +1,33 @@
+@using Syncfusion.Blazor.Notifications
+@using ShimmerEffect = Syncfusion.Blazor.Notifications.ShimmerEffect
+
+<div class="grid grid-cols-2 gap-4 px-4">
+    @if (IsLoading)
+    {
+        <div class="bg-[#EFF2F4] rounded-xl p-6">
+            <p class="text-base font-medium text-[#111416] mb-2">旅行总支出</p>
+            <SfSkeleton Width="80%" Height="26px" Effect=ShimmerEffect.Wave></SfSkeleton>
+        </div>
+        <div class="bg-[#EFF2F4] rounded-xl p-6">
+            <p class="text-base font-medium text-[#111416] mb-2">支出数</p>
+            <SfSkeleton Width="50%" Height="26px" Effect=ShimmerEffect.Wave></SfSkeleton>
+        </div>
+    }
+    else
+    {
+        <div class="bg-[#EFF2F4] rounded-xl p-6">
+            <p class="text-base font-medium text-[#111416] mb-2">旅行总支出</p>
+            <p class="text-2xl font-semibold text-[#111416]">¥@TotalAmount?.ToString("N2")</p>
+        </div>
+        <div class="bg-[#EFF2F4] rounded-xl p-6">
+            <p class="text-base font-medium text-[#111416] mb-2">支出数</p>
+            <p class="text-2xl font-semibold text-[#111416]">@ExpenseCount</p>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public bool IsLoading { get; set; }
+    [Parameter] public double? TotalAmount { get; set; }
+    [Parameter] public int ExpenseCount { get; set; }
+}

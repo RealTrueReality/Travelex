@@ -272,6 +272,24 @@ public class SeedDataService {
                     Category = "保险",
                     TimeOnSpend = new DateTime(2025, 1, 10)
                 },
+                new Expense {
+                    Id = 20,
+                    TripId = 4,
+                    Title = "旅行活动",
+                    Description = "参加小狼的秘密旅行活动",
+                    Amount = 350.00,
+                    Category = "娱乐",
+                    TimeOnSpend = new DateTime(2025, 3, 5)
+                },
+                new Expense {
+                    Id = 21,
+                    TripId = 4,
+                    Title = "旅行活动",
+                    Description = "出去吃饭",
+                    Amount = 350.00,
+                    Category = "娱乐",
+                    TimeOnSpend = new DateTime( 2025, 4, 15)
+                }
             };
             foreach (var expense in expenses) {
                 await _db.AddItemAsync(expense);

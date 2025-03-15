@@ -1,0 +1,187 @@
+@page "/travel/details/{TripId:int}"
+@using Travelex.Components.Controls
+@using Travelex.Entities
+@using Travelex.Utils
+@using Travelex.Services
+@using Travelex.Extensions
+@using Syncfusion.Blazor.Popups
+@using Travelex.Components.Controls.TravelDetailsPageControls
+@inject TravelService TravelService;
+@inject NavigationManager NavigationManager;
+@inject BlazorMauiInterop BlazorMauiInterop;
+
+<FlexedPageComponent>
+    <TopBarLeft>
+        <button @onclick="NavigateBack" class="p-2 text-[#252525]">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+    </TopBarLeft>
+    <TopBarTitle>旅行详情</TopBarTitle>
+    <TopBarRight>
+        <button @onclick="NavigateToChart" class="p-2 text-[#252525]">
+            <i class="fas fa-bar-chart text-xl"></i>
+        </button>
+    </TopBarRight>
+    <PageBody>
+        <div class="flex-1 overflow-auto">
+            @if (IsLoading) {
+                <!-- Shimmer Loading State -->
+                <!-- Statistics Cards Shimmer -->
+                <div class="grid grid-cols-2 gap-4 px-4">
+                    <div class="bg-[#EFF2F4] rounded-xl p-6">
+                        <p class="text-base font-medium text-[#111416] mb-2">旅行总支出</p>
+                        <SfSkeleton Width="80%" Height="26px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                    </div>
+                    <div class="bg-[#EFF2F4] rounded-xl p-6">
+                        <p class="text-base font-medium text-[#111416] mb-2">支出数</p>
+                        <SfSkeleton Width="50%" Height="26px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                    </div>
+                </div>
+
+                <!-- Travel Image Shimmer -->
+                <div class="p-4">
+                    <div class="rounded-xl overflow-hidden">
+                        <SfSkeleton Width="100%" Height="192px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                    </div>
+                </div>
+
+                <!-- Travel Details Card Shimmer -->
+                <div class="bg-white mx-4 rounded-xl p-6 shadow-sm border border-gray-200">
+                    <!-- Title and Status -->
+                    <div class="flex items-center justify-between mb-4">
+                        <SfSkeleton Width="30%" Height="24px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                        <SfSkeleton Width="25%" Height="24px" Effect=ShimmerEffect.Wave
+                                    CssClass="rounded-full"></SfSkeleton>
+                    </div>
+
+                    <!-- Description, Location, Date -->
+                    <div class="space-y-3">
+                        <div class="flex items-start space-x-2">
+                            <SfSkeleton Width="18px" Height="18px" Effect=ShimmerEffect.Wave
+                                        CssClass="mt-1"></SfSkeleton>
+                            <SfSkeleton Width="50%" Height="18px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                        </div>
+                        <div class="flex items-start space-x-2">
+                            <SfSkeleton Width="18px" Height="18px" Effect=ShimmerEffect.Wave
+                                        CssClass="mt-1"></SfSkeleton>
+                            <SfSkeleton Width="50%" Height="18px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                        </div>
+                        <div class="flex items-start space-x-2">
+                            <SfSkeleton Width="18px" Height="18px" Effect=ShimmerEffect.Wave
+                                        CssClass="mt-1"></SfSkeleton>
+                            <SfSkeleton Width="50%" Height="18px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                        </div>
+                        <div class="flex items-start space-x-2">
+                            <SfSkeleton Width="18px" Height="18px" Effect=ShimmerEffect.Wave
+                                        CssClass="mt-1"></SfSkeleton>
+                            <SfSkeleton Width="50%" Height="18px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                        </div>
+                        <div class="flex items-start space-x-2">
+                            <SfSkeleton Width="18px" Height="18px" Effect=ShimmerEffect.Wave
+                                        CssClass="mt-1"></SfSkeleton>
+                            <SfSkeleton Width="50%" Height="18px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Expenses List Shimmer -->
+                <div class="flex-1 overflow-auto mt-4">
+                    @for (int i = 0; i < 4; i++) {
+                        <div class="px-4 py-2">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <SfSkeleton Shape=SkeletonType.Square Width="46px" Height="46px"
+                                                Effect=ShimmerEffect.Wave CssClass="rounded-lg"></SfSkeleton>
+                                    <div class="ml-4">
+                                        <SfSkeleton Width="116px" Height="16px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                                        <div class="flex items-center gap-2 mt-1">
+                                            <SfSkeleton Width="142px" Height="12px"
+                                                        Effect=ShimmerEffect.Wave></SfSkeleton>
+                                        </div>
+                                    </div>
+                                </div>
+                                <SfSkeleton Width="78px" Height="16px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else {
+                <!-- 统计卡片组件 -->
+                <TravelStatisticsCards 
+                    IsLoading="@IsLoading" 
+                    TotalAmount="@TotalAmount" 
+                    ExpenseCount="@ExpenseCount" />
+
+                <!-- 旅行图片组件 -->
+                <TravelImageDisplay 
+                    IsLoading="@IsLoading" 
+                    ImageUrl="@_travel.ImageUrl" 
+                    ImageAlt="@_travel.Title" />
+
+                <!-- 旅行详情卡片组件 -->
+                <TravelDetailsCard 
+                    IsLoading="@IsLoading" 
+                    Travel="@_travel" />
+
+                <!-- 支出列表组件 -->
+                <ExpensesList 
+                    IsLoading="@IsLoading" 
+                    Expenses="@Expenses" 
+                    OnAddExpenseClick="@AddExpense" />
+            }
+        </div>
+    </PageBody>
+</FlexedPageComponent>
+
+@code {
+    [Parameter] public int TripId { get; set; }
+    private Travel _travel = new();
+    private List<Expense> Expenses { get; set; } = [];
+    private bool IsLoading { get; set; } = true;
+    private double? TotalAmount => Expenses.Sum(e => e.Amount);
+    private int ExpenseCount => Expenses.Count;
+
+    protected override async Task OnInitializedAsync() {
+        await base.OnInitializedAsync();
+        try {
+            var res = await TravelService.GetTravelByIdAsync(TripId, includeExpenses: true);
+            if (res.IsSuccess) {
+                if (res.Data is not null) {
+                    _travel = res.Data;
+                    if (_travel.Expense is not null) Expenses = _travel.Expense;
+                }
+                else {
+                    await BlazorMauiInterop.ShowAlertAsync("该旅行不存在");
+                }
+            }
+            else {
+                await BlazorMauiInterop.ShowAlertAsync("服务器错误");
+            }
+        }
+        catch (Exception e) {
+            await BlazorMauiInterop.ShowAlertAsync("服务器错误");
+        }
+        finally {
+            await Task.Delay(1280);
+            IsLoading = false;
+        }
+    }
+
+    private Task AddExpense() {
+        NavigationManager.NavigateToSubPage($"/expense/add/{TripId}");
+        return Task.CompletedTask;
+    }
+
+    private void NavigateBack() {
+        NavigationManager.NavigateTo("/home", replace:true);
+    }
+
+    private void NavigateToChart()
+    {
+        NavigationManager.NavigateToSubPage($"/travel/chart/{TripId}");
+    }
+}

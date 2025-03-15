@@ -1,8 +1,8 @@
-using SQLite;
+
 using Travelex.Data;
 using Travelex.Entities;
 using Travelex.Models;
-using Travelex.Utils;
+
 
 namespace Travelex.Services;
 
@@ -14,7 +14,7 @@ public class ExpenseService {
     }
 
 
-    public async Task<ResultDataModel<List<Expense>?>> GetExpensesAsync() {
+    public async Task<ResultDataModel<List<Expense>>> GetExpensesAsync() {
         var expenses = await _db.GetTableAsync<Expense>();
         var filteredExpenses = await expenses.OrderByDescending(t => t.TimeOnSpend).ToListAsync();
         if (filteredExpenses is null) {
@@ -169,12 +169,44 @@ public class ExpenseService {
 
             // 检查是否有使用该类别的支出记录
             var expenses = await _db.GetTableAsync<Expense>();
-            var relatedExpenses = await expenses.FirstAsync(e => e.Category == categoryName);
-            if (relatedExpenses is not null)
+            var relatedExpenses = await expenses.Where(e => e.Category == categoryName).ToListAsync();
+            if (relatedExpenses.Count != 0)
             {
                 return ResultDataModel<ExpenseCategory>.Failure("该类别下有支出记录，无法删除");
             }
 
+            var success = await _db.DeleteItemAsync(category);
+            return success 
+                ? ResultDataModel<ExpenseCategory>.Success(category) 
+                : ResultDataModel<ExpenseCategory>.Failure("删除失败");
+        }
+        catch (Exception ex)
+        {
+            return ResultDataModel<ExpenseCategory>.Failure(ex.Message);
+        }
+    }
+
+    public async Task<ResultDataModel<ExpenseCategory>> DeleteExpenseCategoryWithExpensesAsync(string categoryName)
+    {
+        try
+        {
+            var category = await _db.GetItemByKeyAsync<ExpenseCategory>(categoryName);
+            if (category is null)
+            {
+                return ResultDataModel<ExpenseCategory>.Failure($"未找到类别：{categoryName}");
+            }
+
+            // 获取该类别下的所有支出记录
+            var expenses = await _db.GetTableAsync<Expense>();
+            var relatedExpenses = await expenses.Where(e => e.Category == categoryName).ToListAsync();
+            
+            // 删除所有支出记录
+            foreach (var expense in relatedExpenses)
+            {
+                await _db.DeleteItemAsync(expense);
+            }
+
+            // 删除类别
             var success = await _db.DeleteItemAsync(category);
             return success 
                 ? ResultDataModel<ExpenseCategory>.Success(category) 

@@ -33,7 +33,7 @@ public class TravelService {
         if (travel is null) {
             return ResultDataModel<Travel>.Failure("获取行程失败");
         }
-        if (includeExpenses ) {
+        if (includeExpenses) {
             var expenses = await _db.GetTableAsync<Expense>();
             var filteredExpenses = await expenses.Where(e => e.TripId == travel.Id).ToListAsync();
             travel.Expense = filteredExpenses;

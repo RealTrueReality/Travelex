@@ -1,0 +1,9 @@
+<div class="p-4">
+    <button @onclick="OnLogout" class="w-full py-3 bg-[#E8F0F2] text-[#1C160C] text-base font-bold rounded-[20px]">
+        退出登录
+    </button>
+</div>
+
+@code {
+    [Parameter] public EventCallback OnLogout { get; set; }
+}

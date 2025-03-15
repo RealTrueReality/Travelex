@@ -95,7 +95,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Resources\Images\TripImages\" />
       <Folder Include="wwwroot\images\homePage\" />
     </ItemGroup>
 
