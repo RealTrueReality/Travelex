@@ -1,10 +1,15 @@
 @using Travelex.Models
+@using Travelex.Components.Controls
 
 <div>
     <div class="px-4 pt-5 pb-3">
-        <div class="text-2xl font-bold text-[#1C160C] text-left">账户与设置</div>
+        <div class="text-2xl font-bold text-[#1C160C] dark:text-[#E0E0E0] text-left">账户与设置</div>
     </div>
 
+    <div class="px-4 py-2">
+        <ThemeToggle />
+    </div>
+    
     <div class="px-4 py-2">
         <ProfileMenuItem 
             IconPath="images/profilePage/shield.svg"

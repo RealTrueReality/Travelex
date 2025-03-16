@@ -11,7 +11,7 @@
 @inject BlazorMauiInterop BlazorMauiInterop
 @layout LayoutWithNavBar
 
-<div class="flex flex-col h-full bg-white select-none">
+<div class="flex flex-col h-full bg-white dark:bg-background-dark select-none">
     <SearchBar @bind-SearchQuery="SearchQuery"/>
 
     <div class="flex-1 overflow-auto">
@@ -21,7 +21,7 @@
         <div class="px-4">
             @if (IsLoading) {
                 @for (int i = 0; i < 4; i++) {
-                    <div class="bg-white rounded-xl p-4 mb-4">
+                    <div class="bg-white dark:bg-card-dark rounded-xl p-4 mb-4">
                         <div class="grid grid-cols-[1fr,auto] gap-4">
                             <div>
                                 <SfSkeleton Width="40%" Height="18px" Effect=ShimmerEffect.Wave></SfSkeleton>
@@ -54,7 +54,7 @@
                     }
                 }
                 else if (!string.IsNullOrWhiteSpace(SearchQuery)) {
-                    <div class="text-center py-8 text-gray-500">
+                    <div class="text-center py-8 text-gray-500 dark:text-gray-400">
                         没有找到匹配的行程
                     </div>
                 }
@@ -63,7 +63,7 @@
 
         <!-- 添加行程按钮 -->
         <div class="p-4">
-            <button @onclick="NavigateToAdd" class="w-full bg-[#119BED] text-white h-12 rounded-[20px] text-base font-bold">
+            <button @onclick="NavigateToAdd" class="w-full bg-[#119BED] dark:bg-primary-dark text-white h-12 rounded-[20px] text-base font-bold">
                 + 添加行程
             </button>
         </div>

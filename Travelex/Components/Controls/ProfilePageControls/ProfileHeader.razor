@@ -2,7 +2,7 @@
 @using Travelex.Services
 
 <div class="flex flex-col items-center mb-8">
-    <div class="w-32 h-32 rounded-full overflow-hidden bg-[#E8F0F2]">
+    <div class="w-32 h-32 rounded-full overflow-hidden bg-[#E8F0F2] dark:bg-[#2A3441]">
         @if (!string.IsNullOrEmpty(ProfileImage))
         {
             @if (ProfileImage.StartsWith("file://"))
@@ -15,7 +15,7 @@
                 else
                 {
                     <div class="w-full h-full flex items-center justify-center">
-                        <span class="text-4xl font-bold text-[#119BED]">@(UserName?.FirstOrDefault() ?? 'U')</span>
+                        <span class="text-4xl font-bold text-[#119BED] dark:text-[#1E90FF]">@(UserName?.FirstOrDefault() ?? 'U')</span>
                     </div>
                 }
             }
@@ -27,12 +27,12 @@
         else
         {
             <div class="w-full h-full flex items-center justify-center">
-                <span class="text-4xl font-bold text-[#119BED]">@(UserName?.FirstOrDefault() ?? 'U')</span>
+                <span class="text-4xl font-bold text-[#119BED] dark:text-[#1E90FF]">@(UserName?.FirstOrDefault() ?? 'U')</span>
             </div>
         }
     </div>
-    <div class="mt-4 text-2xl font-bold text-[#1C160C] text-left">@(UserName ?? "未登录")</div>
-    <button @onclick="OnEditProfile" class="mt-4 px-8 py-2 bg-[#119BED] text-white font-bold rounded-full text-left">
+    <div class="mt-4 text-2xl font-bold text-[#1C160C] dark:text-[#E0E0E0] text-left">@(UserName ?? "未登录")</div>
+    <button @onclick="OnEditProfile" class="mt-4 px-8 py-2 bg-[#119BED] hover:bg-[#0085FF] dark:bg-[#1E90FF] dark:hover:bg-[#0078E7] text-white font-bold rounded-full text-left transition-colors duration-300">
         编辑资料
     </button>
 </div>

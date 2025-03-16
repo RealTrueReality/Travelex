@@ -34,6 +34,41 @@
             touch-action: manipulation;
             outline: none !important;
         }
+        
+        /* 主题切换平滑过渡 */
+        html {
+            transition: background-color 0.5s ease;
+        }
+        
+        /* 为所有元素添加颜色过渡效果 */
+        *, *::before, *::after {
+            transition: color 0.5s ease, 
+                      background-color 0.5s ease, 
+                      border-color 0.5s ease, 
+                      box-shadow 0.5s ease,
+                      opacity 0.5s ease,
+                      transform 0.5s ease;
+        }
+        
+        /* 避免某些不需要过渡的元素 */
+        .loading-spinner, 
+        .no-transition,
+        .no-transition * {
+            transition: none !important;
+        }
+        
+        html.dark {
+            color-scheme: dark;
+        }
+        
+        /* 加载中动画暗黑模式适配 */
+        html.dark #app > div {
+            background-color: #121212;
+        }
+        
+        html.dark .text-gray-600 {
+            color: #A0A0A0;
+        }
     </style>
 </head>
 
@@ -41,10 +76,10 @@
     <div class="status-bar-safe-area"></div>
 
     <div id="app">
-        <div class="fixed inset-0 flex items-center justify-center bg-white">
+        <div class="fixed inset-0 flex items-center justify-center bg-white dark:bg-background-dark">
             <div class="flex flex-col items-center space-y-4">
                 <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full loading-spinner"></div>
-                <div class="text-gray-600 text-lg font-medium">加载中...</div>
+                <div class="text-gray-600 dark:text-gray-300 text-lg font-medium">加载中...</div>
             </div>
         </div>
     </div>
@@ -58,6 +93,7 @@
     <script src="_framework/blazor.webview.js" autostart="false"></script>
     <script src="js/map.js"></script>
     <script src="js/chat.js"></script>
+    <script src="js/theme.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </body>

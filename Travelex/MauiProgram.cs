@@ -39,6 +39,7 @@ public static class MauiProgram {
         builder.Services.AddScoped<TravelService>();
         builder.Services.AddScoped<ExpenseService>();
         builder.Services.AddScoped<DashScopeService>();
+        builder.Services.AddScoped<ThemeService>();
         builder.Services.AddTransient<ActivityIndicatorViewModel>();
         
         // 注册应用程序核心服务

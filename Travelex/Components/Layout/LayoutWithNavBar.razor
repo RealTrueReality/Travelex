@@ -1,7 +1,7 @@
 @inherits LayoutComponentBase
 @inject NavigationManager NavigationManager
 
-<div class="app-container">
+<div class="app-container dark:bg-black">
     @* 渲染页面 *@
     <main class="main-content">
         @Body
@@ -64,6 +64,11 @@
         user-select: none
     }
 
+    :root.dark .bottom-nav {
+        background-color: #000000;
+        box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.3);
+    }
+
     .nav-item {
         display: flex;
         flex-direction: column;
@@ -76,12 +81,20 @@
         height: 100%;
     }
 
+    :root.dark .nav-item {
+        color: #9CA3AF;
+    }
+
     .nav-item:hover {
         color: #2196F3;
     }
 
     .nav-item.active {
         color: #2196F3;
+    }
+
+    :root.dark .nav-item.active {
+        color: #1E90FF;
     }
 
     .nav-item i {

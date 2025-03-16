@@ -2,7 +2,7 @@
 
 <div>
     <div class="px-4 pt-5 pb-3">
-        <div class="text-2xl font-bold text-[#1C160C] text-left">支出分类</div>
+        <div class="text-2xl font-bold text-[#1C160C] dark:text-[#E0E0E0] text-left">支出分类</div>
     </div>
 
     <div class="px-4 py-2">
@@ -17,12 +17,12 @@
     {
         <div class="px-4 py-2">
             <button @onclick="() => OnViewCategory.InvokeAsync(category)" class="w-full flex items-center">
-                <div class="w-12 h-12 bg-[#E8F0F2] rounded-lg flex items-center justify-center">
+                <div class="w-12 h-12 bg-[#E8F0F2] dark:bg-[#2A3441] rounded-lg flex items-center justify-center">
                     <img src="@GetCategoryIcon(category.Name)" alt="@category.Name" class="w-6 h-6" />
                 </div>
                 <div class="ml-4 flex-1">
-                    <div class="text-base font-medium text-[#1C160C] text-left">@category.Name</div>
-                    <div class="text-sm text-[#4C7C99] text-left">¥@(GetCategoryTotal(category.Name).ToString("N0"))</div>
+                    <div class="text-base font-medium text-[#1C160C] dark:text-[#E0E0E0] text-left">@category.Name</div>
+                    <div class="text-sm text-[#4C7C99] dark:text-[#6A98B5] text-left">¥@(GetCategoryTotal(category.Name).ToString("N0"))</div>
                 </div>
                 <div class="w-6 h-6">
                     <img src="images/profilePage/chevron-right.svg" alt="下一步" />
