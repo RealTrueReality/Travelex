@@ -1,0 +1,152 @@
+@using Travelex.Services
+@inject ThemeService ThemeService
+@inject IJSRuntime JSRuntime
+
+<div class="w-full mb-4">
+    <div class="flex items-center mb-3">
+        <div class="w-12 h-12 bg-[#E8F0F2] dark:bg-[#1E1E1E] rounded-lg flex items-center justify-center">
+            @if (ThemeService.IsDarkMode)
+            {
+                <i class="fas fa-moon text-[#0085FF] dark:text-[#1E90FF] text-xl"></i>
+            }
+            else
+            {
+                <i class="fas fa-sun text-[#0085FF] dark:text-[#1E90FF] text-xl"></i>
+            }
+        </div>
+        <div class="ml-4">
+            <div class="text-base font-medium text-[#1C160C] dark:text-[#E0E0E0] text-left">主题设置</div>
+            <div class="text-sm text-[#4C7C99] dark:text-[#6A98B5] text-left">
+                当前：@GetThemeStatusText()
+            </div>
+        </div>
+    </div>
+    
+    <div class="relative bg-gray-100 dark:bg-[#121212] rounded-xl p-3">
+        <!-- 可视化主题预览 -->
+        <div class="grid grid-cols-3 gap-3 mb-4">
+            <!-- 系统主题预览 -->
+            <div @onclick="() => SetThemePreference(ThemePreference.System)" 
+                 class="@GetPreviewClass(ThemePreference.System)">
+                <div class="relative overflow-hidden rounded-lg h-20 flex flex-col border dark:border-gray-700">
+                    <div class="h-4 bg-blue-500 w-full flex items-center justify-end p-0.5">
+                        <div class="h-1.5 w-1.5 rounded-full bg-white"></div>
+                    </div>
+                    <div class="flex-1 flex items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100 dark:from-[#181818] dark:to-[#202020]">
+                        <i class="fas fa-laptop text-gray-600 dark:text-gray-300"></i>
+                    </div>
+                </div>
+                <div class="mt-2 text-center text-xs font-medium text-gray-700 dark:text-gray-300">跟随系统</div>
+            </div>
+            
+            <!-- 浅色主题预览 -->
+            <div @onclick="() => SetThemePreference(ThemePreference.Light)" 
+                 class="@GetPreviewClass(ThemePreference.Light)">
+                <div class="relative overflow-hidden rounded-lg h-20 flex flex-col border dark:border-gray-700">
+                    <div class="h-4 bg-blue-500 w-full flex items-center justify-end p-0.5">
+                        <div class="h-1.5 w-1.5 rounded-full bg-white"></div>
+                    </div>
+                    <div class="flex-1 flex items-center justify-center bg-white">
+                        <i class="fas fa-sun text-yellow-500"></i>
+                    </div>
+                </div>
+                <div class="mt-2 text-center text-xs font-medium text-gray-700 dark:text-gray-300">浅色模式</div>
+            </div>
+            
+            <!-- 深色主题预览 -->
+            <div @onclick="() => SetThemePreference(ThemePreference.Dark)" 
+                 class="@GetPreviewClass(ThemePreference.Dark)">
+                <div class="relative overflow-hidden rounded-lg h-20 flex flex-col border dark:border-gray-700">
+                    <div class="h-4 bg-gray-700 w-full flex items-center justify-end p-0.5">
+                        <div class="h-1.5 w-1.5 rounded-full bg-gray-400"></div>
+                    </div>
+                    <div class="flex-1 flex items-center justify-center bg-[#121212]">
+                        <i class="fas fa-moon text-blue-400"></i>
+                    </div>
+                </div>
+                <div class="mt-2 text-center text-xs font-medium text-gray-700 dark:text-gray-300">深色模式</div>
+            </div>
+        </div>
+        
+        <!-- 主题选择器 -->
+        <div class="relative bg-white dark:bg-[#1A1A1A] rounded-lg p-1 flex border dark:border-gray-800">
+            <div class="absolute inset-y-1 transition-all duration-300 rounded-md bg-[#0085FF] dark:bg-[#1E90FF] z-0"
+                 style="@GetIndicatorStyle()"></div>
+                 
+            <button @onclick="() => SetThemePreference(ThemePreference.System)" 
+                    class="@GetSelectorClass(ThemePreference.System)">
+                <i class="fas fa-laptop mr-1.5"></i>
+                系统
+            </button>
+            <button @onclick="() => SetThemePreference(ThemePreference.Light)" 
+                    class="@GetSelectorClass(ThemePreference.Light)">
+                <i class="fas fa-sun mr-1.5"></i>
+                浅色
+            </button>
+            <button @onclick="() => SetThemePreference(ThemePreference.Dark)" 
+                    class="@GetSelectorClass(ThemePreference.Dark)">
+                <i class="fas fa-moon mr-1.5"></i>
+                深色
+            </button>
+        </div>
+    </div>
+</div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await ThemeService.InitializeAsync();
+        await ThemeService.SetupSystemThemeListenerAsync();
+        ThemeService.ThemeChanged += OnThemeChanged;
+    }
+
+    private void OnThemeChanged(bool isDarkMode)
+    {
+        StateHasChanged();
+    }
+
+    private string GetThemeStatusText()
+    {
+        return ThemeService.Preference switch
+        {
+            ThemePreference.System => "跟随系统",
+            ThemePreference.Light => "浅色",
+            ThemePreference.Dark => "深色",
+            _ => "未知"
+        };
+    }
+
+    private async Task SetThemePreference(ThemePreference preference)
+    {
+        await ThemeService.SetPreferenceAsync(preference);
+    }
+
+    private string GetPreviewClass(ThemePreference preference)
+    {
+        return ThemeService.Preference == preference
+            ? "cursor-pointer transform scale-105 transition-transform"
+            : "cursor-pointer hover:opacity-80 transition-opacity";
+    }
+
+    private string GetSelectorClass(ThemePreference preference)
+    {
+        var baseClass = "z-10 relative flex-1 py-1.5 px-4 rounded-md text-sm flex items-center justify-center transition-all duration-300";
+        
+        return ThemeService.Preference == preference
+            ? $"{baseClass} text-white font-medium"
+            : $"{baseClass} text-gray-600 dark:text-gray-300";
+    }
+
+    private string GetIndicatorStyle()
+    {
+        string left = ThemeService.Preference switch
+        {
+            ThemePreference.System => "0%",
+            ThemePreference.Light => "33.33%",
+            ThemePreference.Dark => "66.66%",
+            _ => "0%"
+        };
+        
+        return $"left: {left}; width: 33.33%;";
+    }
+}

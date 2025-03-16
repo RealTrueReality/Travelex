@@ -1,0 +1,11 @@
+@using Travelex.Services
+@inject ThemeService ThemeService
+@inject IJSRuntime JSRuntime
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await ThemeService.InitializeAsync();
+        await ThemeService.SetupSystemThemeListenerAsync();
+    }
+}
