@@ -1,0 +1,31 @@
+<svg width="240" height="240" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景圆 -->
+    <circle cx="120" cy="120" r="100" fill="#F5F0FF"/>
+
+    <!-- AI大脑图形 -->
+    <path d="M120 70C150 70 170 90 170 120C170 150 150 170 120 170C90 170 70 150 70 120C70 90 90 70 120 70Z" fill="#0085FF" opacity="0.2"/>
+
+    <!-- 连接线路 -->
+    <path d="M100 100C110 90 130 90 140 100" stroke="#0085FF" stroke-width="2"/>
+    <path d="M90 120C90 110 100 100 110 100" stroke="#0085FF" stroke-width="2"/>
+    <path d="M150 120C150 110 140 100 130 100" stroke="#0085FF" stroke-width="2"/>
+    <path d="M100 140C110 150 130 150 140 140" stroke="#0085FF" stroke-width="2"/>
+    <path d="M90 120C90 130 100 140 110 140" stroke="#0085FF" stroke-width="2"/>
+    <path d="M150 120C150 130 140 140 130 140" stroke="#0085FF" stroke-width="2"/>
+
+    <!-- 节点 -->
+    <circle cx="120" cy="85" r="6" fill="#0085FF"/>
+    <circle cx="90" cy="120" r="6" fill="#0085FF"/>
+    <circle cx="150" cy="120" r="6" fill="#0085FF"/>
+    <circle cx="120" cy="155" r="6" fill="#0085FF"/>
+    <circle cx="100" cy="100" r="4" fill="#0085FF"/>
+    <circle cx="140" cy="100" r="4" fill="#0085FF"/>
+    <circle cx="100" cy="140" r="4" fill="#0085FF"/>
+    <circle cx="140" cy="140" r="4" fill="#0085FF"/>
+
+    <!-- 对话气泡 -->
+    <path d="M170 100C180 100 190 110 190 120C190 130 180 140 170 140L165 150L160 140C150 140 140 130 140 120C140 110 150 100 160 100H170Z" fill="#0085FF"/>
+    <circle cx="155" cy="120" r="3" fill="white"/>
+    <circle cx="165" cy="120" r="3" fill="white"/>
+    <circle cx="175" cy="120" r="3" fill="white"/>
+</svg>

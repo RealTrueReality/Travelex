@@ -2,6 +2,7 @@ using CommunityToolkit.Maui.Markup;
 using System.Collections.ObjectModel;
 using Microsoft.Maui.Controls.Shapes;
 using Travelex.Models;
+using Travelex.Services;
 using static CommunityToolkit.Maui.Markup.GridRowsColumns;
 
 namespace Travelex.Pages;
@@ -30,25 +31,29 @@ public class OnboardingPage : ContentPage
         _shell = shell;
         NavigationPage.SetHasNavigationBar(this, false);
         Shell.SetNavBarIsVisible(this, false);
+        
+        bool isDarkMode = Application.Current.RequestedTheme == AppTheme.Dark;
+        
+        BackgroundColor = isDarkMode ? Colors.Black : Colors.White;
+        
         SetupOnboardingItems();
-        Build();
+        Build(isDarkMode);
     }
 
-    private void Build() {
+    private void Build(bool isDarkMode = false) {
         IndicatorView = new IndicatorView {
-            IndicatorColor = Color.Parse("#E0E0E0"),
-            SelectedIndicatorColor = Color.Parse("#0085FF"),
+            IndicatorColor = isDarkMode ? Color.Parse("#555555") : Color.Parse("#E0E0E0"),
+            SelectedIndicatorColor = isDarkMode ? Color.Parse("#1E90FF") : Color.Parse("#0085FF"),
             HorizontalOptions = LayoutOptions.Center,
         };
 
         OnboardingCarousel = new CarouselView {
             ItemsSource = OnboardingItems,
             IndicatorView = IndicatorView,
-            Loop = false,  // 禁用循环滚动
-            IsSwipeEnabled = true,  // 启用滑动
+            Loop = false,  
+            IsSwipeEnabled = true,  
         };
         
-        // 监听位置变化以更新按钮文本
         OnboardingCarousel.PropertyChanged += (sender, args) => {
             if (args.PropertyName == nameof(CarouselView.Position))
             {
@@ -60,6 +65,7 @@ public class OnboardingPage : ContentPage
             new VerticalStackLayout {
                 Spacing = 20,
                 Padding = new Thickness(20),
+                BackgroundColor = isDarkMode ? Colors.Black : Colors.White,
                 Children = {
                     new Image()
                         .Height(300)
@@ -67,12 +73,12 @@ public class OnboardingPage : ContentPage
                         .Bind(Image.SourceProperty, nameof(OnboardingModel.ImageSource)),
                     new Label()
                         .Font(family: "HarmonyBold", size: 32)
-                        .TextColor(Color.Parse("#1A1A1A"))
+                        .TextColor(isDarkMode ? Color.Parse("#E0E0E0") : Color.Parse("#1A1A1A"))
                         .Start()
                         .Bind(Label.TextProperty, nameof(OnboardingModel.Title)),
                     new Label()
                         .Font(family: "HarmonyRegular", size: 16)
-                        .TextColor(Color.Parse("#666666"))
+                        .TextColor(isDarkMode ? Color.Parse("#A0A0A0") : Color.Parse("#666666"))
                         .Start()
                         .Bind(Label.TextProperty, nameof(OnboardingModel.Description))
                 }
@@ -82,7 +88,7 @@ public class OnboardingPage : ContentPage
         NextButton = new Button {
             Text = "下一步",
             TextColor = Colors.White,
-            BackgroundColor = Color.Parse("#0085FF"),
+            BackgroundColor = isDarkMode ? Color.Parse("#1E90FF") : Color.Parse("#0085FF"),
             FontFamily = "HarmonyMedium",
             FontSize = 16,
             HeightRequest = 50,
@@ -92,6 +98,7 @@ public class OnboardingPage : ContentPage
         NextButton.Clicked += OnNextClicked;
 
         Content = new Grid {
+            BackgroundColor = isDarkMode ? Colors.Black : Colors.White,
             RowDefinitions = Rows.Define(
                 (Row.Carousel, Star),
                 (Row.Indicator, Auto),
@@ -104,7 +111,6 @@ public class OnboardingPage : ContentPage
             }
         };
         
-        // 初始化按钮文本
         UpdateNextButton();
     }
 
@@ -120,20 +126,20 @@ public class OnboardingPage : ContentPage
             new OnboardingModel
             {
                 Title = "轻松追踪您的旅程",
-                Description = "轻松追踪您的旅行信息，包括航班、酒店和租车信息。",
+                Description = "轻松管理您的所有旅程，从南极到北极，一站式添加所有行程信息。",
                 ImageSource = "onboarding_track.svg"
             },
             new OnboardingModel
             {
                 Title = "管理您的预算",
-                Description = "使用我们简单易用的工具，追踪您的支出并控制旅行预算。",
+                Description = "轻松跟踪旅行支出，智能分析图表展示，让您的旅行预算一目了然，追踪您的支出并控制旅行预算。",
                 ImageSource = "onboarding_budget.svg"
             },
             new OnboardingModel
             {
-                Title = "分享您的体验",
-                Description = "与亲朋好友分享您的旅行体验，一起发现新的目的地。",
-                ImageSource = "onboarding_share.svg"
+                Title = "AI旅行助手",
+                Description = "通义千问AI为您提供个性化旅行建议，轻松获得旅游信息并获取智能推荐",
+                ImageSource = "onboarding_ai.svg"
             }
         };
     }
@@ -146,17 +152,14 @@ public class OnboardingPage : ContentPage
         }
         else
         {
-            // 只有用户点击"开始使用"按钮时才设置 FirstLaunch 为 false
             Preferences.Default.Set("FirstLaunch", false);
             
-            // 直接设置主页面
             Application.Current.MainPage = _shell;
         }
     }
     
     protected override bool OnBackButtonPressed()
     {
-        // 拦截返回按钮，不设置 FirstLaunch
         return true;
     }
 

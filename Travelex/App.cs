@@ -11,6 +11,7 @@ public class App : Application {
         _seedDataService = seedDataService;
         _shell = shell;
 
+
         // 检查是否是首次启动
         if (Preferences.Default.Get("FirstLaunch", true))
         {

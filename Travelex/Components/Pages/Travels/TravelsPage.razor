@@ -60,7 +60,6 @@
                 }
             }
         </div>
-
         <!-- 添加行程按钮 -->
         <div class="p-4">
             <button @onclick="NavigateToAdd" class="w-full bg-primary-light dark:bg-primary-dark text-white h-12 rounded-[20px] text-base font-bold">
@@ -69,13 +68,10 @@
         </div>
     </div>
 </div>
-
 <DeleteConfirmationDialog Message="确定要删除这个行程吗？此操作无法撤销。"
                           @bind-IsVisible="IsDeleteDialogVisible"
                           OnConfirmed="ConfirmDelete"
-                          OnCancelled="CancelDelete"
-/>
-
+                          OnCancelled="CancelDelete"/>
 @code {
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
 

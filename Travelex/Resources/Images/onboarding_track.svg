@@ -1,24 +1,31 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <!-- Background circle -->
-    <circle cx="200" cy="200" r="180" fill="#E3F2FF" opacity="0.3"/>
-    
-    <!-- Airplane -->
-    <path d="M320 200C320 190 310 185 300 185H250L210 145H190L210 185H160L140 170H120L135 200L120 230H140L160 215H210L190 255H210L250 215H300C310 215 320 210 320 200Z" fill="#0085FF"/>
-    
-    <!-- Hotel -->
-    <rect x="80" y="160" width="60" height="100" fill="#0085FF"/>
-    <rect x="95" y="180" width="10" height="10" fill="white"/>
-    <rect x="115" y="180" width="10" height="10" fill="white"/>
-    <rect x="95" y="200" width="10" height="10" fill="white"/>
-    <rect x="115" y="200" width="10" height="10" fill="white"/>
-    <rect x="95" y="220" width="10" height="10" fill="white"/>
-    <rect x="115" y="220" width="10" height="10" fill="white"/>
-    
-    <!-- Calendar -->
-    <rect x="260" y="240" width="60" height="60" rx="5" fill="#0085FF"/>
-    <rect x="270" y="260" width="10" height="10" fill="white"/>
-    <rect x="290" y="260" width="10" height="10" fill="white"/>
-    <rect x="270" y="280" width="10" height="10" fill="white"/>
-    <rect x="290" y="280" width="10" height="10" fill="white"/>
+<svg width="240" height="240" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景圆 -->
+    <circle cx="120" cy="120" r="100" fill="#F0F7FF"/>
+
+    <!-- 旅行路线 -->
+    <path d="M60 120C60 120 90 80 120 120C150 160 180 120 180 120" stroke="#0085FF" stroke-width="4" stroke-linecap="round" stroke-dasharray="6 6"/>
+
+    <!-- 起点标记 -->
+    <circle cx="60" cy="120" r="12" fill="#0085FF"/>
+    <circle cx="60" cy="120" r="6" fill="white"/>
+
+    <!-- 中间点标记 -->
+    <circle cx="120" cy="120" r="12" fill="#0085FF"/>
+    <circle cx="120" cy="120" r="6" fill="white"/>
+
+    <!-- 终点标记 -->
+    <circle cx="180" cy="120" r="12" fill="#0085FF"/>
+    <circle cx="180" cy="120" r="6" fill="white"/>
+
+    <!-- 飞机图标 -->
+    <g transform="translate(140, 90) rotate(30)">
+        <path d="M30 0L24 6H12L6 12H0L6 6L0 6L3 3L0 0H6L12 6L18 0H30Z" fill="#0085FF"/>
+    </g>
+
+    <!-- 酒店图标 -->
+    <g transform="translate(80, 140)">
+        <rect x="0" y="0" width="20" height="24" rx="2" fill="#0085FF"/>
+        <rect x="5" y="5" width="10" height="8" rx="1" fill="white"/>
+        <rect x="8" y="17" width="4" height="7" fill="white"/>
+    </g>
 </svg>
