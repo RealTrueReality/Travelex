@@ -49,3 +49,33 @@ window.setupSystemThemeListener = function () {
         }
     }
 };
+
+// 在页面加载前应用保存的主题设置
+(function initializeTheme() {
+    try {
+        // 检查本地存储中的主题偏好
+        const themePreference = localStorage.getItem('themePreference');
+        let shouldApplyDark = false;
+        
+        if (themePreference === 'Dark') {
+            // 用户选择了深色模式
+            shouldApplyDark = true;
+        } else if (themePreference === 'Light') {
+            // 用户选择了浅色模式
+            shouldApplyDark = false;
+        } else {
+            // 用户选择了跟随系统或未设置，检测系统主题
+            shouldApplyDark = window.matchMedia && 
+                                window.matchMedia('(prefers-color-scheme: dark)').matches;
+        }
+        
+        // 立即应用主题，不等待页面完全加载
+        if (shouldApplyDark) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    } catch (e) {
+        console.error('主题初始化失败:', e);
+    }
+})();

@@ -12,10 +12,11 @@
 @inject TravelService TravelService
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
+@inject ThemeService Theme
 
 <FlexedPageComponent>
     <TopBarLeft>
-        <button @onclick="NavigateBack" class="p-2 text-[#252525]">
+        <button @onclick="NavigateBack" class="p-2 text-text-light dark:text-text-dark">
             <i class="fas fa-arrow-left text-xl"></i>
         </button>
     </TopBarLeft>
@@ -23,23 +24,18 @@
         支出图表
     </TopBarTitle>
     <TopBarRight>
-        <button @onclick="NavigateToStreamingAnalysis" class="p-2 text-[#252525]">
+        <button @onclick="NavigateToStreamingAnalysis" class="p-2 text-text-light dark:text-text-dark">
             <i class="fas fa-robot text-xl"></i>
         </button>
     </TopBarRight>
     <PageBody>
-        @* <button @onclick="NavigateToAnalysis" class="p-2 text-[#252525]"> *@
-        @*     <i class="fas fa-robot text-xl"></i> *@
-        @* </button> *@
-        
-        
         <div class="flex-1 overflow-auto p-4">
             @if (IsLoading) {
                 <!-- 总支出金额 Shimmer -->
                 <div class="mb-6">
-                    <SfSkeleton Width="148px" Height="22px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                    <SfSkeleton Width="148px" Height="22px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
                     <div class="mt-0.2">
-                        <SfSkeleton Width="198px" Height="34px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                        <SfSkeleton Width="198px" Height="34px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
                     </div>
                 </div>
 
@@ -48,46 +44,46 @@
                     @for (int i = 0; i < 4; i++) {
                         <div class="mb-4">
                             <div class="flex justify-between text-sm mb-1">
-                                <SfSkeleton Width="100px" Height="16px" Effect=ShimmerEffect.Wave></SfSkeleton>
-                                <SfSkeleton Width="80px" Height="16px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                                <SfSkeleton Width="100px" Height="16px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
+                                <SfSkeleton Width="80px" Height="16px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
                             </div>
                             <SfSkeleton Width="100%" Height="8px" Effect=ShimmerEffect.Wave
-                                        CssClass="rounded-full"></SfSkeleton>
+                                        CssClass="rounded-full dark:opacity-50"></SfSkeleton>
                         </div>
                     }
                 </div>
 
                 <!-- 每日支出趋势 Shimmer -->
                 <div>
-                    <SfSkeleton Width="148px" Height="22px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                    <SfSkeleton Width="148px" Height="22px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
                     <div class="mt-0.2">
-                        <SfSkeleton Width="128px" Height="34px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                        <SfSkeleton Width="128px" Height="34px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
                     </div>
                     <div class="flex items-center gap-1 mb-4">
-                        <SfSkeleton Width="118px" Height="18px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                        <SfSkeleton Width="118px" Height="18px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
                     </div>
-                    <SfSkeleton Width="100%" Height="200px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                    <SfSkeleton Width="100%" Height="200px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
                 </div>
 
                 <!-- 支出列表 Shimmer -->
                 <div class="mt-8">
-                    <SfSkeleton Width="100px" Height="24px" Effect=ShimmerEffect.Wave CssClass="mb-4"></SfSkeleton>
+                    <SfSkeleton Width="100px" Height="24px" Effect=ShimmerEffect.Wave CssClass="mb-4 dark:opacity-50"></SfSkeleton>
                     @for (int i = 0; i < 3; i++) {
-                        <div class="flex justify-between items-start mb-4 p-4 bg-[#F5F5F5] rounded-xl">
+                        <div class="flex justify-between items-start mb-4 p-4 bg-active-light dark:bg-active-dark rounded-xl">
                             <div class="flex-1 mr-4">
                                 <SfSkeleton Width="88px" Height="20px" Effect=ShimmerEffect.Wave
-                                            CssClass="mb-1"></SfSkeleton>
+                                            CssClass="mb-1 dark:opacity-50"></SfSkeleton>
                                 <SfSkeleton Width="168px" Height="16px" Effect=ShimmerEffect.Wave
-                                            CssClass="mb-2"></SfSkeleton>
+                                            CssClass="mb-2 dark:opacity-50"></SfSkeleton>
                                 <div class="flex items-center gap-2">
                                     <SfSkeleton Width="40px" Height="24px" Effect=ShimmerEffect.Wave
-                                                CssClass="rounded-lg"></SfSkeleton>
-                                    <SfSkeleton Width="100px" Height="16px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                                                CssClass="rounded-lg dark:opacity-50"></SfSkeleton>
+                                    <SfSkeleton Width="100px" Height="16px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
                                 </div>
                             </div>
                             <div class="flex flex-col items-end gap-2">
-                                <SfSkeleton Width="26px" Height="26px" Effect=ShimmerEffect.Wave></SfSkeleton>
-                                <SfSkeleton Width="100px" Height="20px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                                <SfSkeleton Width="26px" Height="26px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
+                                <SfSkeleton Width="100px" Height="20px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
                             </div>
                         </div>
                     }
@@ -96,8 +92,8 @@
             else {
                 <!-- 总支出金额 -->
                 <div class="mb-6">
-                    <h2 class="text-xl font-bold text-[#111416] mb-2">支出按类别划分</h2>
-                    <p class="text-3xl font-semibold text-[#111416]">￥@TotalAmount</p>
+                    <h2 class="text-xl font-bold text-text-light dark:text-text-dark mb-2">支出按类别划分</h2>
+                    <p class="text-3xl font-semibold text-text-light dark:text-text-dark">￥@TotalAmount</p>
                 </div>
 
                 <!-- 分类支出条形图 -->
@@ -105,11 +101,11 @@
                     @foreach (var category in CategoryExpenses) {
                         <div class="mb-4">
                             <div class="flex justify-between text-sm mb-1">
-                                <span class="text-[#111416] text-base">@category.Category</span>
-                                <span class="text-[#111416] text-base">￥@category.Amount</span>
+                                <span class="text-text-light dark:text-text-dark text-base">@category.Category</span>
+                                <span class="text-text-light dark:text-text-dark text-base">￥@category.Amount</span>
                             </div>
-                            <div class="h-2 bg-[#F5F5F5] rounded-full">
-                                <div class="h-full bg-[#0085FF] rounded-full"
+                            <div class="h-2 bg-active-light dark:bg-active-dark rounded-full">
+                                <div class="h-full bg-primary-light dark:bg-primary-dark rounded-full"
                                      style="width: @(category.Percentage)%">
 
                                 </div>
@@ -120,31 +116,35 @@
 
                 <!-- 每日支出趋势 -->
                 <div>
-                    <h2 class="text-xl font-bold text-[#111416] mb-2">每日消费趋势</h2>
+                    <h2 class="text-xl font-bold text-text-light dark:text-text-dark mb-2">每日消费趋势</h2>
                     <div class="mb-1">
-                        <span class="text-3xl font-semibold text-[#111416]">￥@AverageDailySpend.ToString("F0")</span>
+                        <span class="text-3xl font-semibold text-text-light dark:text-text-dark">￥@AverageDailySpend.ToString("F0")</span>
                     </div>
                     <div class="flex items-center gap-1 mb-4">
-                        <span class="text-lg text-[#111416]">@DaysCount 天</span>
+                        <span class="text-lg text-text-light dark:text-text-dark">@DaysCount 天</span>
                         <span class="text-lg @(TrendPercentage.StartsWith("+") ? "text-[#4CAF50]" : "text-[#F44336]")">
                             @TrendPercentage
                         </span>
                     </div>
 
-                    <SfChart Height="200px">
+                    <SfChart Height="200px" Background="transparent">
+                        <ChartArea Background="transparent">
+                            <ChartAreaBorder Width="0" />
+                        </ChartArea>
                         <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.DateTime"
                                            LabelFormat="MMM d"
                                            EdgeLabelPlacement="EdgeLabelPlacement.Shift"
-
                                            MajorGridLines="new ChartAxisMajorGridLines() { Width = 0 }">
+                            <ChartAxisLabelStyle Color="@(Theme.IsDarkMode ? "#e2e8f0" : "#4b5563")" />
                         </ChartPrimaryXAxis>
                         <ChartPrimaryYAxis LabelFormat="￥{value}"
                                            Minimum="0"
                                            RangePadding="ChartRangePadding.Auto"
                                            Interval="@GetYAxisInterval()"
                                            MaximumLabels="6"
-                                           MajorGridLines=@(new ChartAxisMajorGridLines() { Width = 0.5, DashArray = "5,5" })
+                                           MajorGridLines=@(new ChartAxisMajorGridLines() { Width = 0.5, DashArray = "5,5", Color = Theme.IsDarkMode ? "#4b5563" : "#e2e8f0" })
                                            MajorTickLines="new ChartAxisMajorTickLines() { Width = 0 }">
+                            <ChartAxisLabelStyle Color="@(Theme.IsDarkMode ? "#e2e8f0" : "#4b5563")" />
                         </ChartPrimaryYAxis>
                         <ChartSeriesCollection>
                             <ChartSeries DataSource="@DailyExpenses"
@@ -152,52 +152,53 @@
                                          YName="Amount"
                                          Type="ChartSeriesType.Spline"
                                          Width="2"
-                                         Fill="#0085FF">
+                                         Fill="@(Theme.IsDarkMode ? "#3b82f6" : "#0085FF")">
                                 <ChartMarker Visible="false">
                                 </ChartMarker>
                             </ChartSeries>
                         </ChartSeriesCollection>
+                        <ChartTooltipSettings Enable="true">
+                            <ChartTooltipTextStyle Color="@(Theme.IsDarkMode ? "#e2e8f0" : "#4b5563")" />
+                        </ChartTooltipSettings>
                     </SfChart>
                 </div>
 
                 <!-- 支出列表 -->
                 <div class="mt-8 mb-8">
-                    <h2 class="text-xl font-bold text-[#111416] mb-4">支出列表</h2>
+                    <h2 class="text-xl font-bold text-text-light dark:text-text-dark mb-4">支出列表</h2>
                     @foreach (var expense in Expenses) {
-                        <div class="flex justify-between items-start mb-4 p-4 bg-[#F5F5F5] rounded-xl">
+                        <div class="flex justify-between items-start mb-4 p-4 bg-active-light dark:bg-active-dark rounded-xl" @onclick="() => NavigateToExpenseEdit(expense.Id)">
                             <div class="flex-1 mr-4">
-                                <h3 class="text-lg font-medium text-[#111416]">@expense.Title</h3>
+                                <h3 class="text-lg font-medium text-text-light dark:text-text-dark">@expense.Title</h3>
                                 @if (!string.IsNullOrEmpty(expense.Description)) {
-                                    <p class="text-sm text-[#666666] mt-1">@expense.Description</p>
+                                    <p class="text-sm text-subtext-light dark:text-subtext-dark mt-1">@expense.Description</p>
                                 }
                                 <div class="flex items-center gap-2 mt-2">
-                                    <span
-                                        class="text-xs text-[#666666] bg-white px-2 py-1 rounded">@expense.Category</span>
-                                    <span
-                                        class="text-xs text-[#666666]">@expense.TimeOnSpend.ToString("MM月dd日 HH:mm")</span>
+                                    <span class="text-xs text-subtext-light dark:text-subtext-dark bg-background-light dark:bg-background-dark px-2 py-1 rounded">@expense.Category</span>
+                                    <span class="text-xs text-subtext-light dark:text-subtext-dark">@expense.TimeOnSpend.ToString("MM月dd日 HH:mm")</span>
                                 </div>
                             </div>
                             <div class="flex flex-col items-end gap-2">
-                                <button @onclick="() => NavigateToExpenseEdit(expense.Id)" class="text-[#666666]">
-                                    <img src="images/editPen.png" class="p-2" alt="编辑"/>
+                                <button @onclick:stopPropagation="true" @onclick="() => NavigateToExpenseEdit(expense.Id)" class="text-subtext-light dark:text-subtext-dark">
+                                    <i class="fas fa-pen text-lg p-2"></i>
                                 </button>
-                                <span class="text-lg font-medium text-[#111416]">￥@expense.Amount</span>
+                                <span class="text-lg font-medium text-text-light dark:text-text-dark">￥@expense.Amount</span>
                             </div>
                         </div>
                     }
                 </div>
 
                 <!-- 操作按钮 -->
-                <div class="bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+                <div class="bottom-0 left-0 right-0 bg-background-light dark:bg-background-dark border-t border-gray-200 dark:border-gray-700 p-4">
                     <div class="flex flex-col gap-3 max-w-md mx-auto">
-                        <button @onclick="NavigateToExpenseAdd"
-                                class="flex items-center justify-center gap-2 w-full py-3 text-gray-600 active:bg-[#EFF2F4]">
+                        <button @onclick="NavigateToTravelEdit"
+                                class="flex items-center justify-center gap-2 w-full py-3 text-gray-600 dark:text-gray-300 active:bg-[#EFF2F4] dark:active:bg-gray-700">
                             <i class="fas fa-edit"></i>
-                            <span>添加支出</span>
+                            <span>修改旅行</span>
                         </button>
 
                         <button @onclick="ShowDeleteDialog"
-                                class="flex items-center justify-center gap-2 w-full py-3 text-gray-600 active:bg-[#EFF2F4]">
+                                class="flex items-center justify-center gap-2 w-full py-3 text-gray-600 dark:text-gray-300 active:bg-[#EFF2F4] dark:active:bg-gray-700">
                             <i class="fas fa-trash"></i>
                             <span>删除旅行</span>
                         </button>
@@ -216,9 +217,8 @@
 
 
 @code {
-    [Parameter]
-    public int TripId { get; set; }
-    
+    [Parameter] public int TripId { get; set; }
+
     private bool IsLoading { get; set; } = true;
     private bool IsDeleteDialogVisible { get; set; }
     private bool IsExportDialogVisible { get; set; }
@@ -230,12 +230,11 @@
     private string TrendPercentage { get; set; } = "";
     private int DaysCount { get; set; }
     private string TripTitle { get; set; } = "";
+    
 
-    protected override async Task OnInitializedAsync()
-    {
+    protected override async Task OnInitializedAsync() {
         var result = await ExpenseService.GetExpensesByTripIdAsync(TripId);
-        if (result.IsSuccess)
-        {
+        if (result.IsSuccess) {
             var travelResult = await TravelService.GetTravelByIdAsync(TripId);
             if (travelResult.IsSuccess) {
                 if (travelResult.Data is not null) TripTitle = travelResult.Data.Title;
@@ -248,52 +247,43 @@
         }
     }
 
-    private void NavigateBack()
-    {
+    private void NavigateBack() {
         NavigationManager.NavigateBack();
     }
 
-    private void NavigateToExpenseAdd()
-    {
-        NavigationManager.NavigateToSubPage($"/expense/add/{TripId}");
+    private void NavigateToTravelEdit() {
+        NavigationManager.NavigateToSubPage($"/travel/edit/{TripId}");
     }
 
-    private void NavigateToExpenseEdit(long expenseId)
-    {
+    private void NavigateToExpenseEdit(long expenseId) {
         NavigationManager.NavigateToSubPage($"/travel/expense/edit/{expenseId}");
     }
 
-    private async Task DeleteTravel()
-    {
+    private async Task DeleteTravel() {
         var result = await TravelService.DeleteTravelAsync(TripId);
-        if (result.IsSuccess)
-        {
+        if (result.IsSuccess) {
             NavigationManager.NavigateTo("/home");
         }
     }
 
-    private void ShowDeleteDialog()
-    {
+    private void ShowDeleteDialog() {
         IsDeleteDialogVisible = true;
     }
 
-    private void ShowExportDialog()
-    {
+    private void ShowExportDialog() {
         IsExportDialogVisible = true;
     }
 
-    private void NavigateToStreamingAnalysis()
-    {
+    private void NavigateToStreamingAnalysis() {
         NavigationManager.NavigateToSubPage($"/travel/expense/streaming/{TripId}");
     }
+
     // private void NavigateToAnalysis()
     // {
     //     NavigationManager.NavigateToSubPage($"/travel/expense/analysis/{TripId}");
     // }
-    private async Task ProcessExpenseData()
-    {
-        if (Expenses.Any())
-        {
+    private async Task ProcessExpenseData() {
+        if (Expenses.Any()) {
             // 计算总金额
             TotalAmount = Expenses.Sum(e => e.Amount ?? 0);
 
@@ -307,8 +297,7 @@
                 .ToList();
 
             // 计算百分比
-            foreach (var category in categoryGroups)
-            {
+            foreach (var category in categoryGroups) {
                 category.Percentage = (category.Amount / TotalAmount) * 100;
             }
 
@@ -326,8 +315,7 @@
             DailyExpenses = dailyGroups;
 
             // 计算天数和平均支出
-            if (dailyGroups.Any())
-            {
+            if (dailyGroups.Any()) {
                 var startDate = dailyGroups.Min(d => d.Date);
                 var endDate = dailyGroups.Max(d => d.Date);
                 DaysCount = (endDate - startDate).Days + 1;
@@ -342,8 +330,7 @@
         }
     }
 
-    private double GetYAxisInterval()
-    {
+    private double GetYAxisInterval() {
         if (DailyExpenses == null || !DailyExpenses.Any())
             return 200;
 

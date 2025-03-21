@@ -19,19 +19,31 @@ module.exports = {
         },
         background: {
           light: '#FFFFFF',
-          dark: '#121212'
+          dark: '#000000'
         },
         card: {
           light: '#FFFFFF',
-          dark: '#1E1E1E'
+          dark: '#000000'
         },
         text: {
           light: '#1C160C',
           dark: '#E0E0E0'
         },
         subtext: {
-          light: '#666666',
+          light: '#4b5563',
           dark: '#A0A0A0'
+        },
+        'input-bg': {
+          light: '#F8FAFC',
+          dark: '#1e1e1e'
+        },
+        active: {
+          light: '#EFF2F4',
+          dark: '#1E1E1E'
+        },
+        icon: {
+          light: '#EFF2F4',
+          dark: '#1E1E1E'
         }
       }
     },

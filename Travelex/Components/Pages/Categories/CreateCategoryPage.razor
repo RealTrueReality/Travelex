@@ -5,10 +5,11 @@
 @using Travelex.Extensions
 @inject NavigationManager NavigationManager
 @inject ExpenseService ExpenseService
+@inject ThemeService Theme
 
 <FlexedPageComponent>
     <TopBarLeft>
-    <button @onclick="NavigateBack" class="p-2 text-[#252525]">
+    <button @onclick="NavigateBack" class="p-2 text-text-light dark:text-text-dark">
         <i class="fas fa-arrow-left text-xl"></i>
     </button>
     </TopBarLeft>
@@ -19,19 +20,20 @@
         <div class="p-4">
             <div class="space-y-4">
                 <div>
-                    <label for="name" class="block text-sm font-medium text-[#1C160C] mb-1">分类名称</label>
+                    <label for="name" class="block text-sm font-medium text-text-light dark:text-text-dark mb-1">分类名称</label>
                     <input type="text" id="name" @bind="_categoryName"
-                           class="w-full px-4 py-2 rounded-lg border border-[#E8F0F2] focus:outline-none focus:border-[#119BED]"
+                           class="w-full px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark focus:outline-none focus:border-primary-light dark:focus:border-primary-dark"
                            placeholder="输入分类名称"/>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-[#1C160C] mb-1">选择图标</label>
+                    <label class="block text-sm font-medium text-text-light dark:text-text-dark mb-1">选择图标</label>
                     <div class="grid grid-cols-4 gap-4">
                         @foreach (var icon in _availableIcons) {
                             <button @onclick="() => SelectIcon(icon)"
-                                    class="w-12 h-12 rounded-lg border border-[#E8F0F2] hover:bg-[#F5F5F5] transition-colors duration-200 flex items-center justify-center @(icon == _selectedIcon ? "bg-[#E8F0F2]" : "bg-white")">
-                                <img src="@($"images/expenseCategory/{icon}.svg")" alt="@icon" class="w-6 h-6 @(icon == _selectedIcon ? "" : "opacity-60")"/>
+                                    class="w-12 h-12 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-active-light dark:hover:bg-active-dark transition-colors duration-200 flex items-center justify-center @(icon == _selectedIcon ? "bg-active-light dark:bg-active-dark" : "bg-background-light dark:bg-background-dark")">
+                                <img src="@($"images/expenseCategory/{icon}.svg")" alt="@icon" 
+                                     class="w-6 h-6 @(icon == _selectedIcon ? "" : "opacity-60") dark:invert dark:brightness-90"/>
                             </button>
                         }
                     </div>
@@ -39,7 +41,7 @@
             </div>
 
             <div class="mt-8">
-                <button @onclick="CreateCategory" class="w-full py-3 bg-[#119BED] text-white font-bold rounded-[20px]">
+                <button @onclick="CreateCategory" class="w-full py-3 bg-primary-light dark:bg-primary-dark text-white font-bold rounded-[20px] hover:bg-blue-600 dark:hover:bg-blue-700 transition-colors">
                     创建分类
                 </button>
             </div>

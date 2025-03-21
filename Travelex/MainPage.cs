@@ -10,24 +10,26 @@ using Travelex.ViewModels;
 #if ANDROID
 using AndroidX.Activity;
 #endif
+
 namespace Travelex;
 
 public class MainPage : BaseContentPage<ActivityIndicatorViewModel> {
     private BlazorWebView blazorWebView;
 
     public MainPage(ActivityIndicatorViewModel indicatorViewModel) : base(indicatorViewModel) {
-        
-        
-        BackgroundColor = Application.Current?.RequestedTheme == AppTheme.Dark ? Colors.Black : Colors.White;
+        var themeColor = Application.Current?.RequestedTheme == AppTheme.Dark ? Colors.Black : Colors.White;
+        BackgroundColor = themeColor;
 #pragma warning disable CA1416
-        this.Behaviors.Add(new StatusBarBehavior() {
-            StatusBarColor = Colors.White,
-            StatusBarStyle = StatusBarStyle.DarkContent
+        Behaviors.Add(new StatusBarBehavior() {
+            StatusBarColor = themeColor,
+            StatusBarStyle = Application.Current?.RequestedTheme == AppTheme.Dark
+                ? StatusBarStyle.LightContent
+                : StatusBarStyle.DarkContent
         });
 #pragma warning restore CA1416
 
 #if ANDROID
-        Microsoft.Maui.ApplicationModel.Platform.CurrentActivity.Window.SetNavigationBarColor(Android.Graphics.Color.White);
+        Microsoft.Maui.ApplicationModel.Platform.CurrentActivity.Window.SetNavigationBarColor( Application.Current?.RequestedTheme == AppTheme.Dark ? Android.Graphics.Color.Black : Android.Graphics.Color.White) ;
         Microsoft.Maui.ApplicationModel.Platform.CurrentActivity.Window.NavigationBarContrastEnforced = false;
 #endif
         Content = new Grid {
@@ -42,9 +44,8 @@ public class MainPage : BaseContentPage<ActivityIndicatorViewModel> {
                     }
                 }.Assign(out blazorWebView),
 
-                new ActivityIndicator(){Color = Color.FromArgb("#3b82f6")}
+                new ActivityIndicator() { Color = Color.FromArgb("#3b82f6") }
                     .Center() // This applies both horizontal and vertical center
-                   
                     .Bind(ActivityIndicator.IsRunningProperty, getter: (ActivityIndicatorViewModel vm) => vm.IsLoading,
                         setter: (ActivityIndicatorViewModel vm, bool value) => vm.IsLoading = !value)
             }
@@ -54,8 +55,7 @@ public class MainPage : BaseContentPage<ActivityIndicatorViewModel> {
         blazorWebView.BlazorWebViewInitializing += BlazorWebViewInitializing;
     }
 
-    private void BlazorWebViewInitialized(object? sender, BlazorWebViewInitializedEventArgs e)
-    {
+    private void BlazorWebViewInitialized(object? sender, BlazorWebViewInitializedEventArgs e) {
 #if ANDROID
         if (e.WebView.Context?.GetActivity() is not ComponentActivity activity)
         {
@@ -70,9 +70,8 @@ public class MainPage : BaseContentPage<ActivityIndicatorViewModel> {
 #endif
     }
 
-    private void BlazorWebViewInitializing(object? sender, BlazorWebViewInitializingEventArgs e)
-    {
-#if IOS || MACCATALYST                   
+    private void BlazorWebViewInitializing(object? sender, BlazorWebViewInitializingEventArgs e) {
+#if IOS || MACCATALYST
         e.Configuration.AllowsInlineMediaPlayback = true;
         e.Configuration.MediaTypesRequiringUserActionForPlayback = WebKit.WKAudiovisualMediaTypes.None;
 #endif

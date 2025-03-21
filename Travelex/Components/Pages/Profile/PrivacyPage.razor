@@ -7,10 +7,11 @@
 @inject NavigationManager NavigationManager
 @inject AuthService AuthService
 @inject BlazorMauiInterop BlazorMauiInterop
+@inject ThemeService Theme
 
 <FixedPageComponent>
     <TopBarLeft>
-        <button @onclick="NavigateBack" class="p-2 text-[#252525]">
+        <button @onclick="NavigateBack" class="p-2 text-text-light dark:text-text-dark">
             <i class="fas fa-arrow-left text-xl"></i>
         </button>
     </TopBarLeft>
@@ -19,35 +20,35 @@
     </TopBarTitle>
     <PageBody>
         <div class="p-4">
-            <div class="text-2xl font-bold text-[#1C160C] mb-6">修改密码</div>
+            <div class="text-2xl font-bold text-text-light dark:text-text-dark mb-6">修改密码</div>
 
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-[#4C7C99] mb-1">当前密码</label>
-                    <input type="password" @bind="_currentPassword" class="w-full h-12 px-4 rounded-lg border border-[#E8F0F2] focus:outline-none focus:border-[#119BED]"/>
+                    <label class="block text-sm font-medium text-subtext-light dark:text-subtext-dark mb-1">当前密码</label>
+                    <input type="password" @bind="_currentPassword" class="w-full h-12 px-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark focus:outline-none focus:border-primary-light dark:focus:border-primary-dark"/>
                     @if (!string.IsNullOrEmpty(_currentPasswordError)) {
                         <div class="text-red-500 text-sm mt-1">@_currentPasswordError</div>
                     }
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-[#4C7C99] mb-1">新密码</label>
-                    <input type="password" @bind="_newPassword" class="w-full h-12 px-4 rounded-lg border border-[#E8F0F2] focus:outline-none focus:border-[#119BED]"/>
+                    <label class="block text-sm font-medium text-subtext-light dark:text-subtext-dark mb-1">新密码</label>
+                    <input type="password" @bind="_newPassword" class="w-full h-12 px-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark focus:outline-none focus:border-primary-light dark:focus:border-primary-dark"/>
                     @if (!string.IsNullOrEmpty(_newPasswordError)) {
                         <div class="text-red-500 text-sm mt-1">@_newPasswordError</div>
                     }
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-[#4C7C99] mb-1">确认新密码</label>
-                    <input type="password" @bind="_confirmPassword" class="w-full h-12 px-4 rounded-lg border border-[#E8F0F2] focus:outline-none focus:border-[#119BED]"/>
+                    <label class="block text-sm font-medium text-subtext-light dark:text-subtext-dark mb-1">确认新密码</label>
+                    <input type="password" @bind="_confirmPassword" class="w-full h-12 px-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark focus:outline-none focus:border-primary-light dark:focus:border-primary-dark"/>
                     @if (!string.IsNullOrEmpty(_confirmPasswordError)) {
                         <div class="text-red-500 text-sm mt-1">@_confirmPasswordError</div>
                     }
                 </div>
             </div>
 
-            <button @onclick="ChangePassword" class="w-full h-12 bg-[#119BED] text-white rounded-[20px] mt-8">
+            <button @onclick="ChangePassword" class="w-full h-12 bg-primary-light dark:bg-primary-dark text-white rounded-[20px] mt-8 hover:bg-blue-600 dark:hover:bg-blue-700 transition-colors">
                 修改密码
             </button>
         </div>

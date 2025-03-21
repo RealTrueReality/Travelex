@@ -3,57 +3,65 @@
 @using Travelex.Components.Layout
 @using Travelex.Entities
 @using Travelex.Services
-@using Syncfusion.Blazor.Notifications
+
 @using SkeletonType = Syncfusion.Blazor.Notifications.SkeletonType
 @inject ExpenseService ExpenseService
 @inject NavigationManager NavigationManager
 @inject TravelService TravelService
+@inject ThemeService Theme
 @layout LayoutWithNavBar
 <FlexedPageComponent>
     <TopBarTitle>费用分析</TopBarTitle>
     <PageBody>
-        <div class="flex space-x-4 px-4 border-b border-[#EFF2F4]">
+        <div class="flex space-x-4 px-4 border-b border-[#EFF2F4] dark:border-gray-700">
             <button class="@GetTabClass("monthly")" @onclick="@(() => SwitchTab("monthly"))">月度</button>
             <button class="@GetTabClass("yearly")" @onclick="@(() => SwitchTab("yearly"))">年度</button>
             <button class="@GetTabClass("alltime")" @onclick="@(() => SwitchTab("alltime"))">全部时间</button>
         </div>
 
         <div class="p-4">
-            <div class="text-lg font-medium text-[#111416] mb-4">总支出</div>
+            <div class="text-lg font-medium text-text-light dark:text-text-dark mb-4">总支出</div>
             <div class="grid grid-cols-1 gap-4 mb-6">
                 @if (_isLoading) {
-                    <div class="bg-[#EFF2F4] rounded-xl p-6 flex items-center space-x-3 w-full">
+                    <div class="bg-active-light dark:bg-active-dark rounded-xl p-6 flex items-center space-x-3 w-full">
                         <SfSkeleton Width="24px" Height="24px" Shape="SkeletonType.Square"
-                                    Effect="ShimmerEffect.Wave"></SfSkeleton>
-                        <SfSkeleton Width="120px" Height="24px" Effect="ShimmerEffect.Wave"></SfSkeleton>
+                                    Effect="ShimmerEffect.Wave" CssClass="dark:opacity-50"></SfSkeleton>
+                        <SfSkeleton Width="120px" Height="24px" Effect="ShimmerEffect.Wave" CssClass="dark:opacity-50"></SfSkeleton>
                     </div>
                 }
                 else {
-                    <div class="bg-[#EFF2F4] rounded-xl p-6 flex items-center space-x-3 w-full">
-                        <span class="text-[#252525]">
-                            <img src="images/expense.svg" alt="支出"/>
+                    <div class="bg-active-light dark:bg-active-dark rounded-xl p-6 flex items-center space-x-3 w-full">
+                        <span class="text-subtext-light dark:text-subtext-dark">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-subtext-light dark:text-subtext-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="5" width="20" height="14" rx="2" />
+                            <line x1="2" y1="10" x2="22" y2="10" />
+                            <circle cx="12" cy="15" r="2" />
+                        </svg>
                         </span>
-                        <span class="text-xl font-semibold text-[#111416]">¥@GetTotalSpentData().ToString("N0")</span>
+                        <span class="text-xl font-semibold text-text-light dark:text-text-dark">¥@GetTotalSpentData().ToString("N0")</span>
                     </div>
                 }
             </div>
 
             <div class="mb-6">
-                <div class="text-lg font-medium text-[#111416] mb-4">支出分布</div>
-                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                <div class="text-lg font-medium text-text-light dark:text-text-dark mb-4">支出分布</div>
+                <div class="bg-background-light dark:bg-background-dark rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
                     @if (_isLoading) {
                         <div class="h-[400px] flex items-center justify-center">
                             <SfSkeleton Width="100%" Height="400px" Shape="SkeletonType.Square"
-                                        Effect="ShimmerEffect.Wave"></SfSkeleton>
+                                        Effect="ShimmerEffect.Wave" CssClass="dark:opacity-50"></SfSkeleton>
                         </div>
                     }
                     else {
-                        <SfAccumulationChart EnableBorderOnMouseMove="false" Height="400px">
+                        <SfAccumulationChart EnableBorderOnMouseMove="false" Height="400px" Background="transparent">
                             <AccumulationChartTooltipSettings Enable="true"
                                                               Format="<b>${point.x}</b><br>支出占比: <b>${point.y}%</b>">
+                                <AccumulationChartTooltipTextStyle Color="@(Theme.IsDarkMode ? "#e2e8f0" : "#4b5563")"></AccumulationChartTooltipTextStyle>
                             </AccumulationChartTooltipSettings>
                             <AccumulationChartLegendSettings Visible="true" Position="LegendPosition.Top" Height="100px"
                                                              Width="100%">
+                                <AccumulationChartLegendTextStyle Color="@(Theme.IsDarkMode ? "#e2e8f0" : "#4b5563")">
+                                </AccumulationChartLegendTextStyle>
                             </AccumulationChartLegendSettings>
                             <AccumulationChartSeriesCollection>
                                 <AccumulationChartSeries DataSource="@GetDonutChartData()"
@@ -62,10 +70,12 @@
                                                          Name="支出">
                                     <AccumulationDataLabelSettings Visible="true" Name="DataLabelMappingName"
                                                                    Position="AccumulationLabelPosition.Outside">
-                                        <AccumulationChartConnector Type="ConnectorType.Curve" Length="20px">
-                                        </AccumulationChartConnector>
-                                        <AccumulationChartDataLabelFont FontWeight="600" Size="10px">
+                                        <AccumulationChartDataLabelFont Color="@(Theme.IsDarkMode ? "#e2e8f0" : "#4b5563")"
+                                                                        FontWeight="600" Size="10px">
                                         </AccumulationChartDataLabelFont>
+                                        <AccumulationChartConnector Type="ConnectorType.Curve" Length="20px"
+                                                                    Color="@(Theme.IsDarkMode ? "#64748b" : "#94a3b8")">
+                                        </AccumulationChartConnector>
                                     </AccumulationDataLabelSettings>
                                 </AccumulationChartSeries>
                             </AccumulationChartSeriesCollection>
@@ -75,12 +85,12 @@
             </div>
 
             <div class="mb-6">
-                <div class="text-lg font-medium text-[#111416] mb-4">分类统计</div>
+                <div class="text-lg font-medium text-text-light dark:text-text-dark mb-4">分类统计</div>
                 @if (_isLoading) {
                     <div class="flex flex-wrap gap-2 mb-4 rounded-3xl">
                         @for (int i = 0; i < 5; i++) {
                             <SfSkeleton Width="60px" Height="26px" Shape="SkeletonType.Rectangle"
-                                        CssClass="rounded-full" Effect="ShimmerEffect.Wave"></SfSkeleton>
+                                        CssClass="rounded-full dark:opacity-50" Effect="ShimmerEffect.Wave"></SfSkeleton>
                         }
                     </div>
                 }
@@ -96,28 +106,38 @@
                     </div>
                 }
 
-                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                <div class="bg-background-light dark:bg-background-dark rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
                     @if (_isLoading) {
                         <div class="h-[580px] flex items-center justify-center">
-                            <SfSkeleton Width="100%" Height="580px" Effect="ShimmerEffect.Wave"></SfSkeleton>
+                            <SfSkeleton Width="100%" Height="580px" Effect="ShimmerEffect.Wave" CssClass="dark:opacity-50"></SfSkeleton>
                         </div>
                     }
                     else {
-                        <SfChart @ref="_chart">
+                        <SfChart @ref="_chart" Background="transparent">
                             <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category">
+                                <ChartAxisLabelStyle Color="@(Theme.IsDarkMode ? "#e2e8f0" : "#4b5563")"></ChartAxisLabelStyle>
                                 <ChartAxisMajorGridLines Width="0"></ChartAxisMajorGridLines>
                                 @* <ChartAxisTitle Text="@GetXAxisTitle()"></ChartAxisTitle> *@
                             </ChartPrimaryXAxis>
                             <ChartPrimaryYAxis LabelFormat="@GetYAxisFormat()">
-                                <ChartAxisMajorGridLines Width="0.5" Color="#e0e0e0"></ChartAxisMajorGridLines>
+                                <ChartAxisLabelStyle Color="@(Theme.IsDarkMode ? "#e2e8f0" : "#4b5563")"></ChartAxisLabelStyle>
+                                <ChartAxisMajorGridLines Width="0.5" Color="@(Theme.IsDarkMode ? "#4b5563" : "#e0e0e0")"></ChartAxisMajorGridLines>
                                 @* <ChartAxisTitle Text="@GetYAxisTitle()"></ChartAxisTitle> *@
-
                             </ChartPrimaryYAxis>
+                            <ChartTooltipSettings Enable="true">
+                                <ChartTooltipTextStyle Color="@(Theme.IsDarkMode ? "#e2e8f0" : "#4b5563")"></ChartTooltipTextStyle>
+                            </ChartTooltipSettings>
                             <ChartSeriesCollection>
                                 <ChartSeries DataSource="@GetChartData()"
                                              XName="Month" YName="Amount"
                                              Type="ChartSeriesType.Column"
-                                             Fill="#119BED">
+                                             Fill="@(Theme.IsDarkMode ? "#3b82f6" : "#119BED")">
+                                    <ChartMarker Visible="true">
+                                        <ChartDataLabel Visible="true" Position="@(_selectedCategory == "all" ? LabelPosition.Top : LabelPosition.Middle)" 
+                                                      Format="@(_selectedCategory == "all" ? "¥{value}" : "{value}%")"
+                                                      Font="@(new ChartDataLabelFont { FontWeight = "600", Color = Theme.IsDarkMode ? "#e2e8f0" : "#4b5563" })">
+                                        </ChartDataLabel>
+                                    </ChartMarker>
                                 </ChartSeries>
                             </ChartSeriesCollection>
                         </SfChart>
@@ -128,22 +148,22 @@
             <div class="space-y-4 pb-20">
                 @if (_isLoading) {
                     @for (int i = 0; i < 3; i++) {
-                        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                        <div class="bg-background-light dark:bg-background-dark rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
                             <div class="grid grid-cols-[1fr,200px] gap-4 items-center">
                                 <div>
-                                    <SfSkeleton Width="88px" Height="20px" Effect="ShimmerEffect.Wave"></SfSkeleton>
+                                    <SfSkeleton Width="88px" Height="20px" Effect="ShimmerEffect.Wave" CssClass="dark:opacity-50"></SfSkeleton>
                                     <div class="mt-0.5">
                                         <SfSkeleton Width="88px" Height="14px"
-                                                    Effect="ShimmerEffect.Wave"></SfSkeleton>
+                                                    Effect="ShimmerEffect.Wave" CssClass="dark:opacity-50"></SfSkeleton>
                                         <div class="mt-0.5">
                                             <SfSkeleton Width="66px" Height="14px"
-                                                        Effect="ShimmerEffect.Wave"></SfSkeleton>
+                                                        Effect="ShimmerEffect.Wave" CssClass="dark:opacity-50"></SfSkeleton>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="flex items-center space-x-2">
-                                    <SfSkeleton Width="128px" Height="8px" Effect="ShimmerEffect.Wave"></SfSkeleton>
-                                    <SfSkeleton Width="24px" Height="8px" Effect="ShimmerEffect.Wave"></SfSkeleton>
+                                    <SfSkeleton Width="128px" Height="8px" Effect="ShimmerEffect.Wave" CssClass="dark:opacity-50"></SfSkeleton>
+                                    <SfSkeleton Width="24px" Height="8px" Effect="ShimmerEffect.Wave" CssClass="dark:opacity-50"></SfSkeleton>
                                 </div>
                             </div>
                         </div>
@@ -152,22 +172,22 @@
                 else {
                     @if (_selectedCategory == "all") {
                         @foreach (var expense in GetCategoryExpenses()) {
-                            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                            <div class="bg-background-light dark:bg-background-dark rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
                                 <div class="grid grid-cols-[1fr,200px] gap-4 items-center">
                                     <div>
                                         <div
-                                            class="font-semibold text-[#111416]">@GetCategoryDisplayName(expense.Category)</div>
-                                        <div class="text-sm text-gray-500">@expense.TimeOnSpend.ToString("yyyy年MM月")
+                                            class="font-semibold text-text-light dark:text-text-dark">@GetCategoryDisplayName(expense.Category)</div>
+                                        <div class="text-sm text-subtext-light dark:text-subtext-dark">@expense.TimeOnSpend.ToString("yyyy年MM月")
                                             <br/>
                                             ¥@expense.Amount?.ToString("N0")</div>
                                     </div>
                                     <div class="flex items-center space-x-2">
-                                        <div class="w-32 h-2 bg-[#EFF2F4] rounded-full overflow-hidden">
-                                            <div class="h-full bg-[#119BED]"
+                                        <div class="w-32 h-2 bg-active-light dark:bg-active-dark rounded-full overflow-hidden">
+                                            <div class="h-full bg-primary-light dark:bg-primary-dark"
                                                  style="width: @(GetPercentage(expense))%"></div>
                                         </div>
                                         <span
-                                            class="min-w-[3rem] text-sm text-[#252525]">@GetPercentage(expense)%</span>
+                                            class="min-w-[3rem] text-sm text-text-light dark:text-text-dark">@GetPercentage(expense)%</span>
                                     </div>
                                 </div>
                             </div>
@@ -175,11 +195,11 @@
                     }
                     else {
                         @foreach (var expense in GetExpensesByCategory(_selectedCategory)) {
-                            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                            <div class="bg-background-light dark:bg-background-dark rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
                                 <div class="grid grid-cols-[1fr,200px] gap-4 items-center">
                                     <div>
-                                        <div class="font-semibold text-[#111416]">@expense.Title</div>
-                                        <div class="text-sm text-gray-500">
+                                        <div class="font-semibold text-text-light dark:text-text-dark">@expense.Title</div>
+                                        <div class="text-sm text-subtext-light dark:text-subtext-dark">
                                             @GetTravelTitle(expense.TripId)
                                             <br/>
                                             @expense.TimeOnSpend.ToString("yyyy年MM月dd日")
@@ -188,12 +208,12 @@
                                         </div>
                                     </div>
                                     <div class="flex items-center space-x-2">
-                                        <div class="w-32 h-2 bg-[#EFF2F4] rounded-full overflow-hidden">
-                                            <div class="h-full bg-[#119BED]"
+                                        <div class="w-32 h-2 bg-active-light dark:bg-active-dark rounded-full overflow-hidden">
+                                            <div class="h-full bg-primary-light dark:bg-primary-dark"
                                                  style="width: @(GetExpensePercentageInCategory(expense))%"></div>
                                         </div>
                                         <span
-                                            class="min-w-[3rem] text-sm text-[#252525]">@GetExpensePercentageInCategory(expense)%</span>
+                                            class="min-w-[3rem] text-sm text-text-light dark:text-text-dark">@GetExpensePercentageInCategory(expense)%</span>
                                     </div>
                                 </div>
                             </div>
@@ -326,14 +346,14 @@
 
     private string GetTabClass(string tab) {
         return tab == _currentTab
-            ? "px-4 py-2 border-b-2 border-[#119BED] text-[#252525]"
-            : "px-4 py-2 text-gray-500 hover:text-gray-700";
+            ? "px-4 py-2 border-b-2 border-primary-light dark:border-primary-dark text-text-light dark:text-text-dark"
+            : "px-4 py-2 text-subtext-light dark:text-subtext-dark hover:text-text-light dark:hover:text-text-dark";
     }
 
     private string GetCategoryClass(string category) {
         return category == _selectedCategory
-            ? "px-4 py-1 rounded-full bg-[#119BED] text-white"
-            : "px-4 py-1 rounded-full bg-[#EFF2F4] text-[#252525] hover:bg-gray-200";
+            ? "px-4 py-1 rounded-full bg-primary-light dark:bg-primary-dark text-white"
+            : "px-4 py-1 rounded-full bg-active-light dark:bg-active-dark text-text-light dark:text-text-dark hover:bg-gray-200 dark:hover:bg-gray-700";
     }
 
     private string GetCategoryDisplayName(string? category) {
@@ -351,7 +371,7 @@
         if (_chart != null) await _chart.RefreshAsync();
         StateHasChanged();
     }
-    
+
 
     private string GetTravelTitle(int tripId) {
         return _travelTitles.GetValueOrDefault(tripId, "未知旅行");

@@ -1,7 +1,7 @@
 @inherits LayoutComponentBase
 @inject NavigationManager NavigationManager
 
-<div class="app-container dark:bg-black">
+<div class="app-container dark:bg-background-dark">
     @* 渲染页面 *@
     <main class="main-content">
         @Body
@@ -31,7 +31,6 @@
 </div>
 
 
-
 <style>
     .app-container {
         display: flex;
@@ -39,6 +38,7 @@
         height: 100vh; /* 视窗高度 */
         width: 100vw;
         overflow: hidden; /* 防止整体页面滚动 */
+        background-color: var(--color-background-light);
     }
 
     .main-content {
@@ -56,7 +56,7 @@
         display: flex;
         justify-content: space-around;
         align-items: center;
-        background-color: #ffffff;
+        background-color: var(--color-card-light);
         height: 72px;
         box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.1);
         border-radius: 16px 16px 0 0;
@@ -65,7 +65,7 @@
     }
 
     :root.dark .bottom-nav {
-        background-color: #000000;
+        background-color: var(--color-card-dark);
         box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.3);
     }
 
@@ -74,45 +74,45 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        color: #666666;
+        padding: 8px 12px;
+        color: #666666; /* 默认颜色 */
         text-decoration: none;
-        transition: color 0.2s ease;
         width: 25%;
         height: 100%;
     }
 
     :root.dark .nav-item {
-        color: #9CA3AF;
+        color: #A0A0A0; /* 暗色模式颜色 */
     }
 
-    .nav-item:hover {
-        color: #2196F3;
+    .nav-item:active {
+        opacity: 0.7;
     }
 
     .nav-item.active {
-        color: #2196F3;
+        color: var(--color-primary-light); /* 激活状态颜色 */
     }
 
     :root.dark .nav-item.active {
-        color: #1E90FF;
+        color: var(--color-primary-dark); /* 暗色模式激活状态颜色 */
     }
 
     .nav-item i {
-        font-size: 1.25rem;
-        margin-bottom: 2px;
+        font-size: 22px;
+        margin-bottom: 4px;
     }
 
     .nav-item span {
-        font-size: 0.75rem;
+        font-size: 12px;
     }
 </style>
 
+
 @code {
     private bool ShowBottomNav = true;
-
+    
     protected override void OnParametersSet() {
         var currentUri = NavigationManager.Uri;
         ShowBottomNav = !currentUri.Contains("login", StringComparison.OrdinalIgnoreCase);
     }
-
 }

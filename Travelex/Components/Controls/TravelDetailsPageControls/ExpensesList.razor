@@ -12,15 +12,15 @@
                 <div class="flex items-center justify-between">
                     <div class="flex items-center">
                         <SfSkeleton Shape=SkeletonType.Square Width="46px" Height="46px"
-                                    Effect=ShimmerEffect.Wave CssClass="rounded-lg"></SfSkeleton>
+                                    Effect=ShimmerEffect.Wave CssClass="rounded-lg dark:opacity-50"></SfSkeleton>
                         <div class="ml-4">
-                            <SfSkeleton Width="116px" Height="16px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                            <SfSkeleton Width="116px" Height="16px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
                             <div class="flex items-center gap-2 mt-1">
-                                <SfSkeleton Width="142px" Height="12px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                                <SfSkeleton Width="142px" Height="12px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
                             </div>
                         </div>
                     </div>
-                    <SfSkeleton Width="78px" Height="16px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                    <SfSkeleton Width="78px" Height="16px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
                 </div>
             </div>
         }
@@ -32,19 +32,23 @@
             <div class="px-4 py-2">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center">
-                        <div class="w-12 h-12 bg-[#E8EFF2] rounded-lg flex items-center justify-center">
-                            <img src="images/expense.svg" class="h-5 w-5" alt="支出"/>
+                        <div class="w-12 h-12 bg-active-light dark:bg-active-dark rounded-lg flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-subtext-light dark:text-subtext-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="5" width="20" height="14" rx="2" />
+                                <line x1="2" y1="10" x2="22" y2="10" />
+                                <circle cx="12" cy="15" r="2" />
+                            </svg>
                         </div>
                         <div class="ml-4">
-                            <p class="text-base font-medium text-[#0C161C]">@expense.Title</p>
-                            <div class="flex items-center gap-2 text-sm text-gray-500">
+                            <p class="text-base font-medium text-text-light dark:text-text-dark">@expense.Title</p>
+                            <div class="flex items-center gap-2 text-sm text-subtext-light dark:text-subtext-dark">
                                 <span>@expense.TimeOnSpend.ToString("yyyy-MM-dd HH:mm")</span>
                                 <span>·</span>
                                 <span>@expense.Category</span>
                             </div>
                         </div>
                     </div>
-                    <p class="text-base font-semibold text-[#0C161C]">¥@expense.Amount?.ToString("N2")</p>
+                    <p class="text-base font-semibold text-text-light dark:text-text-dark">¥@expense.Amount?.ToString("N2")</p>
                 </div>
             </div>
         }
@@ -54,7 +58,7 @@
     {
         <!-- Add Expense Button -->
         <div class="p-4">
-            <button @onclick="OnAddExpenseClick" class="w-full bg-[#119BED] text-white h-12 rounded-[20px] text-base font-bold">
+            <button @onclick="OnAddExpenseClick" class="w-full bg-primary-light dark:bg-primary-dark text-white h-12 rounded-[20px] text-base font-bold">
                 + 添加一笔支出
             </button>
         </div>

@@ -5,10 +5,11 @@
 @using Travelex.Extensions
 @inject NavigationManager NavigationManager
 @inject ExpenseService ExpenseService
+@inject ThemeService Theme
 
 <FlexedPageComponent>
     <TopBarLeft>
-        <button @onclick="NavigateBack" class="p-2 text-[#252525]">
+        <button @onclick="NavigateBack" class="p-2 text-text-light dark:text-text-dark">
             <i class="fas fa-arrow-left text-xl"></i>
         </button>
     </TopBarLeft>
@@ -19,7 +20,7 @@
         }
     </TopBarTitle>
     <TopBarRight>
-        <button @onclick="NavigateToEdit" class="p-2 text-[#252525]">
+        <button @onclick="NavigateToEdit" class="p-2 text-text-light dark:text-text-dark">
             <i class="fas fa-edit text-xl"></i>
         </button>
     </TopBarRight>
@@ -28,46 +29,46 @@
             @if (_expenses == null)
             {
                 <div class="flex justify-center items-center h-32">
-                    <div class="text-[#4C7C99]">加载中...</div>
+                    <div class="text-subtext-light dark:text-subtext-dark">加载中...</div>
                 </div>
             }
             else if (!_expenses.Any())
             {
                 <div class="flex flex-col items-center justify-center h-32 space-y-2">
-                    <i class="fas fa-inbox text-4xl text-[#4C7C99] opacity-50"></i>
-                    <div class="text-[#4C7C99]">暂无支出记录</div>
+                    <i class="fas fa-inbox text-4xl text-subtext-light dark:text-subtext-dark opacity-50"></i>
+                    <div class="text-subtext-light dark:text-subtext-dark">暂无支出记录</div>
                 </div>
             }
             else
             {
                 <!-- 总支出金额 -->
                 <div class="mb-6">
-                    <h2 class="text-xl font-bold text-[#111416] mb-2">总支出</h2>
-                    <p class="text-3xl font-semibold text-[#111416]">￥@(_expenses.Sum(e => e.Amount ?? 0).ToString("F2"))</p>
+                    <h2 class="text-xl font-bold text-text-light dark:text-text-dark mb-2">总支出</h2>
+                    <p class="text-3xl font-semibold text-text-light dark:text-text-dark">￥@(_expenses.Sum(e => e.Amount ?? 0).ToString("F2"))</p>
                 </div>
 
                 <!-- 支出列表 -->
                 <div class="mt-8 mb-8">
-                    <h2 class="text-xl font-bold text-[#111416] mb-4">支出列表</h2>
+                    <h2 class="text-xl font-bold text-text-light dark:text-text-dark mb-4">支出列表</h2>
                     @foreach (var expense in _expenses)
                     {
-                        <div class="flex justify-between items-start mb-4 p-4 bg-[#F5F5F5] rounded-xl" @onclick="() => EditExpense(expense.Id)">
+                        <div class="flex justify-between items-start mb-4 p-4 bg-active-light dark:bg-active-dark rounded-xl" @onclick="() => EditExpense(expense.Id)">
                             <div class="flex-1 mr-4">
-                                <h3 class="text-lg font-medium text-[#111416]">@expense.Title</h3>
+                                <h3 class="text-lg font-medium text-text-light dark:text-text-dark">@expense.Title</h3>
                                 @if (!string.IsNullOrEmpty(expense.Description))
                                 {
-                                    <p class="text-sm text-[#666666] mt-1">@expense.Description</p>
+                                    <p class="text-sm text-subtext-light dark:text-subtext-dark mt-1">@expense.Description</p>
                                 }
                                 <div class="flex items-center gap-2 mt-2">
-                                    <span class="text-xs text-[#666666] bg-white px-2 py-1 rounded">@expense.Category</span>
-                                    <span class="text-xs text-[#666666]">@expense.TimeOnSpend.ToString("yyyy年MM月dd日 HH:mm")</span>
+                                    <span class="text-xs text-subtext-light dark:text-subtext-dark bg-background-light dark:bg-background-dark px-2 py-1 rounded">@expense.Category</span>
+                                    <span class="text-xs text-subtext-light dark:text-subtext-dark">@expense.TimeOnSpend.ToString("yyyy年MM月dd日 HH:mm")</span>
                                 </div>
                             </div>
                             <div class="flex flex-col items-end gap-2">
-                                <button @onclick="() => EditExpense(expense.Id)" class="text-[#666666]">
+                                <button @onclick="() => EditExpense(expense.Id)" class="text-subtext-light dark:text-subtext-dark">
                                     <i class="fas fa-pen text-lg p-2"></i>
                                 </button>
-                                <span class="text-lg font-medium text-[#111416]">￥@expense.Amount?.ToString("F2")</span>
+                                <span class="text-lg font-medium text-text-light dark:text-text-dark">￥@expense.Amount?.ToString("F2")</span>
                             </div>
                         </div>
                     }

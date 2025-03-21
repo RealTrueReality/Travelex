@@ -136,6 +136,10 @@ public class ThemeService : INotifyPropertyChanged {
                 StatusBarStyle = isDarkMode ? StatusBarStyle.LightContent : StatusBarStyle.DarkContent
             });
 #pragma warning restore CA1416
+#if ANDROID
+        Microsoft.Maui.ApplicationModel.Platform.CurrentActivity.Window.SetNavigationBarColor(isDarkMode ? Android.Graphics.Color.Black : Android.Graphics.Color.White) ;
+        Microsoft.Maui.ApplicationModel.Platform.CurrentActivity.Window.NavigationBarContrastEnforced = false;
+#endif
         });
     }
 }

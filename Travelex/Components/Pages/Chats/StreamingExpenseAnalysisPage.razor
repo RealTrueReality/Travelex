@@ -17,13 +17,13 @@
 
 <FlexedPageComponent>
     <TopBarLeft>
-        <button @onclick="NavigateBack" class="p-2 text-gray-600">
+        <button @onclick="NavigateBack" class="p-2 text-text-light dark:text-text-dark">
             <i class="fas fa-arrow-left text-lg"></i>
         </button>
     </TopBarLeft>
     <TopBarTitle>AI助手</TopBarTitle>
     <TopBarRight>
-        <button @onclick="NewConversation" class="p-2 text-gray-600">
+        <button @onclick="NewConversation" class="p-2 text-text-light dark:text-text-dark">
             <i class="fas fa-plus text-lg"></i>
         </button>
     </TopBarRight>
@@ -32,7 +32,7 @@
             @if (_messages.Count == 0) {
                 <div class="flex flex-col items-center justify-center h-full">
                     <div
-                        class="w-full max-w-2xl bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg">
+                        class="w-full max-w-2xl bg-gradient-to-r from-primary-light to-blue-600 dark:from-blue-800 dark:to-blue-900 rounded-2xl p-6 text-white shadow-lg">
                         <h2 class="text-xl font-semibold mb-4">欢迎使用 天壤AI 分析助手！</h2>
                         <div class="space-y-2 mb-6">
                             <p class="flex items-center gap-2">
@@ -52,7 +52,7 @@
                                 <span>评估支出合理性</span>
                             </p>
                         </div>
-                        <p class="text-sm text-blue-100">请从下方的建议问题中选择，或直接输入您的问题</p>
+                        <p class="text-sm text-blue-100 dark:text-blue-200">请从下方的建议问题中选择，或直接输入您的问题</p>
                     </div>
                 </div>
             }
@@ -61,19 +61,19 @@
                     <div class="flex items-start gap-2 mb-4 justify-end">
                         <div class="flex flex-col items-end">
                             <div class="flex items-center gap-2">
-                                <span class="text-sm text-gray-600">@(_currentUser?.Name ?? "用户")</span>
+                                <span class="text-sm text-subtext-light dark:text-subtext-dark">@(_currentUser?.Name ?? "用户")</span>
                             </div>
                             <div
-                                class="mt-1 px-3 py-2 bg-blue-500 text-white rounded-2xl rounded-tr-sm prose prose-sm max-w-[80%]">
+                                class="mt-1 px-3 py-2 bg-blue-500 dark:bg-blue-600 text-white rounded-2xl rounded-tr-sm prose prose-sm max-w-[80%]">
                                 @message.Content
                             </div>
                             <div class="flex items-center gap-2 mt-1">
                                 <button @onclick="() => EditMessage(message)"
-                                        class="p-1 text-gray-400 hover:text-blue-500 transition-colors">
+                                        class="p-1 text-subtext-light dark:text-subtext-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors">
                                     <i class="fas fa-edit"></i>
                                 </button>
                                 <button @onclick="() => CopyMessage(message.Content)"
-                                        class="p-1 text-gray-400 hover:text-blue-500 transition-colors">
+                                        class="p-1 text-subtext-light dark:text-subtext-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors">
                                     <i class="fas fa-copy"></i>
                                 </button>
                             </div>
@@ -89,7 +89,7 @@
                         }
                         else {
                             <div
-                                class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-blue-500 font-bold">
+                                class="w-8 h-8 rounded-full bg-active-light dark:bg-active-dark flex items-center justify-center text-primary-light dark:text-primary-dark font-bold">
                                 <span>@(_currentUser?.Name?.FirstOrDefault() ?? 'U')</span>
                             </div>
                         }
@@ -100,19 +100,19 @@
                         <img src="images/truereality.png" alt="AI助手" class="w-8 h-8 rounded-full object-cover"/>
                         <div class="flex flex-col flex-1">
                             <div class="flex items-center gap-2">
-                                <span class="text-sm text-gray-600">AI 助手</span>
+                                <span class="text-sm text-subtext-light dark:text-subtext-dark">AI 助手</span>
                             </div>
                             <div
-                                class="mt-1 px-3 py-2 bg-gray-100 rounded-2xl rounded-tl-sm prose prose-sm max-w-[80%]">
+                                class="mt-1 px-3 py-2 bg-active-light dark:bg-active-dark rounded-2xl rounded-tl-sm prose prose-sm max-w-[80%]">
                                 @((MarkupString)RenderMarkdown(message.Content))
                             </div>
                             <div class="flex items-center gap-2 mt-1">
                                 <button @onclick="() => CopyMessage(message.Content)"
-                                        class="p-1 text-gray-400 hover:text-blue-500 transition-colors">
+                                        class="p-1 text-subtext-light dark:text-subtext-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors">
                                     <i class="fas fa-copy"></i>
                                 </button>
                                 <button @onclick="() => RegenerateResponse(message)"
-                                        class="p-1 text-gray-400 hover:text-blue-500 transition-colors"
+                                        class="p-1 text-subtext-light dark:text-subtext-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors"
                                         disabled="@_isStreaming">
                                     <i class="fas fa-redo-alt"></i>
                                 </button>
@@ -126,9 +126,9 @@
                     <img src="images/truereality.png" alt="AI助手" class="w-8 h-8 rounded-full object-cover"/>
                     <div class="flex flex-col flex-1">
                         <div class="flex items-center gap-2">
-                            <span class="text-sm text-gray-600">AI 助手</span>
+                            <span class="text-sm text-subtext-light dark:text-subtext-dark">AI 助手</span>
                         </div>
-                        <div class="mt-1 px-3 py-2 bg-gray-100 rounded-2xl rounded-tl-sm prose prose-sm max-w-[80%]">
+                        <div class="mt-1 px-3 py-2 bg-active-light dark:bg-active-dark rounded-2xl rounded-tl-sm prose prose-sm max-w-[80%]">
                             @((MarkupString)RenderMarkdown(_streamingContent))
                             <div class="animate-pulse">▊</div>
                         </div>
@@ -144,12 +144,12 @@
             }
         </div>
 
-        <div class="flex-none p-4 border-t">
+        <div class="flex-none p-4 border-t border-gray-200 dark:border-gray-700">
             @if (_suggestionsVisible) {
                 <div class="mb-4 flex flex-wrap gap-2">
                     @foreach (var suggestion in _suggestions) {
                         <button @onclick="() => SendMessage(suggestion)"
-                                class="flex-1 min-w-[45%] px-3 py-2 bg-gray-100 text-gray-600 rounded-lg transition-all duration-200 active:bg-blue-500 active:text-white flex items-center gap-2">
+                                class="flex-1 min-w-[45%] px-3 py-2 bg-active-light dark:bg-active-dark text-text-light dark:text-text-dark rounded-lg transition-all duration-200 active:bg-primary-light active:dark:bg-primary-dark active:text-white flex items-center gap-2">
                             <i class="fas fa-lightbulb text-yellow-400"></i>
                             <span class="text-left text-sm">@suggestion</span>
                         </button>
@@ -163,14 +163,14 @@
                         <input @bind="_editingMessage.Content"
                                @bind:event="oninput"
                                @onkeyup="HandleEditKeyPress"
-                               class="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"/>
+                               class="flex-1 px-3 py-2 border border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-light dark:focus:ring-primary-dark text-sm"/>
                         <button @onclick="() => SaveEdit()"
                                 disabled="@(string.IsNullOrWhiteSpace(_editingMessage.Content) || _isStreaming)"
-                                class="px-4 py-2 bg-blue-500 text-white rounded-lg transition-all duration-200 active:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed">
+                                class="px-4 py-2 bg-primary-light dark:bg-primary-dark text-white rounded-lg transition-all duration-200 active:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed">
                             发送
                         </button>
                         <button @onclick="() => CancelEdit()"
-                                class="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg transition-all duration-200 active:bg-gray-200">
+                                class="px-4 py-2 bg-active-light dark:bg-active-dark text-text-light dark:text-text-dark rounded-lg transition-all duration-200 active:bg-gray-200 dark:active:bg-gray-700">
                             取消
                         </button>
                     </div>
@@ -181,10 +181,10 @@
                            @onkeyup="HandleKeyPress"
                            id="messageInput"
                            placeholder="输入您的问题..."
-                           class="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"/>
+                           class="flex-1 px-3 py-2 border border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-light dark:focus:ring-primary-dark text-sm"/>
                     <button @onclick="() => SendMessage(_currentMessage)"
                             disabled="@(string.IsNullOrWhiteSpace(_currentMessage) || _isStreaming || _editingMessage != null)"
-                            class="px-4 py-2 bg-blue-500 text-white rounded-lg transition-all duration-200 active:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed">
+                            class="px-4 py-2 bg-primary-light dark:bg-primary-dark text-white rounded-lg transition-all duration-200 active:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed">
                         发送
                     </button>
                 }

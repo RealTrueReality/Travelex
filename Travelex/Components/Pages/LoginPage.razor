@@ -9,6 +9,7 @@
 @inject NavigationManager NavigationManager
 @inject AuthService AuthService
 @inject BlazorMauiInterop BlazorMauiInterop
+@inject ThemeService Theme
 
 
 
@@ -26,38 +27,38 @@
 
             <div class="relative">
                 <InputText @bind-Value="_loggingModel.UserName"
-                           class="w-full h-14 px-4 rounded-xl bg-[#EFF2F4] text-[#607A89] focus:outline-none"
+                           class="w-full h-14 px-4 rounded-xl bg-active-light dark:bg-active-dark text-subtext-light dark:text-subtext-dark focus:outline-none"
                            placeholder="用户名"/>
                 <div class="absolute right-4 top-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#607A89]" fill="none" viewBox="0 0 24 24"
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-subtext-light dark:text-subtext-dark" fill="none" viewBox="0 0 24 24"
                          stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                     </svg>
                 </div>
-                <ValidationMessage For="@(() => _loggingModel.UserName)" class="text-red-500 text-sm mt-1"/>
+                <ValidationMessage For="@(() => _loggingModel.UserName)" class="text-red-500 dark:text-red-400 text-sm mt-1"/>
             </div>
 
             <div class="relative">
                 <InputText type="password" @bind-Value="_loggingModel.Password"
-                           class="w-full h-14 px-4 rounded-xl bg-[#EFF2F4] text-[#607A89] focus:outline-none"
+                           class="w-full h-14 px-4 rounded-xl bg-active-light dark:bg-active-dark text-subtext-light dark:text-subtext-dark focus:outline-none"
                            placeholder="密码"/>
                 <div class="absolute right-4 top-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#607A89]" fill="none" viewBox="0 0 24 24"
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-subtext-light dark:text-subtext-dark" fill="none" viewBox="0 0 24 24"
                          stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
                     </svg>
                 </div>
-                <ValidationMessage For="@(() => _loggingModel.Password)" class="text-red-500 text-sm mt-1"/>
+                <ValidationMessage For="@(() => _loggingModel.Password)" class="text-red-500 dark:text-red-400 text-sm mt-1"/>
             </div>
 
-            <button type="button" class="text-sm text-[#607A89] text-center w-full">忘记密码?</button>
+            <button type="button" class="text-sm text-subtext-light dark:text-subtext-dark text-center w-full">忘记密码?</button>
 
-            <button type="submit" class="w-full h-12 bg-[#119BED] text-white text-base font-bold rounded-[20px]">
+            <button type="submit" class="w-full h-12 bg-primary-light dark:bg-primary-dark text-white rounded-[20px] text-base font-bold">
                 登陆
             </button>
-            <button type="button" class="w-full h-12 bg-[#EFF2F4] text-black text-base font-bold rounded-[20px]"
+            <button type="button" class="w-full h-12 bg-active-light dark:bg-active-dark text-text-light dark:text-text-dark text-base font-bold rounded-[20px] hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                     @onclick="() => { IsRegisterDialogVisible = true;_signUpModel=new ();}">
                 注册
             </button>
@@ -70,59 +71,60 @@
                   ShowCloseIcon="true"
                   AllowDragging="false"
                   Target="#app"
+                  CssClass="dark:bg-background-dark"
                   Header="注册您的账户">
             <DialogAnimationSettings Effect="DialogEffect.SlideBottom" Duration="400"/>
             <DialogTemplates>
                 <Content>
-                    <div class="p-4">
+                    <div class="p-4 bg-background-light dark:bg-background-dark">
                         <EditForm Model="@_signUpModel" OnValidSubmit="HandleRegisterAsync" class="p-4 flex flex-col gap-6">
                             <DataAnnotationsValidator/>
 
                             <div class="relative">
                                 <InputText @bind-Value="_signUpModel.Name"
-                                           class="w-full h-14 px-4 rounded-xl bg-[#EFF2F4] text-[#607A89] focus:outline-none"
+                                           class="w-full h-14 px-4 rounded-xl bg-active-light dark:bg-active-dark text-subtext-light dark:text-subtext-dark focus:outline-none"
                                            placeholder="姓名"/>
                                 <div class="absolute right-4 top-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#607A89]" fill="none"
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-subtext-light dark:text-subtext-dark" fill="none"
                                          viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                               d="M12 12c2.28 0 4-1.72 4-4s-1.72-4-4-4-4 1.72-4 4 1.72 4 4 4zM12 14c-3.33 0-10 1.67-10 5v1h20v-1c0-3.33-6.67-5-10-5z"/>
                                     </svg>
                                 </div>
-                                <ValidationMessage For="@(() => _signUpModel.Name)" class="text-red-500 text-sm mt-1"/>
+                                <ValidationMessage For="@(() => _signUpModel.Name)" class="text-red-500 dark:text-red-400 text-sm mt-1"/>
                             </div>
 
                             <div class="relative">
                                 <InputText @bind-Value="_signUpModel.UserName"
-                                           class="w-full h-14 px-4 rounded-xl bg-[#EFF2F4] text-[#607A89] focus:outline-none"
+                                           class="w-full h-14 px-4 rounded-xl bg-active-light dark:bg-active-dark text-subtext-light dark:text-subtext-dark focus:outline-none"
                                            placeholder="用户名"/>
                                 <div class="absolute right-4 top-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#607A89]" fill="none"
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-subtext-light dark:text-subtext-dark" fill="none"
                                          viewBox="0 0 24 24"
                                          stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                               d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                                     </svg>
                                 </div>
-                                <ValidationMessage For="@(() => _signUpModel.UserName)" class="text-red-500 text-sm mt-1"/>
+                                <ValidationMessage For="@(() => _signUpModel.UserName)" class="text-red-500 dark:text-red-400 text-sm mt-1"/>
                             </div>
 
                             <div class="relative">
                                 <InputText type="password" @bind-Value="_signUpModel.Password"
-                                           class="w-full h-14 px-4 rounded-xl bg-[#EFF2F4] text-[#607A89] focus:outline-none"
+                                           class="w-full h-14 px-4 rounded-xl bg-active-light dark:bg-active-dark text-subtext-light dark:text-subtext-dark focus:outline-none"
                                            placeholder="密码"/>
                                 <div class="absolute right-4 top-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#607A89]" fill="none"
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-subtext-light dark:text-subtext-dark" fill="none"
                                          viewBox="0 0 24 24"
                                          stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                               d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
                                     </svg>
                                 </div>
-                                <ValidationMessage For="@(() => _signUpModel.Password)" class="text-red-500 text-sm mt-1"/>
+                                <ValidationMessage For="@(() => _signUpModel.Password)" class="text-red-500 dark:text-red-400 text-sm mt-1"/>
                             </div>
 
-                            <button type="submit" class="w-full h-12 bg-[#119BED] text-white font-bold rounded-[20px]">
+                            <button type="submit" class="w-full h-12 bg-primary-light dark:bg-primary-dark text-white  rounded-[20px] text-base font-bold transition-colors">
                                 注册并登陆
                             </button>
                         </EditForm>
@@ -132,8 +134,35 @@
         </SfDialog>
     </PageBody>
 </FixedPageComponent>
+
+<style>
+    /* 对话框样式调整 */
+    .e-dialog {
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 12px !important;
+        overflow: hidden !important;
+    }
+    
+    .dark .e-dialog {
+        background-color: var(--color-background-dark) !important;
+    }.dark .e-dlg-content {
+        background-color: var(--color-background-dark) !important;
+    }
+    
+    .e-dlg-header-content {
+        background-color: inherit !important;
+    }
+    .dark .e-dlg-header {
+        color: var(--color-text-dark) !important;
+    }
+    
+    .dark .e-dlg-closeicon-btn {
+        color: var(--color-text-dark) !important;
+    }
+</style>
+
 @code {
-    private LoggingModel _loggingModel = new();
+    private readonly LoggingModel _loggingModel = new();
     private SignUpModel _signUpModel = new();
     private bool IsRegisterDialogVisible { get; set; }
 

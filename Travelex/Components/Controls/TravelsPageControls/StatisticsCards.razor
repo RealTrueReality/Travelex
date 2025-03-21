@@ -5,37 +5,37 @@
     <!-- 统计卡片区域 -->
     <div class="grid grid-cols-2 gap-4 p-4">
         <!-- 行程数量卡片 -->
-        <div class="bg-[#EFF2F4] rounded-xl p-6">
-            <p class="text-base font-medium text-[#111416] mb-2">行程数</p>
+        <div class="bg-[#EFF2F4] dark:bg-[#1E1E1E] rounded-xl p-6">
+            <p class="text-base font-medium text-text-light dark:text-text-dark mb-2">行程数</p>
             @if (IsLoading) {
-                <SfSkeleton Width="60%" Height="30px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                <SfSkeleton Width="60%" Height="30px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
             }
             else {
-                <p class="text-2xl font-bold text-[#111416]">@TripCount</p>
+                <p class="text-2xl font-bold text-text-light dark:text-text-dark">@TripCount</p>
             }
         </div>
 
         <!-- 最贵行程卡片 -->
-        <div class="bg-[#EFF2F4] rounded-xl p-6">
-            <p class="text-base font-medium text-[#111416] mb-2">最贵旅行支出</p>
+        <div class="bg-[#EFF2F4] dark:bg-[#1E1E1E] rounded-xl p-6">
+            <p class="text-base font-medium text-text-light dark:text-text-dark mb-2">最贵旅行支出</p>
             @if (IsLoading) {
-                <SfSkeleton Width="60%" Height="30px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                <SfSkeleton Width="60%" Height="30px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
             }
             else {
-                <p class="text-2xl font-bold text-[#111416]">$@MaxExpense</p>
+                <p class="text-2xl font-bold text-text-light dark:text-text-dark">￥@MaxExpense</p>
             }
         </div>
     </div>
 
     <!-- 总支出卡片 -->
     <div class="px-4 mb-4">
-        <div class="bg-[#EFF2F4] rounded-xl p-6">
-            <p class="text-base font-medium text-[#111416] mb-2">总支出</p>
+        <div class="bg-[#EFF2F4] dark:bg-[#1E1E1E] rounded-xl p-6">
+            <p class="text-base font-medium text-text-light dark:text-text-dark mb-2">总支出</p>
             @if (IsLoading) {
-                <SfSkeleton Width="60%" Height="30px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                <SfSkeleton Width="60%" Height="30px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
             }
             else {
-                <p class="text-2xl font-bold text-[#111416]">$@TotalExpense</p>
+                <p class="text-2xl font-bold text-text-light dark:text-text-dark">￥@TotalExpense</p>
             }
         </div>
     </div>

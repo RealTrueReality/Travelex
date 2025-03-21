@@ -10,7 +10,7 @@
 
 <FlexedPageComponent>
     <TopBarLeft>
-        <button @onclick="NavigateBack" class="p-2 text-[#252525]">
+        <button @onclick="NavigateBack" class="p-2 text-text-light dark:text-text-dark">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                  stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -21,7 +21,7 @@
         创建行程
     </TopBarTitle>
     <PageBody>
-        <div class="flex-1 p-4 overflow-auto">
+        <div class="flex-1 p-4 overflow-auto bg-background-light dark:bg-background-dark">
             <TravelForm
                 Travel="@_travel"
                 Categories="@_categories"

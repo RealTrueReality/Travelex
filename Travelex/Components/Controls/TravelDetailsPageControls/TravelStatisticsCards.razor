@@ -4,24 +4,24 @@
 <div class="grid grid-cols-2 gap-4 px-4">
     @if (IsLoading)
     {
-        <div class="bg-[#EFF2F4] rounded-xl p-6">
-            <p class="text-base font-medium text-[#111416] mb-2">旅行总支出</p>
-            <SfSkeleton Width="80%" Height="26px" Effect=ShimmerEffect.Wave></SfSkeleton>
+        <div class="bg-active-light dark:bg-active-dark rounded-xl p-6">
+            <p class="text-base font-medium text-text-light dark:text-text-dark mb-2">旅行总支出</p>
+            <SfSkeleton Width="80%" Height="26px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
         </div>
-        <div class="bg-[#EFF2F4] rounded-xl p-6">
-            <p class="text-base font-medium text-[#111416] mb-2">支出数</p>
-            <SfSkeleton Width="50%" Height="26px" Effect=ShimmerEffect.Wave></SfSkeleton>
+        <div class="bg-active-light dark:bg-active-dark rounded-xl p-6">
+            <p class="text-base font-medium text-text-light dark:text-text-dark mb-2">支出数</p>
+            <SfSkeleton Width="50%" Height="26px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
         </div>
     }
     else
     {
-        <div class="bg-[#EFF2F4] rounded-xl p-6">
-            <p class="text-base font-medium text-[#111416] mb-2">旅行总支出</p>
-            <p class="text-2xl font-semibold text-[#111416]">¥@TotalAmount?.ToString("N2")</p>
+        <div class="bg-active-light dark:bg-active-dark rounded-xl p-6">
+            <p class="text-base font-medium text-text-light dark:text-text-dark mb-2">旅行总支出</p>
+            <p class="text-2xl font-semibold text-text-light dark:text-text-dark">¥@TotalAmount?.ToString("N2")</p>
         </div>
-        <div class="bg-[#EFF2F4] rounded-xl p-6">
-            <p class="text-base font-medium text-[#111416] mb-2">支出数</p>
-            <p class="text-2xl font-semibold text-[#111416]">@ExpenseCount</p>
+        <div class="bg-active-light dark:bg-active-dark rounded-xl p-6">
+            <p class="text-base font-medium text-text-light dark:text-text-dark mb-2">支出数</p>
+            <p class="text-2xl font-semibold text-text-light dark:text-text-dark">@ExpenseCount</p>
         </div>
     }
 </div>

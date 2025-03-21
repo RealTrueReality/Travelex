@@ -12,7 +12,7 @@
 
 <FlexedPageComponent>
     <TopBarLeft>
-        <button @onclick="NavigateBack" class="p-2 text-[#252525]">
+        <button @onclick="NavigateBack" class="p-2 text-text-light dark:text-text-dark">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24"
                  stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -21,7 +21,7 @@
     </TopBarLeft>
     <TopBarTitle>旅行详情</TopBarTitle>
     <TopBarRight>
-        <button @onclick="NavigateToChart" class="p-2 text-[#252525]">
+        <button @onclick="NavigateToChart" class="p-2 text-text-light dark:text-text-dark">
             <i class="fas fa-bar-chart text-xl"></i>
         </button>
     </TopBarRight>
@@ -31,58 +31,58 @@
                 <!-- Shimmer Loading State -->
                 <!-- Statistics Cards Shimmer -->
                 <div class="grid grid-cols-2 gap-4 px-4">
-                    <div class="bg-[#EFF2F4] rounded-xl p-6">
-                        <p class="text-base font-medium text-[#111416] mb-2">旅行总支出</p>
-                        <SfSkeleton Width="80%" Height="26px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                    <div class="bg-active-light dark:bg-active-dark rounded-xl p-6">
+                        <p class="text-base font-medium text-text-light dark:text-text-dark mb-2">旅行总支出</p>
+                        <SfSkeleton Width="80%" Height="26px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
                     </div>
-                    <div class="bg-[#EFF2F4] rounded-xl p-6">
-                        <p class="text-base font-medium text-[#111416] mb-2">支出数</p>
-                        <SfSkeleton Width="50%" Height="26px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                    <div class="bg-active-light dark:bg-active-dark rounded-xl p-6">
+                        <p class="text-base font-medium text-text-light dark:text-text-dark mb-2">支出数</p>
+                        <SfSkeleton Width="50%" Height="26px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
                     </div>
                 </div>
 
                 <!-- Travel Image Shimmer -->
                 <div class="p-4">
                     <div class="rounded-xl overflow-hidden">
-                        <SfSkeleton Width="100%" Height="192px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                        <SfSkeleton Width="100%" Height="192px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
                     </div>
                 </div>
 
                 <!-- Travel Details Card Shimmer -->
-                <div class="bg-white mx-4 rounded-xl p-6 shadow-sm border border-gray-200">
+                <div class="bg-card-light dark:bg-card-dark mx-4 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
                     <!-- Title and Status -->
                     <div class="flex items-center justify-between mb-4">
-                        <SfSkeleton Width="30%" Height="24px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                        <SfSkeleton Width="30%" Height="24px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
                         <SfSkeleton Width="25%" Height="24px" Effect=ShimmerEffect.Wave
-                                    CssClass="rounded-full"></SfSkeleton>
+                                    CssClass="rounded-full dark:opacity-50"></SfSkeleton>
                     </div>
 
                     <!-- Description, Location, Date -->
                     <div class="space-y-3">
                         <div class="flex items-start space-x-2">
                             <SfSkeleton Width="18px" Height="18px" Effect=ShimmerEffect.Wave
-                                        CssClass="mt-1"></SfSkeleton>
-                            <SfSkeleton Width="50%" Height="18px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                                        CssClass="mt-1 dark:opacity-50"></SfSkeleton>
+                            <SfSkeleton Width="50%" Height="18px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
                         </div>
                         <div class="flex items-start space-x-2">
                             <SfSkeleton Width="18px" Height="18px" Effect=ShimmerEffect.Wave
-                                        CssClass="mt-1"></SfSkeleton>
-                            <SfSkeleton Width="50%" Height="18px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                                        CssClass="mt-1 dark:opacity-50"></SfSkeleton>
+                            <SfSkeleton Width="50%" Height="18px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
                         </div>
                         <div class="flex items-start space-x-2">
                             <SfSkeleton Width="18px" Height="18px" Effect=ShimmerEffect.Wave
-                                        CssClass="mt-1"></SfSkeleton>
-                            <SfSkeleton Width="50%" Height="18px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                                        CssClass="mt-1 dark:opacity-50"></SfSkeleton>
+                            <SfSkeleton Width="50%" Height="18px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
                         </div>
                         <div class="flex items-start space-x-2">
                             <SfSkeleton Width="18px" Height="18px" Effect=ShimmerEffect.Wave
-                                        CssClass="mt-1"></SfSkeleton>
-                            <SfSkeleton Width="50%" Height="18px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                                        CssClass="mt-1 dark:opacity-50"></SfSkeleton>
+                            <SfSkeleton Width="50%" Height="18px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
                         </div>
                         <div class="flex items-start space-x-2">
                             <SfSkeleton Width="18px" Height="18px" Effect=ShimmerEffect.Wave
-                                        CssClass="mt-1"></SfSkeleton>
-                            <SfSkeleton Width="50%" Height="18px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                                        CssClass="mt-1 dark:opacity-50"></SfSkeleton>
+                            <SfSkeleton Width="50%" Height="18px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
                         </div>
                     </div>
                 </div>
@@ -94,16 +94,16 @@
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center">
                                     <SfSkeleton Shape=SkeletonType.Square Width="46px" Height="46px"
-                                                Effect=ShimmerEffect.Wave CssClass="rounded-lg"></SfSkeleton>
+                                                Effect=ShimmerEffect.Wave CssClass="rounded-lg dark:opacity-50"></SfSkeleton>
                                     <div class="ml-4">
-                                        <SfSkeleton Width="116px" Height="16px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                                        <SfSkeleton Width="116px" Height="16px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
                                         <div class="flex items-center gap-2 mt-1">
                                             <SfSkeleton Width="142px" Height="12px"
-                                                        Effect=ShimmerEffect.Wave></SfSkeleton>
+                                                        Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
                                         </div>
                                     </div>
                                 </div>
-                                <SfSkeleton Width="78px" Height="16px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                                <SfSkeleton Width="78px" Height="16px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
                             </div>
                         </div>
                     }

@@ -4,53 +4,53 @@
 
 <div class="w-full mb-4">
     <div class="flex items-center mb-3">
-        <div class="w-12 h-12 bg-[#E8F0F2] dark:bg-[#1E1E1E] rounded-lg flex items-center justify-center">
+        <div class="w-12 h-12 bg-card-light dark:bg-card-dark rounded-lg flex items-center justify-center">
             @if (ThemeService.IsDarkMode)
             {
-                <i class="fas fa-moon text-[#0085FF] dark:text-[#1E90FF] text-xl"></i>
+                <i class="fas fa-moon text-primary-light dark:text-primary-dark text-xl"></i>
             }
             else
             {
-                <i class="fas fa-sun text-[#0085FF] dark:text-[#1E90FF] text-xl"></i>
+                <i class="fas fa-sun text-primary-light dark:text-primary-dark text-xl"></i>
             }
         </div>
         <div class="ml-4">
-            <div class="text-base font-medium text-[#1C160C] dark:text-[#E0E0E0] text-left">主题设置</div>
-            <div class="text-sm text-[#4C7C99] dark:text-[#6A98B5] text-left">
+            <div class="text-base font-medium text-text-light dark:text-text-dark text-left">主题设置</div>
+            <div class="text-sm text-secondary-light dark:text-secondary-dark text-left">
                 当前：@GetThemeStatusText()
             </div>
         </div>
     </div>
     
-    <div class="relative bg-gray-100 dark:bg-[#121212] rounded-xl p-3">
+    <div class="relative bg-background-light dark:bg-card-dark rounded-xl p-3">
         <!-- 可视化主题预览 -->
         <div class="grid grid-cols-3 gap-3 mb-4">
             <!-- 系统主题预览 -->
             <div @onclick="() => SetThemePreference(ThemePreference.System)" 
                  class="@GetPreviewClass(ThemePreference.System)">
                 <div class="relative overflow-hidden rounded-lg h-20 flex flex-col border dark:border-gray-700">
-                    <div class="h-4 bg-blue-500 w-full flex items-center justify-end p-0.5">
+                    <div class="h-4 bg-primary-light w-full flex items-center justify-end p-0.5">
                         <div class="h-1.5 w-1.5 rounded-full bg-white"></div>
                     </div>
                     <div class="flex-1 flex items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100 dark:from-[#181818] dark:to-[#202020]">
                         <i class="fas fa-laptop text-gray-600 dark:text-gray-300"></i>
                     </div>
                 </div>
-                <div class="mt-2 text-center text-xs font-medium text-gray-700 dark:text-gray-300">跟随系统</div>
+                <div class="mt-2 text-center text-xs font-medium text-text-light dark:text-text-dark">跟随系统</div>
             </div>
             
             <!-- 浅色主题预览 -->
             <div @onclick="() => SetThemePreference(ThemePreference.Light)" 
                  class="@GetPreviewClass(ThemePreference.Light)">
                 <div class="relative overflow-hidden rounded-lg h-20 flex flex-col border dark:border-gray-700">
-                    <div class="h-4 bg-blue-500 w-full flex items-center justify-end p-0.5">
+                    <div class="h-4 bg-primary-light w-full flex items-center justify-end p-0.5">
                         <div class="h-1.5 w-1.5 rounded-full bg-white"></div>
                     </div>
-                    <div class="flex-1 flex items-center justify-center bg-white">
+                    <div class="flex-1 flex items-center justify-center bg-background-light">
                         <i class="fas fa-sun text-yellow-500"></i>
                     </div>
                 </div>
-                <div class="mt-2 text-center text-xs font-medium text-gray-700 dark:text-gray-300">浅色模式</div>
+                <div class="mt-2 text-center text-xs font-medium text-text-light dark:text-text-dark">浅色模式</div>
             </div>
             
             <!-- 深色主题预览 -->
@@ -60,17 +60,17 @@
                     <div class="h-4 bg-gray-700 w-full flex items-center justify-end p-0.5">
                         <div class="h-1.5 w-1.5 rounded-full bg-gray-400"></div>
                     </div>
-                    <div class="flex-1 flex items-center justify-center bg-[#121212]">
-                        <i class="fas fa-moon text-blue-400"></i>
+                    <div class="flex-1 flex items-center justify-center bg-background-dark">
+                        <i class="fas fa-moon text-primary-dark"></i>
                     </div>
                 </div>
-                <div class="mt-2 text-center text-xs font-medium text-gray-700 dark:text-gray-300">深色模式</div>
+                <div class="mt-2 text-center text-xs font-medium text-text-light dark:text-text-dark">深色模式</div>
             </div>
         </div>
         
         <!-- 主题选择器 -->
-        <div class="relative bg-white dark:bg-[#1A1A1A] rounded-lg p-1 flex border dark:border-gray-800">
-            <div class="absolute inset-y-1 transition-all duration-300 rounded-md bg-[#0085FF] dark:bg-[#1E90FF] z-0"
+        <div class="relative bg-background-light dark:bg-card-dark rounded-lg p-1 flex border dark:border-gray-800">
+            <div class="absolute inset-y-1 transition-all duration-300 rounded-md bg-primary-light dark:bg-primary-dark z-0"
                  style="@GetIndicatorStyle()"></div>
                  
             <button @onclick="() => SetThemePreference(ThemePreference.System)" 
@@ -134,7 +134,7 @@
         
         return ThemeService.Preference == preference
             ? $"{baseClass} text-white font-medium"
-            : $"{baseClass} text-gray-600 dark:text-gray-300";
+            : $"{baseClass} text-subtext-light dark:text-subtext-dark";
     }
 
     private string GetIndicatorStyle()

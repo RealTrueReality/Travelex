@@ -2,7 +2,7 @@
 @using ShimmerEffect = Syncfusion.Blazor.Notifications.ShimmerEffect
 @using Travelex.Entities
 
-<div class="bg-white mx-4 rounded-xl p-6 shadow-sm border border-gray-200">
+<div class="bg-card-light dark:bg-card-dark mx-4 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
     @if (IsLoading)
     {
         <!-- Title and Status -->
@@ -38,7 +38,7 @@
     else
     {
         <div class="flex items-center justify-between mb-4">
-            <h2 class="text-xl font-semibold text-[#111416]">@Travel.Title</h2>
+            <h2 class="text-xl font-semibold text-text-light dark:text-text-dark">@Travel.Title</h2>
             <span class="px-3 py-1 rounded-full text-base @GetStatusClass()">
                 @Travel.StatusForDisplay
             </span>
@@ -48,26 +48,26 @@
             @if (!string.IsNullOrEmpty(Travel.Description))
             {
                 <div class="flex items-start space-x-2">
-                    <i class="fas fa-align-left text-gray-500 mt-1"></i>
-                    <p class="text-gray-600">@Travel.Description</p>
+                    <i class="fas fa-align-left text-subtext-light dark:text-subtext-dark mt-1"></i>
+                    <p class="text-subtext-light dark:text-subtext-dark">@Travel.Description</p>
                 </div>
             }
 
             <div class="flex items-start space-x-2">
-                <i class="fas fa-map-marker-alt text-gray-500 mt-1"></i>
+                <i class="fas fa-map-marker-alt text-subtext-light dark:text-subtext-dark mt-1"></i>
                 @if (Travel is { Longitude: not null, Latitude: not null })
                 {
-                    <p class="text-gray-600">@($"{Travel.LocationName} 经度: {Travel.Longitude.Value}, 纬度: {Travel.Latitude.Value}")</p>
+                    <p class="text-subtext-light dark:text-subtext-dark">@($"{Travel.LocationName} 经度: {Travel.Longitude.Value}, 纬度: {Travel.Latitude.Value}")</p>
                 }
                 else
                 {
-                    <p class="text-gray-600">@Travel.LocationName</p>
+                    <p class="text-subtext-light dark:text-subtext-dark">@Travel.LocationName</p>
                 }
             </div>
 
             <div class="flex items-start space-x-2">
-                <i class="fas fa-calendar text-gray-500 mt-1"></i>
-                <p class="text-gray-600">
+                <i class="fas fa-calendar text-subtext-light dark:text-subtext-dark mt-1"></i>
+                <p class="text-subtext-light dark:text-subtext-dark">
                     @Travel.StartDate?.ToString("yyyy-MM-dd") - @Travel.EndDate?.ToString("yyyy-MM-dd")
                 </p>
             </div>
@@ -75,14 +75,14 @@
             @if (!string.IsNullOrEmpty(Travel.CategoryName))
             {
                 <div class="flex items-start space-x-2">
-                    <i class="fas fa-tag text-gray-500 mt-1"></i>
-                    <p class="text-gray-600">@Travel.CategoryName</p>
+                    <i class="fas fa-tag text-subtext-light dark:text-subtext-dark mt-1"></i>
+                    <p class="text-subtext-light dark:text-subtext-dark">@Travel.CategoryName</p>
                 </div>
             }
 
             <div class="flex items-start space-x-2">
-                <i class="fas fa-clock text-gray-500 mt-1"></i>
-                <div class="text-gray-600">
+                <i class="fas fa-clock text-subtext-light dark:text-subtext-dark mt-1"></i>
+                <div class="text-subtext-light dark:text-subtext-dark">
                     <p>创建于：@Travel.AddedOn.ToString("yyyy-MM-dd HH:mm")</p>
                     @if (Travel.ModifiedOn.HasValue)
                     {
@@ -102,10 +102,10 @@
     {
         return Travel.Status switch
         {
-            TravelStatus.Planning => "bg-yellow-100 text-yellow-600",
-            TravelStatus.Ongoing => "bg-blue-100 text-blue-600",
-            TravelStatus.Completed => "bg-green-100 text-green-600",
-            TravelStatus.Cancelled => "bg-red-100 text-red-600",
+            TravelStatus.Planning => "bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-300",
+            TravelStatus.Ongoing => "bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300",
+            TravelStatus.Completed => "bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-300",
+            TravelStatus.Cancelled => "bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-300",
             _ => ""
         };
     }

@@ -2,17 +2,17 @@
 @using Travelex.Services
 @inject ILocationService LocationService
 
-<div class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center" @onclick="Close">
-    <div class="bg-white w-full h-full md:w-[600px] md:h-[80vh] md:rounded-2xl flex flex-col" @onclick:stopPropagation>
+<div class="fixed inset-0 z-50 bg-background-light dark:bg-background-dark bg-opacity-50 flex items-center justify-center" @onclick="Close">
+    <div class="bg-background-light dark:bg-background-dark w-full h-full md:w-[600px] md:h-[80vh] md:rounded-2xl flex flex-col" @onclick:stopPropagation>
         <!-- 顶部栏 -->
-        <div class="flex items-center px-4 h-[60px] border-b">
-            <button @onclick="Close" class="p-2 -ml-2">
+        <div class="flex items-center px-4 h-[60px] border-b dark:border-gray-700">
+            <button @onclick="Close" class="p-2 -ml-2 text-text-light dark:text-text-dark text-lg font-bold">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
-            <h2 class="flex-1 text-center text-lg font-medium">选择位置</h2>
-            <button @onclick="ConfirmLocation" class="text-blue-500 font-medium">确定</button>
+            <h2 class="flex-1 text-center text-lg font-bold text-text-light dark:text-text-dark">选择位置</h2>
+            <button @onclick="ConfirmLocation" class="text-text-light dark:text-text-dark text-lg font-bold">确定</button>
         </div>
 
         <!-- 搜索框 -->
@@ -21,9 +21,9 @@
                 <input @bind-value="@_searchKeyword" 
                        @bind-value:event="oninput"
                        @onkeyup="HandleSearch"
-                       class="w-full h-10 pl-10 pr-4 bg-gray-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                       class="w-full h-10 pl-10 pr-4 bg-input-bg-light dark:bg-input-bg-dark text-text-light dark:text-text-dark rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-light dark:focus:ring-primary-dark"
                        placeholder="搜索地点" />
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-subtext-light dark:text-subtext-dark absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
             </div>
@@ -36,9 +36,9 @@
                 @foreach (var result in _searchResults)
                 {
                     <button @onclick="() => SelectSearchResult(result)"
-                            class="w-full px-4 py-2 text-left hover:bg-gray-100 rounded-lg">
-                        <div class="font-medium">@result.Name</div>
-                        <div class="text-sm text-gray-500">@result.Address</div>
+                            class="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
+                        <div class="font-medium text-text-light dark:text-text-dark">@result.Name</div>
+                        <div class="text-sm text-subtext-light dark:text-subtext-dark">@result.Address</div>
                     </button>
                 }
             </div>
@@ -48,13 +48,13 @@
         <div class="flex-1 relative">
             @if (_hasError)
             {
-                <div class="absolute inset-0 flex items-center justify-center bg-gray-100">
+                <div class="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800">
                     <div class="text-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-red-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                         </svg>
-                        <p class="text-gray-600">@_errorMessage</p>
-                        <button @onclick="Close" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                        <p class="text-gray-600 dark:text-gray-300">@_errorMessage</p>
+                        <button @onclick="Close" class="mt-4 px-4 py-2 bg-primary-light dark:bg-primary-dark text-white rounded-lg hover:bg-blue-600 dark:hover:bg-blue-700">
                             关闭
                         </button>
                     </div>
@@ -67,7 +67,7 @@
 
 @if (_hasError)
 {
-    <div class="fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50">
+    <div class="fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded z-50">
         <p class="text-center">@_errorMessage</p>
     </div>
 }
@@ -120,7 +120,7 @@
             var hasPermission = await CheckLocationPermission();
             if (!hasPermission) return;
 
-            var location = await JSRuntime.InvokeAsync<LocationResult>("getCurrentLocation");
+            var location = await JSRuntime.InvokeAsync<LocationResult?>("getCurrentLocation");
             if (location == null)
             {
                 _hasError = true;
@@ -149,7 +149,7 @@
         {
             return await LocationService.CheckAndRequestLocationPermission();
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             _errorMessage = "获取位置权限失败";
             await InvokeAsync(StateHasChanged);

@@ -1,20 +1,22 @@
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
 
-<div class="h-[72px] px-4 py-4 bg-white flex items-center justify-between relative">
+<div class="h-[72px] px-4 py-4 bg-background-light dark:bg-background-dark flex items-center justify-between relative">
     @if (!IsSearching)
     {
         <div class="flex-1">
-            <button @onclick="NavigateToAdd" class="p-2 text-[#252525]">
+            <button @onclick="NavigateToAdd" class="p-2 text-text-light dark:text-text-dark">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>
             </button>
         </div>
-        <h1 class="text-[#252525] text-lg font-bold">我的旅行</h1>
+        <h1 class="text-text-light dark:text-text-dark text-lg font-bold">我的旅行</h1>
         <div class="flex-1 flex justify-end">
-            <button @onclick="ToggleSearch">
-                <img src="images/search.png" class="p-2" alt="搜索"/>
+            <button @onclick="ToggleSearch" class="p-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-text-light dark:text-text-dark" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
             </button>
         </div>
     }
@@ -26,10 +28,10 @@
                    @bind:event="oninput"
                    @onkeyup="HandleKeyUp"
                    inputmode="search"
-                   class="flex-1 h-10 px-3 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 text-base"
+                   class="flex-1 h-10 px-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-input-bg-light dark:bg-input-bg-dark text-text-light dark:text-text-dark focus:outline-none"
                    placeholder="搜索旅行..."
                    @ref="_searchInput"/>
-            <button @onclick="ToggleSearch" class="p-2">
+            <button @onclick="ToggleSearch" class="p-2 text-text-light dark:text-text-dark">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                      stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>

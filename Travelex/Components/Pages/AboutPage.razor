@@ -1,11 +1,13 @@
 @page "/about"
 @using Travelex.Components.Layout
 @using Travelex.Utils
+@using Travelex.Services
 @inject BlazorMauiInterop BlazorMauiInterop
+@inject ThemeService Theme
 
 <FlexedPageComponent>
     <TopBarLeft>
-        <button @onclick="NavigateBack" class="p-2 text-[#252525]">
+        <button @onclick="NavigateBack" class="p-2 text-text-light dark:text-text-dark">
             <i class="fas fa-arrow-left text-xl"></i>
         </button>
     </TopBarLeft>
@@ -17,69 +19,69 @@
             <!-- 作者信息 -->
             <div class="flex flex-col items-center mb-8">
                 <img src="images/truereality.png" alt="TrueReality" class="w-36 h-36 rounded-full shadow-lg mb-4"/>
-                <h1 class="text-2xl font-bold text-[#111416] mb-2">TrueReality</h1>
-                <p class="text-[#666666] text-center px-4">一只小狗味🐕的小狼🐺！<br/>致力于创造优秀的用户体验</p>
+                <h1 class="text-2xl font-bold text-text-light dark:text-text-dark mb-2">TrueReality</h1>
+                <p class="text-subtext-light dark:text-subtext-dark text-center px-4">一只小狗味🐕的小狼🐺！<br/>致力于创造优秀的用户体验</p>
             </div>
 
             <!-- 应用信息 -->
             <div class="space-y-6">
                 <div>
-                    <h2 class="text-xl font-bold text-[#111416] mb-3">关于 Travelex</h2>
-                    <p class="text-[#666666] leading-relaxed">
+                    <h2 class="text-xl font-bold text-text-light dark:text-text-dark mb-3">关于 Travelex</h2>
+                    <p class="text-subtext-light dark:text-subtext-dark leading-relaxed">
                         Travelex 是一款专注于旅行支出管理的应用。它帮助用户轻松记录和管理旅行中的各项开支，
                         通过直观的图表展示支出分布，让旅行财务管理变得简单而高效。
                     </p>
                 </div>
 
                 <div>
-                    <h2 class="text-xl font-bold text-[#111416] mb-3">主要功能</h2>
-                    <ul class="space-y-2 text-[#666666]">
+                    <h2 class="text-xl font-bold text-text-light dark:text-text-dark mb-3">主要功能</h2>
+                    <ul class="space-y-2 text-subtext-light dark:text-subtext-dark">
                         <li class="flex items-center">
-                            <i class="fas fa-check text-[#4CAF50] mr-2"></i>
+                            <i class="fas fa-check text-green-500 dark:text-green-400 mr-2"></i>
                             支出记录与分类管理
                         </li>
                         <li class="flex items-center">
-                            <i class="fas fa-check text-[#4CAF50] mr-2"></i>
+                            <i class="fas fa-check text-green-500 dark:text-green-400 mr-2"></i>
                             可视化支出统计图表
                         </li>
                         <li class="flex items-center">
-                            <i class="fas fa-check text-[#4CAF50] mr-2"></i>
+                            <i class="fas fa-check text-green-500 dark:text-green-400 mr-2"></i>
                             多旅程支持
                         </li>
                         <li class="flex items-center">
-                            <i class="fas fa-check text-[#4CAF50] mr-2"></i>
+                            <i class="fas fa-check text-green-500 dark:text-green-400 mr-2"></i>
                             自定义支出分类
                         </li>
                     </ul>
                 </div>
 
                 <div>
-                    <h2 class="text-xl font-bold text-[#111416] mb-3">技术栈</h2>
+                    <h2 class="text-xl font-bold text-text-light dark:text-text-dark mb-3">技术栈</h2>
                     <div class="grid grid-cols-2 gap-3">
-                        <div class="flex items-center p-3 bg-[#F5F5F5] rounded-lg">
-                            <i class="fab fa-microsoft text-xl text-[#666666] mr-2"></i>
-                            <span class="text-[#666666]">.NET MAUI</span>
+                        <div class="flex items-center p-3 bg-active-light dark:bg-active-dark rounded-lg">
+                            <i class="fab fa-microsoft text-xl text-subtext-light dark:text-subtext-dark mr-2"></i>
+                            <span class="text-subtext-light dark:text-subtext-dark">.NET MAUI</span>
                         </div>
-                        <div class="flex items-center p-3 bg-[#F5F5F5] rounded-lg">
-                            <i class="fab fa-microsoft text-xl text-[#666666] mr-2"></i>
-                            <span class="text-[#666666]">Blazor</span>
+                        <div class="flex items-center p-3 bg-active-light dark:bg-active-dark rounded-lg">
+                            <i class="fab fa-microsoft text-xl text-subtext-light dark:text-subtext-dark mr-2"></i>
+                            <span class="text-subtext-light dark:text-subtext-dark">Blazor</span>
                         </div>
-                        <div class="flex items-center p-3 bg-[#F5F5F5] rounded-lg">
-                            <i class="fas fa-database text-xl text-[#666666] mr-2"></i>
-                            <span class="text-[#666666]">SQLite</span>
+                        <div class="flex items-center p-3 bg-active-light dark:bg-active-dark rounded-lg">
+                            <i class="fas fa-database text-xl text-subtext-light dark:text-subtext-dark mr-2"></i>
+                            <span class="text-subtext-light dark:text-subtext-dark">SQLite</span>
                         </div>
-                        <div class="flex items-center p-3 bg-[#F5F5F5] rounded-lg">
-                            <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='#666666' width='24' height='24' class="mr-2">
+                        <div class="flex items-center p-3 bg-active-light dark:bg-active-dark rounded-lg">
+                            <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' class="w-6 h-6 text-subtext-light dark:text-subtext-dark mr-2">
                                 <path d="M18.5 9.51a4.22 4.22 0 0 1-1.91-1.34A5.77 5.77 0 0 0 12 6a4.72 4.72 0 0 0-5 4 3.23 3.23 0 0 1 3.5-1.49 4.32 4.32 0 0 1 1.91 1.35A5.77 5.77 0 0 0 17 12a4.72 4.72 0 0 0 5-4 3.2 3.2 0 0 1-3.5 1.51zm-13 4.98a4.22 4.22 0 0 1 1.91 1.34A5.77 5.77 0 0 0 12 18a4.72 4.72 0 0 0 5-4 3.23 3.23 0 0 1-3.5 1.49 4.32 4.32 0 0 1-1.91-1.35A5.8 5.8 0 0 0 7 12a4.72 4.72 0 0 0-5 4 3.2 3.2 0 0 1 3.5-1.51z"></path>
                             </svg>
-                            <span class="text-[#666666]">Tailwind CSS</span>
+                            <span class="text-subtext-light dark:text-subtext-dark">Tailwind CSS</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- GitHub链接 -->
                 <div>
-                    <h2 class="text-xl font-bold text-[#111416] mb-3">项目源码</h2>
+                    <h2 class="text-xl font-bold text-text-light dark:text-text-dark mb-3">项目源码</h2>
                     <button @onclick="OpenGitHubRepo" class="flex items-center justify-center w-full p-3 bg-[#24292E] text-white rounded-lg hover:bg-[#2F363D] transition-colors">
                         <i class="fab fa-github text-xl mr-2"></i>
                         <span>在GitHub上查看源码</span>
@@ -87,7 +89,7 @@
                 </div>
 
                 <div class="pt-4">
-                    <p class="text-center text-sm text-[#666666]">
+                    <p class="text-center text-sm text-subtext-light dark:text-subtext-dark">
                         版本 1.0.0 · Made with <i class="fas fa-heart text-red-500"></i> by TrueReality
                     </p>
                 </div>

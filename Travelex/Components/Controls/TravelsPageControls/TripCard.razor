@@ -1,7 +1,7 @@
 @using Travelex.Entities
 
 <div class="relative touch-pan-y mb-4" @onclick:stopPropagation>
-    <div class="relative rounded-xl p-4 transition-all duration-300 ease-in-out touch-pan-y @(TouchedTripId == Trip.Id ? "bg-[#EFF2F4]" : "bg-white")"
+    <div class="relative rounded-xl p-4 transition-all duration-300 ease-in-out touch-pan-y @(TouchedTripId == Trip.Id ? "bg-active-light dark:bg-active-dark" : "bg-card-light dark:bg-card-dark")"
          style="@GetTripCardStyle()"
          @ontouchstart="@(e => HandleTouchStart(e))"
          @ontouchmove="@(e => HandleTouchMove(e))"
@@ -9,18 +9,22 @@
          @onclick="@(e => OnCardClick())">
         <div class="grid grid-cols-[1fr,auto] gap-4">
             <div>
-                <h3 class="text-[#252525] text-base font-bold">@Trip.Title</h3>
-                <p class="text-[#607A89] text-sm">
+                <h3 class="text-text-light dark:text-text-dark text-base font-bold">@Trip.Title</h3>
+                <p class="text-subtext-light dark:text-subtext-dark text-sm">
                     @Trip.StartDate?.ToString("yyyy年M月d日") - @Trip.EndDate?.ToString("d日")
                 </p>
 
                 <div class="flex items-center gap-2 mt-4">
-                    <div class="bg-[#E8EFF2] rounded-lg h-10 w-10 flex items-center justify-center">
-                        <img src="images/expense.svg" alt="支出"/>
+                    <div class="bg-[#E8EFF2] dark:bg-gray-700 text-subtext-light dark:text-subtext-dark rounded-lg h-10 w-10 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-subtext-light dark:text-subtext-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="5" width="20" height="14" rx="2" />
+                            <line x1="2" y1="10" x2="22" y2="10" />
+                            <circle cx="12" cy="15" r="2" />
+                        </svg>
                     </div>
                     <div>
-                        <p class="text-[#252525] text-sm">总支出</p>
-                        <p class="text-[#4C7C99] text-base font-medium">￥@Trip.Expense.Sum(e => e.Amount)</p>
+                        <p class="text-text-light dark:text-text-dark text-sm">总支出</p>
+                        <p class="text-secondary-light dark:text-secondary-dark text-base font-medium">￥@Trip.Expense.Sum(e => e.Amount)</p>
                     </div>
                 </div>
             </div>
@@ -34,14 +38,12 @@
                     }
                     else if (File.Exists(Trip.ImageUrl))
                     {
-                        <img src="data:image/jpeg;base64,@Convert.ToBase64String(File.ReadAllBytes(Trip.ImageUrl))"
-                             class="w-full h-full object-cover"
-                             alt="@Trip.Title"/>
+                        <img src="data:image/jpeg;base64,@Convert.ToBase64String(File.ReadAllBytes(Trip.ImageUrl))" class="w-full h-full object-cover" alt="@Trip.Title"/>
                     }
                     else
                     {
-                        <div class="w-full h-full bg-gray-100 flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <div class="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                         </div>
@@ -49,8 +51,8 @@
                 }
                 else
                 {
-                    <div class="w-full h-full bg-gray-100 flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div class="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                     </div>
@@ -101,8 +103,8 @@
 
     private void HandleTouchStart(TouchEventArgs e)
     {
-        _touchStartX = e.Touches[0].ClientX;
         TouchedTripId = Trip.Id;
+        _touchStartX = e.Touches[0].ClientX;
     }
 
     private void HandleTouchMove(TouchEventArgs e)
@@ -153,6 +155,6 @@
             return;
         }
 
-        await OnClick.InvokeAsync(Trip);
+            await OnClick.InvokeAsync(Trip);
     }
 }

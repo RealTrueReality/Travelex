@@ -11,7 +11,7 @@
 @inject BlazorMauiInterop BlazorMauiInterop
 @layout LayoutWithNavBar
 
-<div class="flex flex-col h-full bg-white dark:bg-background-dark select-none">
+<div class="flex flex-col h-full bg-background-light dark:bg-background-dark select-none">
     <SearchBar @bind-SearchQuery="SearchQuery"/>
 
     <div class="flex-1 overflow-auto">
@@ -21,26 +21,26 @@
         <div class="px-4">
             @if (IsLoading) {
                 @for (int i = 0; i < 4; i++) {
-                    <div class="bg-white dark:bg-card-dark rounded-xl p-4 mb-4">
+                    <div class="bg-card-light dark:bg-card-dark rounded-xl p-4 mb-4">
                         <div class="grid grid-cols-[1fr,auto] gap-4">
                             <div>
-                                <SfSkeleton Width="40%" Height="18px" Effect=ShimmerEffect.Wave></SfSkeleton>
-                                <SfSkeleton Width="70%" Height="14px" CssClass="mt-0.5"
+                                <SfSkeleton Width="40%" Height="18px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
+                                <SfSkeleton Width="70%" Height="14px" CssClass="mt-0.5 dark:opacity-50"
                                             Effect=ShimmerEffect.Wave></SfSkeleton>
 
                                 <div class="flex items-center gap-2 mt-q2">
                                     <SfSkeleton Shape=SkeletonType.Square Width="40px" Height="36px"
-                                                Effect=ShimmerEffect.Wave></SfSkeleton>
+                                                Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
                                     <div>
-                                        <SfSkeleton Width="60px" Height="14px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                                        <SfSkeleton Width="60px" Height="14px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
                                         <div class="mt-0.2">
-                                            <SfSkeleton Width="80px" Height="16px" CssClass="mt-0.5"
+                                            <SfSkeleton Width="80px" Height="16px" CssClass="mt-0.5 dark:opacity-50"
                                                         Effect=ShimmerEffect.Wave></SfSkeleton>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <SfSkeleton Width="130px" Height="101px" Effect=ShimmerEffect.Wave></SfSkeleton>
+                            <SfSkeleton Width="130px" Height="101px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
                         </div>
                     </div>
                 }
@@ -54,7 +54,7 @@
                     }
                 }
                 else if (!string.IsNullOrWhiteSpace(SearchQuery)) {
-                    <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                    <div class="text-center py-8 text-subtext-light dark:text-subtext-dark">
                         没有找到匹配的行程
                     </div>
                 }
@@ -63,7 +63,7 @@
 
         <!-- 添加行程按钮 -->
         <div class="p-4">
-            <button @onclick="NavigateToAdd" class="w-full bg-[#119BED] dark:bg-primary-dark text-white h-12 rounded-[20px] text-base font-bold">
+            <button @onclick="NavigateToAdd" class="w-full bg-primary-light dark:bg-primary-dark text-white h-12 rounded-[20px] text-base font-bold">
                 + 添加行程
             </button>
         </div>
@@ -145,5 +145,4 @@
     private void NavigateToAdd() {
         NavigationManager.NavigateTo("/travel/add");
     }
-
 }

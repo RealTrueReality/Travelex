@@ -17,7 +17,7 @@
     <PageBody>
         @if (_currentUser != null)
         {
-            <div class="p-4 bg-white dark:bg-black">
+            <div class="p-4 bg-background-light dark:bg-background-dark">
                 <!-- 用户资料头部 -->
                 <ProfileHeader 
                     ProfileImage="@_profileImage" 
@@ -48,7 +48,7 @@
 @code {
     private List<ExpenseCategory> _categories = [];
     private Dictionary<string, double> _categoryTotals = new();
-    private string _profileImage = "";
+    private string? _profileImage = "";
     private string _imageBase64 = "";
     private LoggingModel? _currentUser;
 
@@ -77,7 +77,7 @@
         {
             _categoryTotals = expRes.Data
                 .GroupBy(e => e.Category)
-                .ToDictionary(g => g.Key, g => g.Sum(e => e.Amount ?? 0));
+                .ToDictionary(g => g.Key??string.Empty, g => g.Sum(e => e.Amount ?? 0));
         }
     }
 
