@@ -40,7 +40,7 @@ public class ThemeService : INotifyPropertyChanged {
                 _isDarkMode = value;
                 OnPropertyChanged();
                 ThemeChanged?.Invoke(value);
-                UpdateStatusBarColor(value);
+                UpdateNativeUIColor(value);
             }
         }
     }
@@ -123,12 +123,10 @@ public class ThemeService : INotifyPropertyChanged {
     }
 
     // 更新状态栏颜色
-    private void UpdateStatusBarColor(bool isDarkMode) {
+    private void UpdateNativeUIColor(bool isDarkMode) {
         // 确保在主线程上运行UI操作
         MainThread.BeginInvokeOnMainThread(() => {
             var statusBarColor = isDarkMode ? Colors.Black : Colors.White;
-
-
             Application.Current.MainPage.BackgroundColor = statusBarColor;
 #pragma warning disable CA1416
             Application.Current.MainPage.Behaviors.Add(new StatusBarBehavior() {
@@ -136,10 +134,48 @@ public class ThemeService : INotifyPropertyChanged {
                 StatusBarStyle = isDarkMode ? StatusBarStyle.LightContent : StatusBarStyle.DarkContent
             });
 #pragma warning restore CA1416
+
+#if ANDROID
+            UpdateAndroidNavigationBarColor(isDarkMode);
+#endif
+
+#if IOS
+            UpdateiOSNavigationBarColor(isDarkMode);
+#endif
+        });
+    }
+
+    private void UpdateAndroidNavigationBarColor(bool isDarkMode) {
 #if ANDROID
         Microsoft.Maui.ApplicationModel.Platform.CurrentActivity.Window.SetNavigationBarColor(isDarkMode ? Android.Graphics.Color.Black : Android.Graphics.Color.White) ;
         Microsoft.Maui.ApplicationModel.Platform.CurrentActivity.Window.NavigationBarContrastEnforced = false;
 #endif
-        });
+    }
+
+    // 在ThemeService.cs或相关服务中添加这个方法
+    private void UpdateiOSNavigationBarColor(bool isDarkMode) {
+#if IOS
+        // 获取UITabBar的外观
+        UIKit.UITabBarAppearance appearance = new UIKit.UITabBarAppearance();
+        appearance.ConfigureWithDefaultBackground();
+
+        // 设置背景颜色
+        UIKit.UIColor backgroundColor = isDarkMode
+            ? new UIKit.UIColor(0.0f, 0.0f, 0.0f, 1.0f)
+            : // 黑色
+            new UIKit.UIColor(1.0f, 1.0f, 1.0f, 1.0f); // 白色
+
+        appearance.BackgroundColor = backgroundColor;
+
+        // 应用外观到所有标签栏
+        UIKit.UITabBar.Appearance.StandardAppearance = appearance;
+        UIKit.UITabBar.Appearance.ScrollEdgeAppearance = appearance;
+
+        // 如果是iOS 15及以上，还需要设置这个属性
+        if (UIKit.UIDevice.CurrentDevice.CheckSystemVersion(15, 0)) {
+            UIKit.UITabBar.Appearance.StandardAppearance = appearance;
+            UIKit.UITabBar.Appearance.ScrollEdgeAppearance = appearance;
+        }
+#endif
     }
 }
