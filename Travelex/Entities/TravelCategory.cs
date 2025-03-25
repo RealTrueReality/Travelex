@@ -7,5 +7,4 @@ namespace Travelex.Entities;
 public class TravelCategory {
     [PrimaryKey,MaxLength(100)]
     public string? CategoryName { get; set; }
-    public string? CategoryImage { get; set; }
 }

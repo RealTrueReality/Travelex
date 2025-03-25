@@ -30,14 +30,14 @@ public class SeedDataService {
         // 检查并初始化 TravelCategory 表数据
         if (!await _db.TableExistsAsync<TravelCategory>()) {
             var tripCategories = new List<TravelCategory> {
-                new() { CategoryName = "海滩", CategoryImage = "/images/chair.png" },
-                new() { CategoryName = "野外", CategoryImage = "/images/conservation.png" },
-                new() { CategoryName = "爬山", CategoryImage = "/images/mountain.png" },
-                new() { CategoryName = "City Walk", CategoryImage = "/images/city.png" },
-                new() { CategoryName = "岛屿", CategoryImage = "/images/island.png" },
-                new() { CategoryName = "宗教", CategoryImage = "/images/buddha.png" },
-                new() { CategoryName = "出境", CategoryImage = "/images/abroad.png" },
-                new() { CategoryName = "长途旅行", CategoryImage = "/images/roadtrip.png" }
+                new() { CategoryName = "海滩", },
+                new() { CategoryName = "野外" },
+                new() { CategoryName = "爬山" },
+                new() { CategoryName = "City Walk" },
+                new() { CategoryName = "岛屿" },
+                new() { CategoryName = "宗教" },
+                new() { CategoryName = "出境" },
+                new() { CategoryName = "长途旅行" }
             };
 
             foreach (var category in tripCategories) await _db.AddItemAsync(category);
@@ -91,15 +91,12 @@ public class SeedDataService {
                     Status = TravelStatus.Planning,
                     Description = "一次特殊的旅行，前往小狼家探访乖小狼天壤，享受温馨的安心时光。",
                 },
-
-
             };
             foreach (var travel in travels) await _db.AddItemAsync(travel);
         }
 
         // 检查并初始化 Expense 表数据
         if (!await _db.TableExistsAsync<Expense>()) {
-
             var expenses = new List<Expense> {
                 new Expense {
                     Id = 1,
@@ -288,7 +285,7 @@ public class SeedDataService {
                     Description = "出去吃饭",
                     Amount = 350.00,
                     Category = "娱乐",
-                    TimeOnSpend = new DateTime( 2025, 4, 15)
+                    TimeOnSpend = new DateTime(2025, 4, 15)
                 }
             };
             foreach (var expense in expenses) {
