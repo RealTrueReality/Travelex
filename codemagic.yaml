@@ -48,7 +48,9 @@
       - name: Build macOS (Mac Catalyst) app
         script: |
           $DOTNET_BIN workload install maccatalyst --source https://aka.ms/dotnet8/nuget/index.json --source https://api.nuget.org/v3/index.json
-
+                  
+          find . -name "package.json" -exec rm -rf {} +
+          find . -name "package-lock.json" -exec rm -rf {} +
           $DOTNET_BIN publish -f net8.0-maccatalyst \
             -c Release \
             -p:ApplicationDisplayVersion="1.0.0" \
