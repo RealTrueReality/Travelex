@@ -27,23 +27,23 @@
           PLIST_BUDDY=/usr/libexec/PlistBuddy
           $PLIST_BUDDY -c "Add :ITSAppUsesNonExemptEncryption bool false" $PLIST
 
-      - name: Set build version and build the iOS app
-        script: |
-          CERT_NAME=$(keychain list-certificates | jq -r '.[] | .common_name')
-          PROFILE_NAME=$(find ~/Library/MobileDevice/Provisioning\ Profiles -name "*.mobileprovision" -execdir sh -c '/usr/libexec/PlistBuddy -c "print :Name" /dev/stdin <<< $(security cms -D -i {})' \;)
-
-          find . -name "package.json" -exec rm -rf {} +
-          find . -name "package-lock.json" -exec rm -rf {} +
-
-          $DOTNET_BIN publish -f net8.0-ios \
-            -c Release \
-            -p:BuildIpa=True \
-            -p:ApplicationDisplayVersion="1.0.0" \
-            -p:ApplicationVersion=1 \
-            -p:RuntimeIdentifier=ios-arm64 \
-            -p:CodesignKey="$CERT_NAME" \
-            -p:CodesignProvision="$PROFILE_NAME" \
-            -o /Users/builder/artifacts/ios
+#      - name: Set build version and build the iOS app
+#        script: |
+#          CERT_NAME=$(keychain list-certificates | jq -r '.[] | .common_name')
+#          PROFILE_NAME=$(find ~/Library/MobileDevice/Provisioning\ Profiles -name "*.mobileprovision" -execdir sh -c '/usr/libexec/PlistBuddy -c "print :Name" /dev/stdin <<< $(security cms -D -i {})' \;)
+#
+#          find . -name "package.json" -exec rm -rf {} +
+#          find . -name "package-lock.json" -exec rm -rf {} +
+#
+#          $DOTNET_BIN publish -f net8.0-ios \
+#            -c Release \
+#            -p:BuildIpa=True \
+#            -p:ApplicationDisplayVersion="1.0.0" \
+#            -p:ApplicationVersion=1 \
+#            -p:RuntimeIdentifier=ios-arm64 \
+#            -p:CodesignKey="$CERT_NAME" \
+#            -p:CodesignProvision="$PROFILE_NAME" \
+#            -o /Users/builder/artifacts/ios
 
       - name: Build macOS (Mac Catalyst) app
         script: |
@@ -56,7 +56,7 @@
             -o /Users/builder/artifacts/macos
 
     artifacts:
-      - /Users/builder/artifacts/ios/*.ipa
+#      - /Users/builder/artifacts/ios/*.ipa
       - /Users/builder/artifacts/macos/*.app
     publishing:
       email:
