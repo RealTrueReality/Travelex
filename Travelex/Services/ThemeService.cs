@@ -147,7 +147,9 @@ public class ThemeService : INotifyPropertyChanged {
 
     private void UpdateAndroidNavigationBarColor(bool isDarkMode) {
 #if ANDROID
-        Microsoft.Maui.ApplicationModel.Platform.CurrentActivity.Window.SetNavigationBarColor(isDarkMode ? Android.Graphics.Color.Black : Android.Graphics.Color.White) ;
+        Microsoft.Maui.ApplicationModel.Platform.CurrentActivity.Window.SetNavigationBarColor(isDarkMode
+            ? Android.Graphics.Color.Black
+            : Android.Graphics.Color.White);
         Microsoft.Maui.ApplicationModel.Platform.CurrentActivity.Window.NavigationBarContrastEnforced = false;
 #endif
     }
