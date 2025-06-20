@@ -33,9 +33,9 @@ Travelex 是一款基于 .NET MAUI Blazor Hybrid 构建的现代化、跨平台�
 
 | 首页 | 行程详情 |
 | :---: | :---: |
-| *[请在此处添加首页截图]* | *[请在此处添加行程详情页截图]* |
+| ![图片](https://github.com/user-attachments/assets/4b01cbd2-b5fc-4942-8411-a2de54c8a92f)| ![图片](https://github.com/user-attachments/assets/d492313c-5c4e-4541-933f-8a45371d2d9c)|
 | **图表分析** | **AI 智能摘要** |
-| *[请在此处添加图表分析页截图]* | *[请在此处添加 AI 摘要页截图]* |
+| ![图片](https://github.com/user-attachments/assets/4b774dec-2d71-4943-9e2d-9ef7ff82444d)| ![图片](https://github.com/user-attachments/assets/2a5954ff-eda2-4c8c-9117-02923bf68c97)|
 
 ## 🛠️ 技术栈
 
@@ -44,7 +44,6 @@ Travelex 是一款基于 .NET MAUI Blazor Hybrid 构建的现代化、跨平台�
 *   **UI**: Razor Components, [Tailwind CSS](https://tailwindcss.com/), [Syncfusion Blazor](https://www.syncfusion.com/blazor-components)
 *   **AI 服务**: 阿里云通义千问 (DashScope)
 *   **数据库**: SQLite (本地存储)
-*   **架构**: MVVM (Model-View-ViewModel) 模式
 
 ## 🚀 快速开始
 
