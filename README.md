@@ -1,6 +1,5 @@
 # Travelex - 您的智能旅行消费管家
 
-[![.NET](https://github.com/actions/workflows/dotnet.yml/badge.svg)](https://github.com/actions/workflows/dotnet.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## 📥 下载
