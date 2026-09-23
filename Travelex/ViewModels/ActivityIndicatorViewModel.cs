@@ -5,6 +5,6 @@ namespace Travelex.ViewModels;
 
 public partial class ActivityIndicatorViewModel : BaseViewModel{
     [ObservableProperty]
-    private bool _isLoading; // 私有字段
+    public partial bool IsLoading { get; set; }
     
 }

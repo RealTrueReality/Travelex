@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Travelex.Models;
 
@@ -9,9 +10,10 @@ public class LoggingModel {
     public string UserName { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "请输入密码")]
-    [MaxLength(20, ErrorMessage = "密码不能超过20个字符")]
+    [MaxLength(128, ErrorMessage = "密码不能超过128个字符")]
     [DataType(DataType.Password)]
     [MinLength(6, ErrorMessage = "密码不能少于6个字符")]
+    [JsonIgnore]
     public string Password { get; set; } = string.Empty;
 
     public string Name { get; set; } = string.Empty;

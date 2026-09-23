@@ -133,17 +133,17 @@
                         </ChartArea>
                         <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.DateTime"
                                            LabelFormat="MMM d"
-                                           EdgeLabelPlacement="EdgeLabelPlacement.Shift"
-                                           MajorGridLines="new ChartAxisMajorGridLines() { Width = 0 }">
+                                           EdgeLabelPlacement="EdgeLabelPlacement.Shift">
+                            <ChartAxisMajorGridLines Width="0" />
                             <ChartAxisLabelStyle Color="@(Theme.IsDarkMode ? "#e2e8f0" : "#4b5563")" />
                         </ChartPrimaryXAxis>
                         <ChartPrimaryYAxis LabelFormat="￥{value}"
                                            Minimum="0"
                                            RangePadding="ChartRangePadding.Auto"
                                            Interval="@GetYAxisInterval()"
-                                           MaximumLabels="6"
-                                           MajorGridLines=@(new ChartAxisMajorGridLines() { Width = 0.5, DashArray = "5,5", Color = Theme.IsDarkMode ? "#4b5563" : "#e2e8f0" })
-                                           MajorTickLines="new ChartAxisMajorTickLines() { Width = 0 }">
+                                           MaximumLabels="6">
+                            <ChartAxisMajorGridLines Width="0.5" DashArray="5,5" Color="@(Theme.IsDarkMode ? "#4b5563" : "#e2e8f0")" />
+                            <ChartAxisMajorTickLines Width="0" />
                             <ChartAxisLabelStyle Color="@(Theme.IsDarkMode ? "#e2e8f0" : "#4b5563")" />
                         </ChartPrimaryYAxis>
                         <ChartSeriesCollection>

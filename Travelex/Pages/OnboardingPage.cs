@@ -9,11 +9,11 @@ namespace Travelex.Pages;
 
 public class OnboardingPage : ContentPage
 {
-    private CarouselView OnboardingCarousel;
-    private IndicatorView IndicatorView;
-    private Button NextButton;
+    private CarouselView OnboardingCarousel = null!;
+    private IndicatorView IndicatorView = null!;
+    private Button NextButton = null!;
     
-    private ObservableCollection<OnboardingModel> _onboardingItems;
+    private ObservableCollection<OnboardingModel> _onboardingItems = [];
     private readonly AppShell _shell;
     
     public ObservableCollection<OnboardingModel> OnboardingItems
@@ -32,7 +32,7 @@ public class OnboardingPage : ContentPage
         NavigationPage.SetHasNavigationBar(this, false);
         Shell.SetNavBarIsVisible(this, false);
         
-        bool isDarkMode = Application.Current.RequestedTheme == AppTheme.Dark;
+        bool isDarkMode = Application.Current?.RequestedTheme == AppTheme.Dark;
         
         BackgroundColor = isDarkMode ? Colors.Black : Colors.White;
         
@@ -144,7 +144,7 @@ public class OnboardingPage : ContentPage
         };
     }
 
-    private void OnNextClicked(object sender, EventArgs e)
+    private void OnNextClicked(object? sender, EventArgs e)
     {
         if (OnboardingCarousel.Position < OnboardingItems.Count - 1)
         {
@@ -154,7 +154,9 @@ public class OnboardingPage : ContentPage
         {
             Preferences.Default.Set("FirstLaunch", false);
             
-            Application.Current.MainPage = _shell;
+            if (Window is not null) {
+                Window.Page = _shell;
+            }
         }
     }
     

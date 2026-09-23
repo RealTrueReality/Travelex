@@ -13,7 +13,7 @@ public class SignUpModel {
     public string UserName { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "请输入密码")]
-    [MaxLength(30, ErrorMessage = "密码不能超过30个字符")]
+    [MaxLength(128, ErrorMessage = "密码不能超过128个字符")]
     [MinLength(6, ErrorMessage = "密码不能少于6个字符")]
     [DataType(DataType.Password)]
     public string Password { get; set; } = string.Empty;

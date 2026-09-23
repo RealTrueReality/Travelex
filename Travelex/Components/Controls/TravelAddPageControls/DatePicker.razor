@@ -46,8 +46,9 @@
     private async Task OnDateChanged(ChangeEventArgs e)
     {
         DateTime? newValue = null;
-        if (!string.IsNullOrEmpty((string)e.Value) && 
-            DateTime.TryParse((string)e.Value, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime date))
+        var input = Convert.ToString(e.Value, CultureInfo.InvariantCulture);
+        if (!string.IsNullOrEmpty(input) &&
+            DateTime.TryParse(input, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime date))
         {
             newValue = date;
         }

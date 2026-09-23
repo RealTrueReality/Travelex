@@ -14,16 +14,16 @@
       - name: Install dotnet sdk
         script: |
           chmod +x dotnet-install.sh
-          ./dotnet-install.sh --install-dir $DOTNET_PATH --channel 8.0
+          ./dotnet-install.sh --install-dir $DOTNET_PATH --channel 10.0
 
       - name: Install MAUI and iOS workloads
         script: |
           $DOTNET_BIN nuget locals all --clear 
-          $DOTNET_BIN workload install ios maui --source https://aka.ms/dotnet8/nuget/index.json --source https://api.nuget.org/v3/index.json      
+          $DOTNET_BIN workload install ios maui --source https://aka.ms/dotnet10/nuget/index.json --source https://api.nuget.org/v3/index.json
 
       - name: Set Info.plist values
         script: |
-          PLIST=$CM_BUILD_DIR/src/WeatherTwentyOne/Platforms/iOS/Info.plist
+          PLIST=$CM_BUILD_DIR/Travelex/Platforms/iOS/Info.plist
           PLIST_BUDDY=/usr/libexec/PlistBuddy
           $PLIST_BUDDY -c "Add :ITSAppUsesNonExemptEncryption bool false" $PLIST
 
@@ -35,7 +35,7 @@
           find . -name "package.json" -exec rm -rf {} +
           find . -name "package-lock.json" -exec rm -rf {} +
 
-          $DOTNET_BIN publish -f net8.0-ios \
+          $DOTNET_BIN publish -f net10.0-ios \
             -c Release \
             -p:BuildIpa=True \
             -p:ApplicationDisplayVersion="1.0.0" \
@@ -47,11 +47,11 @@
 
       - name: Build macOS (Mac Catalyst) app
         script: |
-          $DOTNET_BIN workload install maccatalyst --source https://aka.ms/dotnet8/nuget/index.json --source https://api.nuget.org/v3/index.json
+          $DOTNET_BIN workload install maccatalyst --source https://aka.ms/dotnet10/nuget/index.json --source https://api.nuget.org/v3/index.json
                   
           find . -name "package.json" -exec rm -rf {} +
           find . -name "package-lock.json" -exec rm -rf {} +
-          $DOTNET_BIN publish -f net8.0-maccatalyst \
+          $DOTNET_BIN publish -f net10.0-maccatalyst \
             -c Release \
             -p:ApplicationDisplayVersion="1.0.0" \
             -p:ApplicationVersion=1 \

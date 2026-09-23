@@ -3,18 +3,20 @@ using System.Text.Json;
 
 namespace Travelex.Services;
 
-public class DashScopeService {
-    private const string AppId = "73c75256f5fe48a599ecefa884770b6b";
-    private const string ApiKey = "sk-636215b534d94ec7bf5a13dc0c28875c";
-    private const string BaseUrl = "https://dashscope.aliyuncs.com/api/v1/apps";
+public sealed class DashScopeService : IDisposable {
+    private const string DefaultBaseUrl = "https://dashscope.aliyuncs.com/api/v1/apps";
 
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _jsonOptions;
+    private readonly string _appId;
+    private readonly string _apiKey;
+    private readonly string _baseUrl;
 
     public DashScopeService() {
         _httpClient = new HttpClient();
-        _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {ApiKey}");
-        _httpClient.DefaultRequestHeaders.Add("X-DashScope-SSE", "enable");
+        _appId = Environment.GetEnvironmentVariable("TRAVELEX_DASHSCOPE_APP_ID") ?? string.Empty;
+        _apiKey = Environment.GetEnvironmentVariable("TRAVELEX_DASHSCOPE_API_KEY") ?? string.Empty;
+        _baseUrl = (Environment.GetEnvironmentVariable("TRAVELEX_DASHSCOPE_BASE_URL") ?? DefaultBaseUrl).TrimEnd('/');
 
         _jsonOptions = new JsonSerializerOptions {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -22,9 +24,15 @@ public class DashScopeService {
         };
     }
 
+    public bool IsConfigured => !string.IsNullOrWhiteSpace(_appId) && !string.IsNullOrWhiteSpace(_apiKey);
+
     public async Task<string> AnalyzeTravelExpensesAsync(object travelData) {
+        if (!IsConfigured) {
+            return "AI 服务尚未配置。请设置 TRAVELEX_DASHSCOPE_APP_ID 和 TRAVELEX_DASHSCOPE_API_KEY。";
+        }
+
         try {
-            var url = $"{BaseUrl}/{AppId}/completion";
+            var url = $"{_baseUrl}/{Uri.EscapeDataString(_appId)}/completion";
             var jsonData = JsonSerializer.Serialize(travelData, _jsonOptions);
 
             var requestBody = new {
@@ -82,8 +90,8 @@ public class DashScopeService {
             };
 
             var jsonContent = JsonSerializer.Serialize(requestBody, _jsonOptions);
-            var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync(url, content);
+            using var request = CreateRequest(url, jsonContent);
+            using var response = await _httpClient.SendAsync(request);
 
             if (!response.IsSuccessStatusCode) {
                 var errorContent = await response.Content.ReadAsStringAsync();
@@ -115,7 +123,12 @@ public class DashScopeService {
 
     public async IAsyncEnumerable<string> AnalyzeTravelExpensesStreamAsync(object travelData,
         [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default) {
-        var url = $"{BaseUrl}/{AppId}/completion";
+        if (!IsConfigured) {
+            yield return "AI 服务尚未配置。请设置 TRAVELEX_DASHSCOPE_APP_ID 和 TRAVELEX_DASHSCOPE_API_KEY。";
+            yield break;
+        }
+
+        var url = $"{_baseUrl}/{Uri.EscapeDataString(_appId)}/completion";
         var jsonData = JsonSerializer.Serialize(travelData, _jsonOptions);
 
         var requestBody = new {
@@ -172,10 +185,10 @@ public class DashScopeService {
         };
 
         var jsonContent = JsonSerializer.Serialize(requestBody, _jsonOptions);
-        var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        using var response = await _httpClient.PostAsync(url, content, cts.Token);
+        using var request = CreateRequest(url, jsonContent);
+        using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cts.Token);
 
         if (!response.IsSuccessStatusCode) {
             var errorContent = await response.Content.ReadAsStringAsync(cts.Token);
@@ -186,10 +199,11 @@ public class DashScopeService {
         using var stream = await response.Content.ReadAsStreamAsync(cts.Token);
         using var reader = new StreamReader(stream);
 
-        while (!reader.EndOfStream) {
+        while (true) {
             cts.Token.ThrowIfCancellationRequested();
 
-            var line = await reader.ReadLineAsync();
+            var line = await reader.ReadLineAsync(cts.Token);
+            if (line is null) break;
             if (string.IsNullOrEmpty(line)) continue;
 
             if (line.StartsWith("data:")) {
@@ -201,26 +215,37 @@ public class DashScopeService {
             }
         }
     }
+
+    private HttpRequestMessage CreateRequest(string url, string jsonContent) {
+        var request = new HttpRequestMessage(HttpMethod.Post, url) {
+            Content = new StringContent(jsonContent, Encoding.UTF8, "application/json")
+        };
+        request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _apiKey);
+        request.Headers.Add("X-DashScope-SSE", "enable");
+        return request;
+    }
+
+    public void Dispose() => _httpClient.Dispose();
 }
 
 public class DashScopeResponse {
-    public DashScopeOutput Output { get; set; }
-    public DashScopeUsage Usage { get; set; }
-    public string RequestId { get; set; }
+    public DashScopeOutput? Output { get; set; }
+    public DashScopeUsage? Usage { get; set; }
+    public string RequestId { get; set; } = string.Empty;
 }
 
 public class DashScopeOutput {
-    public string Text { get; set; }
-    public string FinishReason { get; set; }
-    public string SessionId { get; set; }
+    public string Text { get; set; } = string.Empty;
+    public string FinishReason { get; set; } = string.Empty;
+    public string SessionId { get; set; } = string.Empty;
 }
 
 public class DashScopeUsage {
-    public DashScopeModel[] Models { get; set; }
+    public DashScopeModel[] Models { get; set; } = [];
 }
 
 public class DashScopeModel {
-    public string ModelId { get; set; }
+    public string ModelId { get; set; } = string.Empty;
     public int InputTokens { get; set; }
     public int OutputTokens { get; set; }
 }

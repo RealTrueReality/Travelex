@@ -13,6 +13,8 @@ namespace Travelex;
 
 public static class MauiProgram {
     public static MauiApp CreateMauiApp() {
+        SQLitePCL.Batteries_V2.Init();
+
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
@@ -40,7 +42,6 @@ public static class MauiProgram {
         builder.Services.AddScoped<ExpenseService>();
         builder.Services.AddScoped<DashScopeService>();
         builder.Services.AddScoped<ThemeService>();
-        builder.Services.AddTransient<ActivityIndicatorViewModel>();
         
         // 注册应用程序核心服务
         builder.Services.AddTransient<AppShell>();
@@ -49,8 +50,12 @@ public static class MauiProgram {
         
         // 注册 Blazor MAUI 互操作服务
         builder.Services.AddSingleton<ActivityIndicatorViewModel>();
-        builder.Services.AddSingleton<BlazorMauiInterop>();   
-        Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NMaF5cXmBCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWH1fc3RVRWFZVUJ0VkE=");
+        builder.Services.AddSingleton<BlazorMauiInterop>();
+
+        var syncfusionLicenseKey = Environment.GetEnvironmentVariable("TRAVELEX_SYNCFUSION_LICENSE_KEY");
+        if (!string.IsNullOrWhiteSpace(syncfusionLicenseKey)) {
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(syncfusionLicenseKey);
+        }
 
         // 注册位置服务
         builder.Services.AddScoped<ILocationService, LocationService>();

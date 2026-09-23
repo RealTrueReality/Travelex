@@ -44,14 +44,14 @@
         <DatePicker Label="开始日期"
                     Min="@DateTime.MinValue"
                     @bind-Value="Travel.StartDate"
-                    Error="@(context.GetValidationMessages(() => Travel.StartDate).FirstOrDefault())"
+                    Error="@(context.GetValidationMessages(() => Travel.StartDate).FirstOrDefault() ?? string.Empty)"
                     OnChange="OnStartDateChanged"
         />
 
         <DatePicker Label="结束日期"
                     Min="@Travel.StartDate"
                     @bind-Value="Travel.EndDate"
-                    Error="@(context.GetValidationMessages(() => Travel.EndDate).FirstOrDefault())"
+                    Error="@(context.GetValidationMessages(() => Travel.EndDate).FirstOrDefault() ?? string.Empty)"
                     OnChange="OnEndDateChanged"
         />
     </div>
@@ -156,7 +156,7 @@
     private bool ShowMap;
     private double Latitude;
     private double Longitude;
-    private string CustomCategory;
+    private string CustomCategory = string.Empty;
 
     protected override async Task OnInitializedAsync() {
         await base.OnInitializedAsync();

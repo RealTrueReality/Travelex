@@ -5,3 +5,10 @@ riderModule.iml
 /_ReSharper.Caches/
 node_modules/
 /Travelex/publish
+.idea/
+*.keystore
+*.jks
+*.pfx
+*.cer
+identifier.sqlite
+Travelex/wwwroot/js/runtime-config.local.js

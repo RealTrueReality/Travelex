@@ -13,11 +13,6 @@ window.initAMap = async (helper) => {
         // 加载高德地图脚本
         await loadAMapScript();
 
-        // 设置安全密钥
-        window._AMapSecurityConfig = {
-            securityJsCode: '91413e848de640e2734f9b42857bb255',
-        };
-
         // 如果已经存在地图实例，先销毁
         if (map) {
             map.destroy();
@@ -440,13 +435,19 @@ function loadAMapScript() {
             return;
         }
 
+        const config = window.travelexConfig?.amap;
+        if (!config?.key || !config?.securityJsCode) {
+            reject(new Error('高德地图尚未配置，请创建 js/runtime-config.local.js'));
+            return;
+        }
+
         // 设置安全密钥配置
         window._AMapSecurityConfig = {
-            securityJsCode: '91413e848de640e2734f9b42857bb255',
+            securityJsCode: config.securityJsCode,
         };
 
         const script = document.createElement('script');
-        script.src = 'https://webapi.amap.com/maps?v=2.0&key=0ea3d0f98d99e3fb713de48fdd9a6046&plugin=AMap.Geocoder,AMap.AutoComplete,AMap.Geolocation';
+        script.src = `https://webapi.amap.com/maps?v=2.0&key=${encodeURIComponent(config.key)}&plugin=AMap.Geocoder,AMap.AutoComplete,AMap.Geolocation`;
         script.async = true;
         script.onload = () => resolve();
         script.onerror = () => reject();

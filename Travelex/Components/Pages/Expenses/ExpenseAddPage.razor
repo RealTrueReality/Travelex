@@ -145,7 +145,7 @@
 
 @code {
     [Parameter] public int TripId { get; set; }
-    private string CustomCategory { get; set; }
+    private string CustomCategory { get; set; } = string.Empty;
 
     private List<ExpenseCategory> _categories = new();
     private Expense _expense = new();

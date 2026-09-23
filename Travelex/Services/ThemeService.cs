@@ -23,7 +23,7 @@ public class ThemeService : INotifyPropertyChanged {
     private ThemePreference _preference = ThemePreference.System;
 
     public event PropertyChangedEventHandler? PropertyChanged;
-    public event Action<bool> ThemeChanged;
+    public event Action<bool>? ThemeChanged;
 
     // 静态实例，用于从JS回调
     private static ThemeService? _instance;
@@ -126,13 +126,20 @@ public class ThemeService : INotifyPropertyChanged {
     private void UpdateNativeUIColor(bool isDarkMode) {
         // 确保在主线程上运行UI操作
         MainThread.BeginInvokeOnMainThread(() => {
+            var rootPage = Application.Current?.Windows.FirstOrDefault()?.Page;
+            if (rootPage is null) return;
+
             var statusBarColor = isDarkMode ? Colors.Black : Colors.White;
-            Application.Current.MainPage.BackgroundColor = statusBarColor;
+            rootPage.BackgroundColor = statusBarColor;
 #pragma warning disable CA1416
-            Application.Current.MainPage.Behaviors.Add(new StatusBarBehavior() {
-                StatusBarColor = statusBarColor,
-                StatusBarStyle = isDarkMode ? StatusBarStyle.LightContent : StatusBarStyle.DarkContent
-            });
+            var statusBarBehavior = rootPage.Behaviors.OfType<StatusBarBehavior>().FirstOrDefault();
+            if (statusBarBehavior is null) {
+                statusBarBehavior = new StatusBarBehavior();
+                rootPage.Behaviors.Add(statusBarBehavior);
+            }
+
+            statusBarBehavior.StatusBarColor = statusBarColor;
+            statusBarBehavior.StatusBarStyle = isDarkMode ? StatusBarStyle.LightContent : StatusBarStyle.DarkContent;
 #pragma warning restore CA1416
 
 #if ANDROID

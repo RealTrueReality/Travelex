@@ -18,10 +18,14 @@ public class AuthService {
     
 
     public async Task<ResultModel> LogInAsync(LoggingModel loggingModel) {
-        var usersFiltered = await _db.GetFileteredAsync<User>(u =>
-            u.UserName == loggingModel.UserName && u.Password == loggingModel.Password);
+        var usersFiltered = await _db.GetFileteredAsync<User>(u => u.UserName == loggingModel.UserName);
         var user = usersFiltered.FirstOrDefault();
-        if (user is not null) {
+        if (user is not null && PasswordHasher.Verify(loggingModel.Password, user.Password, out var needsUpgrade)) {
+            if (needsUpgrade) {
+                user.Password = PasswordHasher.Hash(loggingModel.Password);
+                await _db.UpdateItemAsync(user);
+            }
+
             SetUserAsLoggedIn(user);
             return ResultModel.Success();
         }
@@ -32,7 +36,6 @@ public class AuthService {
     private void SetUserAsLoggedIn(User user) {
         var loggingModel = new LoggingModel() {
             UserName = user.UserName,
-            Password = user.Password,
             Name = user.Name
         };
         Preferences.Set(LoggedInKey, loggingModel.ToJson());
@@ -42,11 +45,15 @@ public class AuthService {
     public void LogdOut() => Preferences.Remove(LoggedInKey);
 
     public async Task<ResultModel> SignUpAsync(SignUpModel signUpModel) {
-        
+        var existingUsers = await _db.GetFileteredAsync<User>(u => u.UserName == signUpModel.UserName);
+        if (existingUsers.Any()) {
+            return ResultModel.Failure("用户名已存在");
+        }
+
         var user = new User() {
             Name = signUpModel.Name,
             UserName = signUpModel.UserName,
-            Password = signUpModel.Password
+            Password = PasswordHasher.Hash(signUpModel.Password)
         };
 
         var result = await _db.AddItemAsync(user);
@@ -80,13 +87,13 @@ public class AuthService {
             }
 
             // 验证当前密码
-            if (user.Password != currentPassword)
+            if (!PasswordHasher.Verify(currentPassword, user.Password, out _))
             {
                 return ResultModel.Failure("当前密码错误");
             }
 
             // 更新密码
-            user.Password = newPassword;
+            user.Password = PasswordHasher.Hash(newPassword);
             var success = await _db.UpdateItemAsync(user);
             if (success)
             {

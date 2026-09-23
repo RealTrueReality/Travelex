@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
-        <TargetFrameworks>net8.0-android;net8.0-ios;net8.0-maccatalyst</TargetFrameworks>
-        <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.19041.0</TargetFrameworks>
+        <TargetFrameworks>net10.0-android;net10.0-ios;net10.0-maccatalyst</TargetFrameworks>
+        <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net10.0-windows10.0.19041.0</TargetFrameworks>
         <!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
-        <!-- <TargetFrameworks>$(TargetFrameworks);net8.0-tizen</TargetFrameworks> -->
+        <!-- <TargetFrameworks>$(TargetFrameworks);net10.0-tizen</TargetFrameworks> -->
 
         <!-- Note for MacCatalyst:
             The default runtime is maccatalyst-x64, except in Release config, in which case the default is maccatalyst-x64;maccatalyst-arm64.
@@ -31,8 +31,8 @@
         <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
         <ApplicationVersion>1</ApplicationVersion>
 
-        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">14.2</SupportedOSPlatformVersion>
-        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">14.0</SupportedOSPlatformVersion>
+        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
+        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">15.0</SupportedOSPlatformVersion>
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">24.0</SupportedOSPlatformVersion>
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
         <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
@@ -43,10 +43,6 @@
         <UseInterpreter>true</UseInterpreter>
         <MtouchExtraArgs>--linkskip=Syncfusion.Blazor.Themes --linkskip=Syncfusion.Blazor.Inputs</MtouchExtraArgs>
     </PropertyGroup>
-    <PropertyGroup>
-        <AndroidSdkDirectory>C:\Users\d\AppData\Local\Android\Sdk</AndroidSdkDirectory>
-    </PropertyGroup>
-
     <ItemGroup>
         <!-- App Icon -->
         <MauiFont Include="wwwroot\fonts\HarmonyOS_Sans_Bold.ttf" />
@@ -75,23 +71,23 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="CommunityToolkit.Maui" Version="9.0.2" />
-        <PackageReference Include="CommunityToolkit.Maui.Markup" Version="4.2.0" />
-        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0-preview3" />
-        <PackageReference Include="Markdig" Version="0.39.1" />
-        <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.100" />
+        <PackageReference Include="CommunityToolkit.Maui" Version="13.0.0" />
+        <PackageReference Include="CommunityToolkit.Maui.Markup" Version="7.0.0" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+        <PackageReference Include="Markdig" Version="1.4.0" />
+        <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="$(MauiVersion)" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.1" />
-        <PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
-        <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.10" />
-        <PackageReference Include="Syncfusion.Blazor.Calendars" Version="28.1.38" />
-        <PackageReference Include="Syncfusion.Blazor.Charts" Version="28.1.38" />
-        <PackageReference Include="Syncfusion.Blazor.DropDowns" Version="28.1.38" />
-        <PackageReference Include="Syncfusion.Blazor.InteractiveChat" Version="28.1.38" />
-        <PackageReference Include="Syncfusion.Blazor.Notifications" Version="28.1.38" />
-        <PackageReference Include="Syncfusion.Blazor.Popups" Version="28.1.38" />
-        <PackageReference Include="Syncfusion.Blazor.Themes" Version="28.1.38" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.12" />
+        <PackageReference Include="sqlite-net-base" Version="1.9.172" />
+        <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.13" />
+        <PackageReference Include="Syncfusion.Blazor.Calendars" Version="34.2.8" />
+        <PackageReference Include="Syncfusion.Blazor.Charts" Version="34.2.8" />
+        <PackageReference Include="Syncfusion.Blazor.DropDowns" Version="34.2.8" />
+        <PackageReference Include="Syncfusion.Blazor.InteractiveChat" Version="34.2.8" />
+        <PackageReference Include="Syncfusion.Blazor.Notifications" Version="34.2.8" />
+        <PackageReference Include="Syncfusion.Blazor.Popups" Version="34.2.8" />
+        <PackageReference Include="Syncfusion.Blazor.Themes" Version="34.2.8" />
     </ItemGroup>
 
     <ItemGroup>
@@ -113,6 +109,4 @@
       <AndroidAsset Include="wwwroot\images\tripCategory\roadtrip.png" />
       <AndroidAsset Include="wwwroot\images\tripCategory\travels.png" />
     </ItemGroup>
-    
-    
 </Project>

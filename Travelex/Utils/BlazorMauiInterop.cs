@@ -24,7 +24,7 @@ public class BlazorMauiInterop {
 
     //show alert async
     public async Task ShowAlertAsync(string? message, string title = "警告") =>
-        await Shell.Current.DisplayAlert(title, message, "关闭");
+        await Shell.Current.DisplayAlertAsync(title, message, "关闭");
 
     //show toast async communityTool
     public async Task ShowToastAsync(string message) => await Toast.Make(message).Show();

@@ -5,28 +5,31 @@ namespace Travelex;
 
 public class App : Application {
     private readonly SeedDataService _seedDataService;
-    private readonly AppShell _shell;
+    private readonly Page _initialPage;
 
     public App(SeedDataService seedDataService, AppShell shell) {
         _seedDataService = seedDataService;
-        _shell = shell;
-
 
         // 检查是否是首次启动
         if (Preferences.Default.Get("FirstLaunch", true))
         {
-            MainPage = new NavigationPage(new OnboardingPage(_shell));
-            Preferences.Default.Set("FirstLaunch", false);
+            _initialPage = new NavigationPage(new OnboardingPage(shell));
         }
         else
         {
-            MainPage = _shell;
+            _initialPage = shell;
         }
     }
 
+    protected override Window CreateWindow(IActivationState? activationState) => new(_initialPage);
+
     protected override async void OnStart() {
-        
         base.OnStart();
-        await _seedDataService.SeedDataAsync();
+        try {
+            await _seedDataService.SeedDataAsync();
+        }
+        catch (Exception ex) {
+            System.Diagnostics.Debug.WriteLine($"Database initialization failed: {ex}");
+        }
     }
 }
