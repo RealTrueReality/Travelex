@@ -26,6 +26,12 @@
           npm ci
           npm run css:build
 
+      - name: Prepare Syncfusion license
+        script: |
+          if [ -n "${TRAVELEX_SYNCFUSION_LICENSE_KEY:-}" ]; then
+            printf '%s' "$TRAVELEX_SYNCFUSION_LICENSE_KEY" > "$CM_BUILD_DIR/Travelex/syncfusion-license.local.txt"
+          fi
+
       - name: Set Info.plist values
         script: |
           PLIST=$CM_BUILD_DIR/Travelex/Platforms/iOS/Info.plist

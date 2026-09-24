@@ -9,7 +9,7 @@
 @* @using Travelex.Models *@
 @* @using Markdig *@
 @* @inject NavigationManager NavigationManager *@
-@* @inject DashScopeService DashScopeService *@
+@* @inject QwenService QwenService *@
 @* @inject TravelService TravelService *@
 @* @inject ExpenseService ExpenseService *@
 @* @inject AuthService AuthService *@
@@ -176,7 +176,7 @@
 @*             }; *@
 @* *@
 @*             // 调用AI分析 *@
-@*             var analysis = await DashScopeService.AnalyzeTravelExpensesAsync(analysisData); *@
+@*             var analysis = await QwenService.AnalyzeTravelExpensesAsync(analysisData); *@
 @*             args.Response = analysis; *@
 @*         } *@
 @*         catch (Exception ex) *@

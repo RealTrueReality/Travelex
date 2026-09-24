@@ -64,6 +64,9 @@
 
         <!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
         <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+        <EmbeddedResource Include="syncfusion-license.local.txt"
+                          LogicalName="Travelex.SyncfusionLicense"
+                          Condition="Exists('syncfusion-license.local.txt')" />
     </ItemGroup>
     <ItemGroup>
         <None Remove="package.json" />

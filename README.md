@@ -8,7 +8,7 @@ Travelex 是一款基于 .NET MAUI Blazor Hybrid 的本地优先旅行消费管�
 - 行程封面、日期、目的地和高德地图选点
 - 消费记录、自定义消费类别与分类查看
 - 全局及单次行程的消费构成、趋势和统计图表
-- 基于阿里云 DashScope 应用的流式 AI 消费分析
+- 基于千问 AI 模型的流式旅行消费分析
 - 本地注册、登录、头像及个人资料管理
 - 明暗主题、系统主题跟随和首次启动引导
 
@@ -19,7 +19,7 @@ Travelex 是一款基于 .NET MAUI Blazor Hybrid 的本地优先旅行消费管�
 - Syncfusion Blazor Charts / Calendars / Popups
 - sqlite-net-base、SQLitePCLRaw
 - CommunityToolkit.Maui、CommunityToolkit.Mvvm
-- 阿里云 DashScope、高德地图 JavaScript API
+- 千问 AI 平台、高德地图 JavaScript API
 
 ## 架构
 
@@ -59,25 +59,11 @@ dotnet workload install maui
 
 仓库不会保存 API Key、许可证或签名密码。历史版本曾包含开发凭据；从旧版本迁移时，请先在对应平台轮换这些凭据。
 
-### DashScope
+### 千问 AI
 
-开发环境通过环境变量配置：
+AI 助手使用千问 AI 平台的 OpenAI 兼容 `chat/completions` 接口（默认模型 `qwen3.7-plus`），不再需要旧版 DashScope 应用的 APP ID。个人在手机上使用时，打开「AI助手」或单次旅行 AI 分析页，展开「千问 API Key」，输入自己的 `sk-ws-` Key。Key 仅保存在该设备的系统安全存储中，不写入源码、安装包或 Windows 用户环境变量；旅行分析数据会发送至千问 AI 平台。可在同一处移除或更换 Key。
 
-```powershell
-$env:TRAVELEX_DASHSCOPE_APP_ID = "your-app-id"
-$env:TRAVELEX_DASHSCOPE_API_KEY = "your-api-key"
-```
-
-macOS / Linux：
-
-```bash
-export TRAVELEX_DASHSCOPE_APP_ID="your-app-id"
-export TRAVELEX_DASHSCOPE_API_KEY="your-api-key"
-```
-
-也可通过 `TRAVELEX_DASHSCOPE_BASE_URL` 覆盖默认 API 地址。未配置时，应用其他功能仍可使用，AI 页面会显示配置提示。
-
-移动端正式发布时，不应把 DashScope Key 编译进客户端；建议由受控后端代理 AI 请求并在服务端保存凭据。
+此方式仅适合个人自用。移动客户端仍可能被设备持有者分析，**公开分发或多人使用时不要在客户端保存长期 API Key**，应改由受控后端代理请求、保护凭据并限制用量。[接口接入文档](https://platform.qianwenai.com/docs/developer-guides/getting-started/first-api-call) · [密钥安全建议](https://platform.qianwenai.com/docs/developer-guides/administration/api-keys)
 
 ### 高德地图
 
@@ -91,7 +77,9 @@ Copy-Item Travelex/wwwroot/js/runtime-config.example.js Travelex/wwwroot/js/runt
 
 ### Syncfusion
 
-如需注册 Syncfusion License，请设置：
+在本机创建 `Travelex/syncfusion-license.local.txt`，内容为一整行 Syncfusion License Key。该文件已被 Git 忽略，构建时会嵌入应用，并在 Syncfusion 控件初始化前注册。重新构建、安装应用后生效。
+
+Codemagic 发布构建请配置加密环境变量 `TRAVELEX_SYNCFUSION_LICENSE_KEY`；构建脚本会把它写入同名的本地文件。直接从终端运行项目时也可以设置该环境变量作为备用方式：
 
 ```powershell
 $env:TRAVELEX_SYNCFUSION_LICENSE_KEY = "your-license-key"

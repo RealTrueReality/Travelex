@@ -8,7 +8,7 @@
 @using Travelex.Utils
 @using Markdig
 @inject NavigationManager NavigationManager
-@inject DashScopeService DashScopeService
+@inject QwenService QwenService
 @inject TravelService TravelService
 @inject ExpenseService ExpenseService
 @inject AuthService AuthService
@@ -28,6 +28,7 @@
         </button>
     </TopBarRight>
     <PageBody>
+        <AiKeySettings />
         <div class="flex-1 overflow-auto px-4 py-2" id="chatContainer">
             @if (_messages.Count == 0) {
                 <div class="flex flex-col items-center justify-center h-full">
@@ -292,7 +293,7 @@
             };
 
             // 调用AI分析并处理流式响应
-            await foreach (var chunk in DashScopeService.AnalyzeTravelExpensesStreamAsync(analysisData)
+            await foreach (var chunk in QwenService.AnalyzeTravelExpensesStreamAsync(analysisData)
                                .WithCancellation(_streamingCts.Token)) {
                 _streamingContent += chunk;
                 StateHasChanged();
@@ -477,7 +478,7 @@
             StateHasChanged();
 
             // 调用AI分析并处理流式响应
-            await foreach (var chunk in DashScopeService.AnalyzeTravelExpensesStreamAsync(analysisData)
+            await foreach (var chunk in QwenService.AnalyzeTravelExpensesStreamAsync(analysisData)
                                .WithCancellation(_streamingCts.Token)) {
                 _streamingContent += chunk;
                 StateHasChanged();

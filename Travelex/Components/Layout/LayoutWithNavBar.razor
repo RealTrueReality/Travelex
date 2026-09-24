@@ -40,7 +40,7 @@
         flex: 1;
         min-height: 0;
         overflow-y: auto;
-        padding-bottom: calc(72px + env(safe-area-inset-bottom));
+        padding-bottom: 72px;
         -webkit-overflow-scrolling: touch;
         overscroll-behavior-y: contain;
     }
@@ -53,9 +53,7 @@
         display: flex;
         justify-content: space-around;
         align-items: center;
-        box-sizing: content-box;
         height: 72px;
-        padding-bottom: env(safe-area-inset-bottom);
         background-color: rgb(var(--color-surface) / 0.96);
         backdrop-filter: blur(18px);
         border-top: 1px solid rgb(var(--color-outline));

@@ -15,6 +15,11 @@ public static class MauiProgram {
     public static MauiApp CreateMauiApp() {
         SQLitePCL.Batteries_V2.Init();
 
+        var syncfusionLicenseKey = GetSyncfusionLicenseKey();
+        if (!string.IsNullOrWhiteSpace(syncfusionLicenseKey)) {
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(syncfusionLicenseKey);
+        }
+
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
@@ -40,7 +45,7 @@ public static class MauiProgram {
         builder.Services.AddScoped<AuthService>();
         builder.Services.AddScoped<TravelService>();
         builder.Services.AddScoped<ExpenseService>();
-        builder.Services.AddScoped<DashScopeService>();
+        builder.Services.AddScoped<QwenService>();
         builder.Services.AddScoped<ThemeService>();
         
         // 注册应用程序核心服务
@@ -52,11 +57,6 @@ public static class MauiProgram {
         builder.Services.AddSingleton<ActivityIndicatorViewModel>();
         builder.Services.AddSingleton<BlazorMauiInterop>();
 
-        var syncfusionLicenseKey = Environment.GetEnvironmentVariable("TRAVELEX_SYNCFUSION_LICENSE_KEY");
-        if (!string.IsNullOrWhiteSpace(syncfusionLicenseKey)) {
-            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(syncfusionLicenseKey);
-        }
-
         // 注册位置服务
         builder.Services.AddScoped<ILocationService, LocationService>();
 
@@ -66,5 +66,16 @@ public static class MauiProgram {
 #endif
 
         return builder.Build();
+    }
+
+    private static string? GetSyncfusionLicenseKey() {
+        using var stream = typeof(MauiProgram).Assembly.GetManifestResourceStream("Travelex.SyncfusionLicense");
+        if (stream is not null) {
+            using var reader = new StreamReader(stream);
+            var embeddedKey = reader.ReadToEnd().Trim();
+            if (!string.IsNullOrWhiteSpace(embeddedKey)) return embeddedKey;
+        }
+
+        return Environment.GetEnvironmentVariable("TRAVELEX_SYNCFUSION_LICENSE_KEY")?.Trim();
     }
 }

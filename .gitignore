@@ -12,3 +12,4 @@ node_modules/
 *.cer
 identifier.sqlite
 Travelex/wwwroot/js/runtime-config.local.js
+Travelex/syncfusion-license.local.txt
