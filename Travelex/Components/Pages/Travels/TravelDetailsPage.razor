@@ -12,7 +12,7 @@
 
 <FlexedPageComponent>
     <TopBarLeft>
-        <button @onclick="NavigateBack" class="p-2 text-text-light dark:text-text-dark">
+        <button type="button" aria-label="返回" @onclick="NavigateBack" class="icon-button">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24"
                  stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -21,7 +21,7 @@
     </TopBarLeft>
     <TopBarTitle>旅行详情</TopBarTitle>
     <TopBarRight>
-        <button @onclick="NavigateToChart" class="p-2 text-text-light dark:text-text-dark">
+        <button @onclick="NavigateToChart" class="icon-button">
             <i class="fas fa-bar-chart text-xl"></i>
         </button>
     </TopBarRight>
@@ -162,11 +162,10 @@
                 await BlazorMauiInterop.ShowAlertAsync("服务器错误");
             }
         }
-        catch (Exception e) {
+        catch (Exception) {
             await BlazorMauiInterop.ShowAlertAsync("服务器错误");
         }
         finally {
-            await Task.Delay(1280);
             IsLoading = false;
         }
     }

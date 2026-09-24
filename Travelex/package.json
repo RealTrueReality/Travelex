@@ -1,10 +1,9 @@
 {
   "name": "travelex",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Tailwind CSS build tooling for the Travelex MAUI Blazor app",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "css:build": "tailwindcss -i ./wwwroot/css/app.css -o ./wwwroot/css/app.min.css --minify",
     "css:watch": "tailwindcss -i ./wwwroot/css/app.css -o ./wwwroot/css/app.min.css --watch"
   },
@@ -12,8 +11,8 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "autoprefixer": "^10.4.16",
-    "postcss": "^8.4.32",
-    "tailwindcss": "^3.3.6"
+    "autoprefixer": "10.6.1",
+    "postcss": "8.5.28",
+    "tailwindcss": "3.4.19"
   }
 }

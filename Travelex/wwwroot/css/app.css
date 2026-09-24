@@ -2,11 +2,115 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body {
-    font-family: 'HarmonyOSSans', 'PlusJakartaSans', Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    height: 100%;
+@layer base {
+    :root {
+        --color-canvas: 247 251 255;
+        --color-surface: 255 255 255;
+        --color-surface-muted: 239 246 252;
+        --color-content: 16 42 67;
+        --color-content-muted: 93 113 135;
+        --color-outline: 214 226 238;
+        --color-brand: 0 133 255;
+        --color-success: 22 163 74;
+        --color-danger: 220 38 38;
+        --color-warning: 217 119 6;
+
+        /* Backwards-compatible variables used by Syncfusion and legacy styles. */
+        --color-primary-light: #0085FF;
+        --color-primary-dark: #35A2FF;
+        --color-background-light: #F7FBFF;
+        --color-background-dark: #07111F;
+        --color-card-light: #FFFFFF;
+        --color-card-dark: #0F1B2D;
+        --color-text-light: #102A43;
+        --color-text-dark: #F8FAFC;
+        --color-subtext-light: #5D7187;
+        --color-subtext-dark: #A8B7CA;
+    }
+
+    :root.dark {
+        --color-canvas: 7 17 31;
+        --color-surface: 15 27 45;
+        --color-surface-muted: 23 39 61;
+        --color-content: 248 250 252;
+        --color-content-muted: 168 183 202;
+        --color-outline: 43 62 86;
+        --color-brand: 53 162 255;
+        --color-success: 74 222 128;
+        --color-danger: 248 113 113;
+        --color-warning: 251 191 36;
+    }
+
+    html,
+    body {
+        @apply h-full bg-canvas font-sans text-content;
+        margin: 0;
+        padding: 0;
+    }
+
+    button,
+    [role="button"] {
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+    }
+
+    input,
+    textarea,
+    [contenteditable="true"],
+    .prose {
+        -webkit-user-select: text;
+        user-select: text;
+    }
+
+    :focus-visible {
+        outline: 2px solid rgb(var(--color-brand));
+        outline-offset: 2px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+            scroll-behavior: auto !important;
+            transition-duration: 0.01ms !important;
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+        }
+    }
+}
+
+@layer components {
+    .app-page {
+        @apply flex h-full flex-col bg-canvas text-content;
+    }
+
+    .app-topbar {
+        @apply relative flex h-[72px] shrink-0 items-center justify-between px-4 py-3;
+    }
+
+    .icon-button {
+        @apply inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl text-content transition-colors active:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-canvas;
+    }
+
+    .btn-primary {
+        @apply inline-flex h-12 w-full items-center justify-center rounded-app bg-brand px-5 text-base font-bold text-white shadow-sm transition disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-canvas;
+    }
+
+    .btn-secondary {
+        @apply inline-flex h-12 w-full items-center justify-center rounded-app bg-surface-muted px-5 text-base font-bold text-content transition disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-canvas;
+    }
+
+    .surface-card {
+        @apply rounded-2xl border border-outline bg-surface shadow-sm;
+    }
+
+    .form-control {
+        @apply w-full rounded-xl border border-outline bg-surface-muted px-4 text-content placeholder:text-content-muted focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20;
+    }
+
+    .empty-state {
+        @apply mx-4 flex flex-col items-center justify-center rounded-2xl border border-dashed border-outline bg-surface px-6 py-10 text-center;
+    }
 }
 
 #app {
@@ -23,9 +127,10 @@ html, body {
         position: sticky;
         top: 0;
         height: env(safe-area-inset-top);
-        background-color: #f7f7f7;
+        flex: 0 0 env(safe-area-inset-top);
+        background-color: rgb(var(--color-canvas));
         width: 100%;
-        z-index: 1;
+        z-index: 1100;
     }
 
     .flex-column, .navbar-brand {
@@ -38,8 +143,8 @@ html, body {
 }
 
 .custom-dialog .e-dlg-closeicon-btn .e-icons {
-    font-size: 1.5rem; /* 调整为合适的大小，例如 1.5rem */
-    color: #000; /* 如果需要更改颜色 */
+    font-size: 1.5rem;
+    color: rgb(var(--color-content));
 }
 
 .animate-fade-in {
@@ -85,8 +190,8 @@ html, body {
 }
 
 .prose code {
-    color: #1a56db;
-    background-color: #e5edff;
+    color: rgb(var(--color-brand));
+    background-color: rgb(var(--color-surface-muted));
     padding: 0.2em 0.4em;
     border-radius: 0.25em;
     font-size: 0.9em;
@@ -108,9 +213,9 @@ html, body {
 }
 
 .prose blockquote {
-    border-left: 4px solid #e5e7eb;
+    border-left: 4px solid rgb(var(--color-outline));
     padding-left: 1em;
-    color: #4b5563;
+    color: rgb(var(--color-content-muted));
     font-style: italic;
     margin: 1em 0;
 }
@@ -122,12 +227,12 @@ html, body {
 }
 
 .prose th, .prose td {
-    border: 1px solid #e5e7eb;
+    border: 1px solid rgb(var(--color-outline));
     padding: 0.5em;
     text-align: left;
 }
 
 .prose th {
-    background-color: #f3f4f6;
+    background-color: rgb(var(--color-surface-muted));
     font-weight: 600;
 }

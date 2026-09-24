@@ -4,6 +4,9 @@ namespace Travelex.Models;
 
 public class OnboardingModel
 {
+    [Required]
+    public required string Eyebrow { get; set; }
+
     [Required(ErrorMessage = "请输入标题")]
     [MaxLength(50, ErrorMessage = "标题不能超过50个字符")]
     public required string Title { get; set; }

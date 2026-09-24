@@ -1,0 +1,16 @@
+<div class="@(FillHeight ? "app-page" : "app-page min-h-full")">
+    <header class="app-topbar">
+        <div class="flex min-w-11 flex-1 justify-start">@TopBarLeft</div>
+        <h1 class="text-center text-lg font-bold text-content">@TopBarTitle</h1>
+        <div class="flex min-w-11 flex-1 justify-end">@TopBarRight</div>
+    </header>
+    @PageBody
+</div>
+
+@code {
+    [Parameter] public bool FillHeight { get; set; }
+    [Parameter] public RenderFragment? TopBarLeft { get; set; }
+    [Parameter] public RenderFragment? TopBarRight { get; set; }
+    [Parameter] public RenderFragment? TopBarTitle { get; set; }
+    [Parameter] public RenderFragment? PageBody { get; set; }
+}

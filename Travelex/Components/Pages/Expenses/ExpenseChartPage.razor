@@ -16,7 +16,7 @@
 
 <FlexedPageComponent>
     <TopBarLeft>
-        <button @onclick="NavigateBack" class="p-2 text-text-light dark:text-text-dark">
+        <button type="button" aria-label="返回" @onclick="NavigateBack" class="icon-button">
             <i class="fas fa-arrow-left text-xl"></i>
         </button>
     </TopBarLeft>
@@ -24,7 +24,7 @@
         支出图表
     </TopBarTitle>
     <TopBarRight>
-        <button @onclick="NavigateToStreamingAnalysis" class="p-2 text-text-light dark:text-text-dark">
+        <button @onclick="NavigateToStreamingAnalysis" class="icon-button">
             <i class="fas fa-robot text-xl"></i>
         </button>
     </TopBarRight>
@@ -34,7 +34,7 @@
                 <!-- 总支出金额 Shimmer -->
                 <div class="mb-6">
                     <SfSkeleton Width="148px" Height="22px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
-                    <div class="mt-0.2">
+                    <div class="mt-0.5">
                         <SfSkeleton Width="198px" Height="34px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
                     </div>
                 </div>
@@ -56,7 +56,7 @@
                 <!-- 每日支出趋势 Shimmer -->
                 <div>
                     <SfSkeleton Width="148px" Height="22px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
-                    <div class="mt-0.2">
+                    <div class="mt-0.5">
                         <SfSkeleton Width="128px" Height="34px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
                     </div>
                     <div class="flex items-center gap-1 mb-4">
@@ -242,7 +242,6 @@
 
             if (result.Data is not null) Expenses = result.Data;
             await ProcessExpenseData();
-            await Task.Delay(1200);
             IsLoading = false;
         }
     }

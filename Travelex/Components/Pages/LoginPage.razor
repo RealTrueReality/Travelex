@@ -26,8 +26,11 @@
             <DataAnnotationsValidator/>
 
             <div class="relative">
+                <label for="login-username" class="sr-only">用户名</label>
                 <InputText @bind-Value="_loggingModel.UserName"
-                           class="w-full h-14 px-4 rounded-xl bg-active-light dark:bg-active-dark text-subtext-light dark:text-subtext-dark focus:outline-none"
+                           id="login-username"
+                           autocomplete="username"
+                           class="form-control h-14 pr-12"
                            placeholder="用户名"/>
                 <div class="absolute right-4 top-4">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-subtext-light dark:text-subtext-dark" fill="none" viewBox="0 0 24 24"
@@ -40,8 +43,11 @@
             </div>
 
             <div class="relative">
+                <label for="login-password" class="sr-only">密码</label>
                 <InputText type="password" @bind-Value="_loggingModel.Password"
-                           class="w-full h-14 px-4 rounded-xl bg-active-light dark:bg-active-dark text-subtext-light dark:text-subtext-dark focus:outline-none"
+                           id="login-password"
+                           autocomplete="current-password"
+                           class="form-control h-14 pr-12"
                            placeholder="密码"/>
                 <div class="absolute right-4 top-4">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-subtext-light dark:text-subtext-dark" fill="none" viewBox="0 0 24 24"
@@ -53,12 +59,11 @@
                 <ValidationMessage For="@(() => _loggingModel.Password)" class="text-red-500 dark:text-red-400 text-sm mt-1"/>
             </div>
 
-            <button type="button" class="text-sm text-subtext-light dark:text-subtext-dark text-center w-full">忘记密码?</button>
-
-            <button type="submit" class="w-full h-12 bg-primary-light dark:bg-primary-dark text-white rounded-[20px] text-base font-bold">
-                登陆
+            <button type="submit" class="btn-primary" disabled="@_isLoggingIn">
+                @(_isLoggingIn ? "正在登录…" : "登录")
             </button>
-            <button type="button" class="w-full h-12 bg-active-light dark:bg-active-dark text-text-light dark:text-text-dark text-base font-bold rounded-[20px] hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            <button type="button" class="btn-secondary"
+                    disabled="@_isLoggingIn"
                     @onclick="() => { IsRegisterDialogVisible = true;_signUpModel=new ();}">
                 注册
             </button>
@@ -81,8 +86,11 @@
                             <DataAnnotationsValidator/>
 
                             <div class="relative">
+                                <label for="register-name" class="sr-only">姓名</label>
                                 <InputText @bind-Value="_signUpModel.Name"
-                                           class="w-full h-14 px-4 rounded-xl bg-active-light dark:bg-active-dark text-subtext-light dark:text-subtext-dark focus:outline-none"
+                                           id="register-name"
+                                           autocomplete="name"
+                                           class="form-control h-14 pr-12"
                                            placeholder="姓名"/>
                                 <div class="absolute right-4 top-4">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-subtext-light dark:text-subtext-dark" fill="none"
@@ -95,8 +103,11 @@
                             </div>
 
                             <div class="relative">
+                                <label for="register-username" class="sr-only">用户名</label>
                                 <InputText @bind-Value="_signUpModel.UserName"
-                                           class="w-full h-14 px-4 rounded-xl bg-active-light dark:bg-active-dark text-subtext-light dark:text-subtext-dark focus:outline-none"
+                                           id="register-username"
+                                           autocomplete="username"
+                                           class="form-control h-14 pr-12"
                                            placeholder="用户名"/>
                                 <div class="absolute right-4 top-4">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-subtext-light dark:text-subtext-dark" fill="none"
@@ -110,8 +121,11 @@
                             </div>
 
                             <div class="relative">
+                                <label for="register-password" class="sr-only">密码</label>
                                 <InputText type="password" @bind-Value="_signUpModel.Password"
-                                           class="w-full h-14 px-4 rounded-xl bg-active-light dark:bg-active-dark text-subtext-light dark:text-subtext-dark focus:outline-none"
+                                           id="register-password"
+                                           autocomplete="new-password"
+                                           class="form-control h-14 pr-12"
                                            placeholder="密码"/>
                                 <div class="absolute right-4 top-4">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-subtext-light dark:text-subtext-dark" fill="none"
@@ -124,8 +138,8 @@
                                 <ValidationMessage For="@(() => _signUpModel.Password)" class="text-red-500 dark:text-red-400 text-sm mt-1"/>
                             </div>
 
-                            <button type="submit" class="w-full h-12 bg-primary-light dark:bg-primary-dark text-white  rounded-[20px] text-base font-bold transition-colors">
-                                注册并登陆
+                            <button type="submit" class="btn-primary" disabled="@_isRegistering">
+                                @(_isRegistering ? "正在注册…" : "注册并登录")
                             </button>
                         </EditForm>
                     </div>
@@ -165,12 +179,13 @@
     private readonly LoggingModel _loggingModel = new();
     private SignUpModel _signUpModel = new();
     private bool IsRegisterDialogVisible { get; set; }
+    private bool _isLoggingIn;
+    private bool _isRegistering;
 
     private async Task HandleLoginAsync() {
-        Console.WriteLine($"Login attempt with: {_loggingModel.ToJson()}");
-        //显示加载(ActivityIndicator)
+        if (_isLoggingIn) return;
+        _isLoggingIn = true;
         BlazorMauiInterop.ShowIndicator();
-        await Task.Delay(1800);
         try {
             var res = await AuthService.LogInAsync(_loggingModel);
             if (res.IsSuccess) {
@@ -185,17 +200,18 @@
                 BlazorMauiInterop.HideIndicator();
             }
         }
-        catch (Exception ex) {
+        catch (Exception) {
             await BlazorMauiInterop.ShowAlertAsync("登录失败");
         }
         finally {
+            _isLoggingIn = false;
             BlazorMauiInterop.HideIndicator();
         }
     }
 
     private async Task HandleRegisterAsync() {
-        Console.WriteLine($"Register attempt with: {_signUpModel.ToJson()}");
-        //显示加载(ActivityIndicator)
+        if (_isRegistering) return;
+        _isRegistering = true;
         BlazorMauiInterop.ShowIndicator();
         try {
             //注册
@@ -218,6 +234,7 @@
             await BlazorMauiInterop.ShowAlertAsync(ex.Message);
         }
         finally {
+            _isRegistering = false;
             BlazorMauiInterop.HideIndicator();
         }
     }

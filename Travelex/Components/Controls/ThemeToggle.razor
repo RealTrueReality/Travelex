@@ -1,6 +1,6 @@
 @using Travelex.Services
+@implements IDisposable
 @inject ThemeService ThemeService
-@inject IJSRuntime JSRuntime
 
 <div class="w-full mb-4">
     <div class="flex items-center mb-3">
@@ -95,14 +95,13 @@
 @code {
     protected override async Task OnInitializedAsync()
     {
-        await ThemeService.InitializeAsync();
-        await ThemeService.SetupSystemThemeListenerAsync();
         ThemeService.ThemeChanged += OnThemeChanged;
+        await base.OnInitializedAsync();
     }
 
     private void OnThemeChanged(bool isDarkMode)
     {
-        StateHasChanged();
+        _ = InvokeAsync(StateHasChanged);
     }
 
     private string GetThemeStatusText()
@@ -148,5 +147,10 @@
         };
         
         return $"left: {left}; width: 33.33%;";
+    }
+
+    public void Dispose()
+    {
+        ThemeService.ThemeChanged -= OnThemeChanged;
     }
 }

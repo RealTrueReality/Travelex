@@ -135,13 +135,16 @@ Android：
 dotnet build Travelex/Travelex.csproj -t:Run -f net10.0-android
 ```
 
-重新生成 Tailwind CSS：
+安装前端构建依赖并重新生成 Tailwind CSS（在仓库根目录执行）：
 
 ```bash
-cd Travelex
-npm install
+npm ci
 npm run css:build
 ```
+
+`codemagic.yaml` 也会在打包前执行这两步。修改 Razor 中的 Tailwind 类名、`Travelex/tailwind.config.js` 或 `Travelex/wwwroot/css/app.css` 后，请重新生成并提交 `app.min.css`。
+
+页面样式优先使用语义化颜色（`bg-canvas`、`bg-surface`、`text-content`、`text-content-muted`、`border-outline`、`bg-brand`）。明暗主题的实际色值统一定义在 `Travelex/wwwroot/css/app.css`；旧的 `*-light` / `*-dark` 类仍可兼容使用，新增页面请使用语义类。常用页面容器、图标按钮、主次按钮、卡片、输入框和空状态分别使用 `app-page`、`icon-button`、`btn-primary` / `btn-secondary`、`surface-card`、`form-control`、`empty-state`。页面标题栏通过 `AppPageShell` 复用。
 
 ## 数据与安全说明
 

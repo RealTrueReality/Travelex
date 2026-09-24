@@ -1,5 +1,11 @@
 {
-  "devDependencies": {
-    "tailwindcss": "^3.4.16"
+  "name": "travelex-workspace",
+  "private": true,
+  "workspaces": [
+    "Travelex"
+  ],
+  "scripts": {
+    "css:build": "npm --workspace travelex run css:build",
+    "css:watch": "npm --workspace travelex run css:watch"
   }
 }

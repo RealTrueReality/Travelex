@@ -11,13 +11,13 @@
 
 <FlexedPageComponent>
     <TopBarLeft>
-        <button @onclick="NavigateBack" class="p-2 text-text-light dark:text-text-dark">
+        <button type="button" aria-label="返回" @onclick="NavigateBack" class="icon-button">
             <i class="fas fa-arrow-left text-xl"></i>
         </button>
     </TopBarLeft>
     <TopBarTitle>编辑支出</TopBarTitle>
     <TopBarRight>
-        <button @onclick="() => IsDeleteDialogVisible = true" class="p-2 text-text-light dark:text-text-dark">
+        <button @onclick="() => IsDeleteDialogVisible = true" class="icon-button">
             <i class="fas fa-trash text-xl"></i>
         </button>
     </TopBarRight>

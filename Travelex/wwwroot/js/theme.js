@@ -19,6 +19,10 @@ window.setDarkMode = function (isDark) {
     }
 };
 
+window.blurActiveElement = function () {
+    document.activeElement?.blur();
+};
+
 // 检测系统主题是否为暗色模式
 window.isSystemInDarkMode = function () {
     return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -26,7 +30,8 @@ window.isSystemInDarkMode = function () {
 
 // 设置系统主题变化监听器
 window.setupSystemThemeListener = function () {
-    if (window.matchMedia) {
+    if (window.matchMedia && !window.__travelexThemeListenerAttached) {
+        window.__travelexThemeListenerAttached = true;
         const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
         
         // 检测变化并通知.NET

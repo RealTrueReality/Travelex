@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Travelex.Models;
 
@@ -16,6 +17,7 @@ public class SignUpModel {
     [MaxLength(128, ErrorMessage = "密码不能超过128个字符")]
     [MinLength(6, ErrorMessage = "密码不能少于6个字符")]
     [DataType(DataType.Password)]
+    [JsonIgnore]
     public string Password { get; set; } = string.Empty;
     
     public string ToJson()

@@ -52,6 +52,9 @@
                                         Effect="ShimmerEffect.Wave" CssClass="dark:opacity-50"></SfSkeleton>
                         </div>
                     }
+                    else if (GetTotalSpentData() <= 0) {
+                        <div class="empty-state text-content-muted">当前时间范围内还没有支出数据</div>
+                    }
                     else {
                         <SfAccumulationChart EnableBorderOnMouseMove="false" Height="400px" Background="transparent">
                             <AccumulationChartTooltipSettings Enable="true"
@@ -149,7 +152,7 @@
                 @if (_isLoading) {
                     @for (int i = 0; i < 3; i++) {
                         <div class="bg-background-light dark:bg-background-dark rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-                            <div class="grid grid-cols-[1fr,200px] gap-4 items-center">
+                            <div class="grid grid-cols-[minmax(0,1fr)_minmax(96px,42%)] gap-4 items-center">
                                 <div>
                                     <SfSkeleton Width="88px" Height="20px" Effect="ShimmerEffect.Wave" CssClass="dark:opacity-50"></SfSkeleton>
                                     <div class="mt-0.5">
@@ -173,7 +176,7 @@
                     @if (_selectedCategory == "all") {
                         @foreach (var expense in GetCategoryExpenses()) {
                             <div class="bg-background-light dark:bg-background-dark rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-                                <div class="grid grid-cols-[1fr,200px] gap-4 items-center">
+                                <div class="grid grid-cols-[minmax(0,1fr)_minmax(96px,42%)] gap-4 items-center">
                                     <div>
                                         <div
                                             class="font-semibold text-text-light dark:text-text-dark">@GetCategoryDisplayName(expense.Category)</div>
@@ -182,7 +185,7 @@
                                             ¥@expense.Amount?.ToString("N0")</div>
                                     </div>
                                     <div class="flex items-center space-x-2">
-                                        <div class="w-32 h-2 bg-active-light dark:bg-active-dark rounded-full overflow-hidden">
+                                        <div class="w-full h-2 bg-active-light dark:bg-active-dark rounded-full overflow-hidden">
                                             <div class="h-full bg-primary-light dark:bg-primary-dark"
                                                  style="width: @(GetPercentage(expense))%"></div>
                                         </div>
@@ -196,7 +199,7 @@
                     else {
                         @foreach (var expense in GetExpensesByCategory(_selectedCategory)) {
                             <div class="bg-background-light dark:bg-background-dark rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-                                <div class="grid grid-cols-[1fr,200px] gap-4 items-center">
+                                <div class="grid grid-cols-[minmax(0,1fr)_minmax(96px,42%)] gap-4 items-center">
                                     <div>
                                         <div class="font-semibold text-text-light dark:text-text-dark">@expense.Title</div>
                                         <div class="text-sm text-subtext-light dark:text-subtext-dark">
@@ -208,7 +211,7 @@
                                         </div>
                                     </div>
                                     <div class="flex items-center space-x-2">
-                                        <div class="w-32 h-2 bg-active-light dark:bg-active-dark rounded-full overflow-hidden">
+                                        <div class="w-full h-2 bg-active-light dark:bg-active-dark rounded-full overflow-hidden">
                                             <div class="h-full bg-primary-light dark:bg-primary-dark"
                                                  style="width: @(GetExpensePercentageInCategory(expense))%"></div>
                                         </div>
@@ -238,7 +241,6 @@
         await LoadExpenses();
         var travels = await TravelService.GetTravelsAsync();
         if (travels is { IsSuccess: true, Data: not null }) _travelTitles = travels.Data.ToDictionary(t => t.Id, t => t.Title);
-        await Task.Delay(1125);
         _isLoading = false;
     }
 
@@ -266,6 +268,7 @@
     private List<DonutChartData> GetDonutChartData() {
         var query = ApplyTimeFilter(_expenses.AsQueryable());
         var total = query.Sum(e => e.Amount ?? 0);
+        if (total <= 0) return [];
 
         return query.GroupBy(e => e.Category)
             .Select(g => new DonutChartData {
@@ -299,6 +302,7 @@
                 .ToList();
 
             var total = categoryExpenses.Sum(e => e.Amount ?? 0);
+            if (total <= 0) return [];
 
             return categoryExpenses.Select(e => new ChartData {
                 Month = e.Title, // 使用支出标题
@@ -335,6 +339,7 @@
         var query = ApplyTimeFilter(_expenses.AsQueryable());
         var categoryTotal = query.Where(e => e.Category == expense.Category)
             .Sum(e => e.Amount ?? 0);
+        if (categoryTotal <= 0) return 0;
         return Math.Round((expense.Amount ?? 0) / categoryTotal * 100, 0);
     }
 

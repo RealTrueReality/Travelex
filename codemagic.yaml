@@ -21,6 +21,11 @@
           $DOTNET_BIN nuget locals all --clear 
           $DOTNET_BIN workload install ios maui --source https://aka.ms/dotnet10/nuget/index.json --source https://api.nuget.org/v3/index.json
 
+      - name: Build Tailwind CSS
+        script: |
+          npm ci
+          npm run css:build
+
       - name: Set Info.plist values
         script: |
           PLIST=$CM_BUILD_DIR/Travelex/Platforms/iOS/Info.plist
@@ -31,9 +36,6 @@
         script: |
           CERT_NAME=$(keychain list-certificates | jq -r '.[] | .common_name')
           PROFILE_NAME=$(find ~/Library/MobileDevice/Provisioning\ Profiles -name "*.mobileprovision" -execdir sh -c '/usr/libexec/PlistBuddy -c "print :Name" /dev/stdin <<< $(security cms -D -i {})' \;)
-
-          find . -name "package.json" -exec rm -rf {} +
-          find . -name "package-lock.json" -exec rm -rf {} +
 
           $DOTNET_BIN publish -f net10.0-ios \
             -c Release \
@@ -49,8 +51,6 @@
         script: |
           $DOTNET_BIN workload install maccatalyst --source https://aka.ms/dotnet10/nuget/index.json --source https://api.nuget.org/v3/index.json
                   
-          find . -name "package.json" -exec rm -rf {} +
-          find . -name "package-lock.json" -exec rm -rf {} +
           $DOTNET_BIN publish -f net10.0-maccatalyst \
             -c Release \
             -p:ApplicationDisplayVersion="1.0.0" \

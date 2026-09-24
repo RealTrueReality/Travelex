@@ -2,49 +2,64 @@
 module.exports = {
   content: [
     "./Components/**/*.{razor,html,cshtml}",
-    "./Pages/**/*.{razor,html,cshtml}",
     "./wwwroot/index.html"
   ],
   darkMode: 'class',
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['HarmonyOSSans', 'PlusJakartaSans', 'Arial', 'sans-serif']
+      },
       colors: {
+        canvas: 'rgb(var(--color-canvas) / <alpha-value>)',
+        surface: 'rgb(var(--color-surface) / <alpha-value>)',
+        'surface-muted': 'rgb(var(--color-surface-muted) / <alpha-value>)',
+        content: 'rgb(var(--color-content) / <alpha-value>)',
+        'content-muted': 'rgb(var(--color-content-muted) / <alpha-value>)',
+        outline: 'rgb(var(--color-outline) / <alpha-value>)',
+        brand: 'rgb(var(--color-brand) / <alpha-value>)',
+        success: 'rgb(var(--color-success) / <alpha-value>)',
+        danger: 'rgb(var(--color-danger) / <alpha-value>)',
+        warning: 'rgb(var(--color-warning) / <alpha-value>)',
         primary: {
-          light: '#0085FF',
-          dark: '#1E90FF'
+          light: 'rgb(var(--color-brand) / <alpha-value>)',
+          dark: 'rgb(var(--color-brand) / <alpha-value>)'
         },
         secondary: {
-          light: '#4C7C99',
-          dark: '#6A98B5'
+          light: 'rgb(var(--color-content-muted) / <alpha-value>)',
+          dark: 'rgb(var(--color-content-muted) / <alpha-value>)'
         },
         background: {
-          light: '#FFFFFF',
-          dark: '#000000'
+          light: 'rgb(var(--color-canvas) / <alpha-value>)',
+          dark: 'rgb(var(--color-canvas) / <alpha-value>)'
         },
         card: {
-          light: '#FFFFFF',
-          dark: '#000000'
+          light: 'rgb(var(--color-surface) / <alpha-value>)',
+          dark: 'rgb(var(--color-surface) / <alpha-value>)'
         },
         text: {
-          light: '#1C160C',
-          dark: '#E0E0E0'
+          light: 'rgb(var(--color-content) / <alpha-value>)',
+          dark: 'rgb(var(--color-content) / <alpha-value>)'
         },
         subtext: {
-          light: '#4b5563',
-          dark: '#A0A0A0'
+          light: 'rgb(var(--color-content-muted) / <alpha-value>)',
+          dark: 'rgb(var(--color-content-muted) / <alpha-value>)'
         },
         'input-bg': {
-          light: '#F8FAFC',
-          dark: '#1e1e1e'
+          light: 'rgb(var(--color-surface-muted) / <alpha-value>)',
+          dark: 'rgb(var(--color-surface-muted) / <alpha-value>)'
         },
         active: {
-          light: '#EFF2F4',
-          dark: '#1E1E1E'
+          light: 'rgb(var(--color-surface-muted) / <alpha-value>)',
+          dark: 'rgb(var(--color-surface-muted) / <alpha-value>)'
         },
         icon: {
-          light: '#EFF2F4',
-          dark: '#1E1E1E'
+          light: 'rgb(var(--color-surface-muted) / <alpha-value>)',
+          dark: 'rgb(var(--color-surface-muted) / <alpha-value>)'
         }
+      },
+      borderRadius: {
+        app: '1.25rem'
       }
     },
   },

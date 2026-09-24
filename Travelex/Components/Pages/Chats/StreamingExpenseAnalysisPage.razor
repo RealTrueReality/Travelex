@@ -17,13 +17,13 @@
 
 <FlexedPageComponent>
     <TopBarLeft>
-        <button @onclick="NavigateBack" class="p-2 text-text-light dark:text-text-dark">
+        <button type="button" aria-label="返回" @onclick="NavigateBack" class="icon-button">
             <i class="fas fa-arrow-left text-lg"></i>
         </button>
     </TopBarLeft>
     <TopBarTitle>AI助手</TopBarTitle>
     <TopBarRight>
-        <button @onclick="NewConversation" class="p-2 text-text-light dark:text-text-dark">
+        <button @onclick="NewConversation" class="icon-button">
             <i class="fas fa-plus text-lg"></i>
         </button>
     </TopBarRight>

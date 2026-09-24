@@ -28,12 +28,12 @@
                                 <SfSkeleton Width="70%" Height="14px" CssClass="mt-0.5 dark:opacity-50"
                                             Effect=ShimmerEffect.Wave></SfSkeleton>
 
-                                <div class="flex items-center gap-2 mt-q2">
+                                <div class="flex items-center gap-2 mt-2">
                                     <SfSkeleton Shape=SkeletonType.Square Width="40px" Height="36px"
                                                 Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
                                     <div>
                                         <SfSkeleton Width="60px" Height="14px" Effect=ShimmerEffect.Wave CssClass="dark:opacity-50"></SfSkeleton>
-                                        <div class="mt-0.2">
+                                        <div class="mt-0.5">
                                             <SfSkeleton Width="80px" Height="16px" CssClass="mt-0.5 dark:opacity-50"
                                                         Effect=ShimmerEffect.Wave></SfSkeleton>
                                         </div>
@@ -58,11 +58,20 @@
                         没有找到匹配的行程
                     </div>
                 }
+                else {
+                    <div class="empty-state">
+                        <div class="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-muted text-brand">
+                            <i class="fas fa-route text-2xl" aria-hidden="true"></i>
+                        </div>
+                        <h2 class="text-lg font-bold text-content">从第一段旅程开始</h2>
+                        <p class="mt-2 max-w-xs text-sm leading-relaxed text-content-muted">添加目的地、日期和预算，之后的所有旅行信息都会汇总在这里。</p>
+                    </div>
+                }
             }
         </div>
         <!-- 添加行程按钮 -->
         <div class="p-4">
-            <button @onclick="NavigateToAdd" class="w-full bg-primary-light dark:bg-primary-dark text-white h-12 rounded-[20px] text-base font-bold">
+            <button type="button" @onclick="NavigateToAdd" class="btn-primary">
                 + 添加行程
             </button>
         </div>
@@ -96,12 +105,12 @@
                 await BlazorMauiInterop.ShowAlertAsync("获取行程列表失败");
             }
         }
-        catch (Exception e) {
+        catch (Exception) {
             await BlazorMauiInterop.ShowAlertAsync("获取行程列表失败");
         }
-
-        await Task.Delay(1280);
-        IsLoading = false;
+        finally {
+            IsLoading = false;
+        }
     }
 
     private void OnTripClick(Travel trip) {
@@ -109,9 +118,10 @@
         NavigationManager.NavigateTo($"/travel/details/{trip.Id}");
     }
 
-    private async Task DeleteTrip(Travel trip) {
+    private Task DeleteTrip(Travel trip) {
         TripToDelete = trip;
         IsDeleteDialogVisible = true;
+        return Task.CompletedTask;
     }
 
     private async Task ConfirmDelete() {
@@ -123,13 +133,15 @@
                 }
                 else {
                     await BlazorMauiInterop.ShowToastAsync("删除行程成功");
+                    Trips?.Remove(TripToDelete);
                 }
             }
-            catch (Exception e) {
+            catch (Exception) {
                 await BlazorMauiInterop.ShowAlertAsync("删除行程失败");
             }
-
-            Trips!.Remove(TripToDelete);
+            finally {
+                TripToDelete = null;
+            }
             StateHasChanged();
         }
     }
