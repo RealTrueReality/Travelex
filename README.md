@@ -2,6 +2,12 @@
 
 Travelex 是一款基于 .NET MAUI Blazor Hybrid 的本地优先旅行消费管理应用。它把行程规划、消费记录、数据图表和 AI 财务分析串成一个完整流程，并以同一套代码支持 Windows、Android、iOS 和 Mac Catalyst。
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+## 下载
+
+安装包与版本信息请查看 [GitHub Releases](https://github.com/RealTrueReality/Travelex/releases)。
+
 ## 主要功能
 
 - 行程新增、编辑、删除、搜索、状态与分类管理
@@ -11,6 +17,14 @@ Travelex 是一款基于 .NET MAUI Blazor Hybrid 的本地优先旅行消费管�
 - 通过千问 AI 平台调用 Qwen / DeepSeek 模型进行流式旅行消费分析
 - 本地注册、登录、头像及个人资料管理
 - 明暗主题、系统主题跟随和首次启动引导
+
+## 应用截图
+
+| 首页 | 行程详情 |
+| :---: | :---: |
+| ![首页](https://github.com/user-attachments/assets/4b01cbd2-b5fc-4942-8411-a2de54c8a92f) | ![行程详情](https://github.com/user-attachments/assets/d492313c-5c4e-4541-933f-8a45371d2d9c) |
+| **图表分析** | **AI 智能摘要** |
+| ![图表分析](https://github.com/user-attachments/assets/4b774dec-2d71-4943-9e2d-9ef7ff82444d) | ![AI 智能摘要](https://github.com/user-attachments/assets/2a5954ff-eda2-4c8c-9117-02923bf68c97) |
 
 ## 技术栈
 
@@ -174,3 +188,7 @@ Travelex/
 ## License
 
 项目代码按 MIT License 使用。第三方组件、字体、图片和外部服务分别受其自身许可协议约束。
+
+## 贡献
+
+欢迎通过 [Issues](https://github.com/RealTrueReality/Travelex/issues) 反馈问题，或提交 [Pull Request](https://github.com/RealTrueReality/Travelex/pulls)。
