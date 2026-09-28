@@ -3,6 +3,8 @@ using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
+using System.Threading.Channels;
+using Microsoft.Extensions.Logging;
 
 namespace Travelex.Services;
 
@@ -11,11 +13,16 @@ namespace Travelex.Services;
 /// </summary>
 public sealed class QwenService : IDisposable {
     private const string ApiKeyStorageKey = "Travelex.Qwen.ApiKey";
+    private const string ModelStorageKey = "Travelex.Ai.Model";
     private const string CompletionUrl = "https://maas.qianwenaiapi.com/compatible-mode/v1/chat/completions";
-    private const string Model = "qwen3.7-plus";
+    public const string QwenModel = "qwen3.8-max";
+    public const string DeepSeekModel = "deepseek-v4-pro-0813";
     private const string SystemPrompt = "你是 Travelex 的旅行开支分析助手。只根据用户提供的数据分析总支出、分类占比、时间与地点趋势，并提出具体可行的节省建议。金额和日期必须准确；数据不足时明确说明，不要编造实时天气、汇率、景点信息或声称使用了搜索工具。请用简洁中文回答。";
 
     private readonly HttpClient _httpClient = new();
+    private readonly ILogger<QwenService> _logger;
+
+    public QwenService(ILogger<QwenService> logger) => _logger = logger;
 
     public async Task<bool> HasApiKeyAsync() =>
         !string.IsNullOrWhiteSpace(await SecureStorage.Default.GetAsync(ApiKeyStorageKey));
@@ -31,14 +38,27 @@ public sealed class QwenService : IDisposable {
 
     public void RemoveApiKey() => SecureStorage.Default.Remove(ApiKeyStorageKey);
 
+    public string GetSelectedModel() {
+        var model = Preferences.Default.Get(ModelStorageKey, QwenModel);
+        return IsSupportedModel(model) ? model : QwenModel;
+    }
+
+    public void SetSelectedModel(string model) {
+        if (!IsSupportedModel(model)) throw new ArgumentException("不支持的 AI 模型。", nameof(model));
+        Preferences.Default.Set(ModelStorageKey, model);
+    }
+
+    private static bool IsSupportedModel(string model) => model is QwenModel or DeepSeekModel;
+
     public async Task<string> AnalyzeTravelExpensesAsync(object travelData) {
         var apiKey = await SecureStorage.Default.GetAsync(ApiKeyStorageKey);
         if (string.IsNullOrWhiteSpace(apiKey)) return "请先在 AI 助手中设置 API Key。";
 
-        using var request = CreateRequest(apiKey, travelData, stream: false);
+        var model = GetSelectedModel();
+        using var request = CreateRequest(apiKey, model, travelData, stream: false);
         try {
             using var response = await _httpClient.SendAsync(request);
-            if (!response.IsSuccessStatusCode) return GetErrorMessage(response.StatusCode);
+            if (!response.IsSuccessStatusCode) return await GetErrorMessageAsync(response, model);
 
             using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
             if (document.RootElement.TryGetProperty("choices", out var choices) &&
@@ -69,22 +89,78 @@ public sealed class QwenService : IDisposable {
             yield return "请先在 AI 助手中设置 API Key。";
             yield break;
         }
+        var model = GetSelectedModel();
 
-        using var request = CreateRequest(apiKey, travelData, stream: true);
-        using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+        // Android's native HTTP handler may perform network I/O while synchronously closing a
+        // response stream. Keep the entire read AND disposal path off the Blazor UI thread.
+        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        var channel = Channel.CreateBounded<string>(new BoundedChannelOptions(64) {
+            SingleReader = true,
+            SingleWriter = true,
+            FullMode = BoundedChannelFullMode.Wait
+        });
+        var producer = Task.Run(() => ProduceStreamAsync(apiKey, model, travelData, channel.Writer, linkedCts.Token));
+
+        try {
+            await foreach (var chunk in channel.Reader.ReadAllAsync(linkedCts.Token)) {
+                yield return chunk;
+            }
+        }
+        finally {
+            if (!producer.IsCompleted) {
+                // Cancellation can disconnect Android's native HTTP connection; do that off UI too.
+                await Task.Run(linkedCts.Cancel);
+            }
+            await producer.ConfigureAwait(false);
+        }
+    }
+
+    private async Task ProduceStreamAsync(string apiKey, string model, object travelData, ChannelWriter<string> writer,
+        CancellationToken cancellationToken) {
+        var state = new StreamReadState();
+        try {
+            await ReadStreamAsync(apiKey, model, travelData, writer, state, cancellationToken).ConfigureAwait(false);
+            writer.TryComplete();
+        }
+        catch (OperationCanceledException ex) when (cancellationToken.IsCancellationRequested) {
+            writer.TryComplete(ex);
+        }
+        catch (Exception ex) {
+            // The answer is already complete if only Android's connection cleanup failed.
+            if (state.Completed) {
+                _logger.LogWarning(ex, "Qwen response cleanup failed after completion");
+                writer.TryComplete();
+            }
+            else {
+                _logger.LogError(ex, "Qwen stream failed before completion");
+                writer.TryComplete(ex);
+            }
+        }
+    }
+
+    private async Task ReadStreamAsync(string apiKey, string model, object travelData, ChannelWriter<string> writer,
+        StreamReadState state, CancellationToken cancellationToken) {
+        using var request = CreateRequest(apiKey, model, travelData, stream: true);
+        using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead,
+            cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode) {
-            yield return GetErrorMessage(response.StatusCode);
-            yield break;
+            var errorMessage = await GetErrorMessageAsync(response, model, cancellationToken).ConfigureAwait(false);
+            await writer.WriteAsync(errorMessage, cancellationToken).ConfigureAwait(false);
+            state.Completed = true;
+            return;
         }
 
-        await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+        await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
         using var reader = new StreamReader(stream);
         var receivedContent = false;
 
-        while (await reader.ReadLineAsync(cancellationToken) is { } line) {
+        while (await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false) is { } line) {
             if (!line.StartsWith("data:", StringComparison.Ordinal)) continue;
             var data = line[5..].Trim();
-            if (data == "[DONE]") break;
+            if (data == "[DONE]") {
+                state.Completed = true;
+                break;
+            }
             if (data.Length == 0) continue;
 
             string? content;
@@ -98,10 +174,17 @@ public sealed class QwenService : IDisposable {
 
             if (string.IsNullOrEmpty(content)) continue;
             receivedContent = true;
-            yield return content;
+            await writer.WriteAsync(content, cancellationToken).ConfigureAwait(false);
         }
 
-        if (!receivedContent) yield return "没有收到分析结果，请稍后重试。";
+        if (!state.Completed) throw new IOException("Qwen stream ended before the DONE marker.");
+        if (!receivedContent) {
+            await writer.WriteAsync("没有收到分析结果，请稍后重试。", cancellationToken).ConfigureAwait(false);
+        }
+    }
+
+    private sealed class StreamReadState {
+        public bool Completed { get; set; }
     }
 
     private static string? GetDeltaContent(JsonElement root) {
@@ -114,9 +197,9 @@ public sealed class QwenService : IDisposable {
         return content.GetString();
     }
 
-    private static HttpRequestMessage CreateRequest(string apiKey, object travelData, bool stream) {
+    private static HttpRequestMessage CreateRequest(string apiKey, string model, object travelData, bool stream) {
         var requestBody = new {
-            model = Model,
+            model,
             messages = new[] {
                 new { role = "system", content = SystemPrompt },
                 new { role = "user", content = "请分析以下旅行数据并回答其中的 Question 字段：\n" + JsonSerializer.Serialize(travelData) }
@@ -131,11 +214,47 @@ public sealed class QwenService : IDisposable {
         return request;
     }
 
-    private static string GetErrorMessage(HttpStatusCode statusCode) => statusCode switch {
-        HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden => "API Key 无效或没有模型访问权限，请检查后重试。",
-        HttpStatusCode.TooManyRequests => "请求过于频繁或额度已用完，请稍后重试并检查平台用量。",
-        _ => $"AI 服务请求失败（HTTP {(int)statusCode}），请稍后重试。"
-    };
+    private async Task<string> GetErrorMessageAsync(HttpResponseMessage response, string model,
+        CancellationToken cancellationToken = default) {
+        string? errorCode = null;
+        try {
+            using var document = JsonDocument.Parse(
+                await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false));
+            var root = document.RootElement;
+            if (root.ValueKind == JsonValueKind.Object) {
+                if (root.TryGetProperty("error", out var error) && error.ValueKind == JsonValueKind.Object) {
+                    root = error;
+                }
+                if (root.TryGetProperty("code", out var code) && code.ValueKind == JsonValueKind.String) {
+                    var value = code.GetString();
+                    // Never display or log the raw provider response: it may contain request details.
+                    if (value is { Length: > 0 and <= 80 } &&
+                        value.All(c => char.IsAsciiLetterOrDigit(c) || c is '.' or '_' or '-')) {
+                        errorCode = value;
+                    }
+                }
+            }
+        }
+        catch (JsonException) {
+            // A non-JSON gateway error still has a useful HTTP status.
+        }
+        catch (HttpRequestException) {
+            // Keep the HTTP status if the error body cannot be read.
+        }
+        catch (IOException) {
+            // Keep the HTTP status if the error body cannot be read.
+        }
+
+        _logger.LogWarning("AI request rejected: model {Model}, HTTP {StatusCode}, provider code {ErrorCode}",
+            model, (int)response.StatusCode, errorCode ?? "unavailable");
+        var detail = $"HTTP {(int)response.StatusCode}" + (errorCode is null ? "" : $"，{errorCode}");
+        return response.StatusCode switch {
+            HttpStatusCode.Unauthorized => $"千问鉴权失败（{detail}）。请重新粘贴完整的 API Key，并确认它未被重置、与接入地址匹配。",
+            HttpStatusCode.Forbidden => $"千问平台拒绝访问 {model}（{detail}）。请检查业务空间的模型权限、服务开通状态及免费额度。",
+            HttpStatusCode.TooManyRequests => $"千问请求受限（{detail}）。请稍后重试并检查平台用量。",
+            _ => $"AI 服务请求失败（{detail}），请检查模型与平台设置后重试。"
+        };
+    }
 
     public void Dispose() => _httpClient.Dispose();
 }

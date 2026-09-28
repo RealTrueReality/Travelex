@@ -7,7 +7,9 @@
 @using System.Text.Json
 @using Travelex.Utils
 @using Markdig
+@using Microsoft.Extensions.Logging
 @inject NavigationManager NavigationManager
+@inject ILogger<StreamingExpenseAnalysisPage> Logger
 @inject QwenService QwenService
 @inject TravelService TravelService
 @inject ExpenseService ExpenseService
@@ -225,6 +227,16 @@
         return Markdown.ToHtml(markdown, _pipeline);
     }
 
+    private void AddStreamFailure(Exception ex) {
+        Logger.LogError(ex, "Travel expense stream failed");
+        _messages.Add(new ChatMessage {
+            IsUser = false,
+            Content = string.IsNullOrWhiteSpace(_streamingContent)
+                ? "分析暂时失败，请稍后重试。"
+                : _streamingContent + "\n\n_分析未正常完成，已保留收到的内容；可稍后重试。_"
+        });
+    }
+
     protected override async Task OnInitializedAsync() {
         // 获取用户信息
         _currentUser = AuthService.CurrentUser;
@@ -313,15 +325,14 @@
             // 用户取消了生成
             _messages.Add(new ChatMessage {
                 IsUser = false,
-                Content = "_已停止生成_"
+                Content = string.IsNullOrWhiteSpace(_streamingContent)
+                    ? "_已停止生成_"
+                    : _streamingContent + "\n\n_已停止生成_"
             });
             _suggestionsVisible = true;
         }
         catch (Exception ex) {
-            _messages.Add(new ChatMessage {
-                IsUser = false,
-                Content = $"<div class='text-red-500'>分析数据时出错: {ex.Message}</div>"
-            });
+            AddStreamFailure(ex);
         }
         finally {
             _isStreaming = false;
@@ -495,14 +506,13 @@
             // 用户取消了生成
             _messages.Add(new ChatMessage {
                 IsUser = false,
-                Content = "_已停止生成_"
+                Content = string.IsNullOrWhiteSpace(_streamingContent)
+                    ? "_已停止生成_"
+                    : _streamingContent + "\n\n_已停止生成_"
             });
         }
         catch (Exception ex) {
-            _messages.Add(new ChatMessage {
-                IsUser = false,
-                Content = $"<div class='text-red-500'>分析数据时出错: {ex.Message}</div>"
-            });
+            AddStreamFailure(ex);
         }
         finally {
             _isStreaming = false;
