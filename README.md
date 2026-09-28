@@ -1,12 +1,18 @@
 # Travelex
 
-Travelex 是一款基于 .NET MAUI Blazor Hybrid 的本地优先旅行消费管理应用。它把行程规划、消费记录、数据图表和 AI 财务分析串成一个完整流程，并以同一套代码支持 Windows、Android、iOS 和 Mac Catalyst。
+基于 .NET MAUI Blazor Hybrid 的本地优先旅行记账应用。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![.NET 10](https://img.shields.io/badge/.NET-10-512BD4)](https://dotnet.microsoft.com/download/dotnet/10.0)
+[![Latest release](https://img.shields.io/github/v/release/RealTrueReality/Travelex?display_name=tag)](https://github.com/RealTrueReality/Travelex/releases)
+
+Travelex 帮助个人记录行程和分类支出、查看消费图表，并在自行配置 API Key 后使用流式 AI 助手分析旅行开销。行程和消费数据默认保存在设备本地的 SQLite 数据库中；使用 AI 功能时，相关分析数据会发送给所选模型的服务平台。项目面向 Windows、Android、iOS 和 Mac Catalyst，具体构建条件见下文。
+
+[下载安装包](https://github.com/RealTrueReality/Travelex/releases) · [构建与运行](#构建与运行) · [AI 配置](#千问-ai) · [MAF 学习笔记](docs/maf-learning.md)
 
 ## 下载
 
-安装包与版本信息请查看 [GitHub Releases](https://github.com/RealTrueReality/Travelex/releases)。
+安装包与版本信息请查看 [GitHub Releases](https://github.com/RealTrueReality/Travelex/releases)。移动端或桌面端是否提供预编译包，以对应版本的资产列表为准。
 
 ## 主要功能
 
@@ -19,6 +25,8 @@ Travelex 是一款基于 .NET MAUI Blazor Hybrid 的本地优先旅行消费管�
 - 明暗主题、系统主题跟随和首次启动引导
 
 ## 应用截图
+
+以下是早期 Android 版本的界面截图，展示行程、图表和 AI 分析页面；当前界面可能有所不同。新版截图有待更新。
 
 | 首页 | 行程详情 |
 | :---: | :---: |
@@ -115,9 +123,11 @@ dotnet publish Travelex/Travelex.csproj `
 
 ## 构建与运行
 
-还原依赖：
+克隆仓库并还原依赖：
 
 ```bash
+git clone https://github.com/RealTrueReality/Travelex.git
+cd Travelex
 dotnet restore Travelex.sln
 ```
 
