@@ -45,6 +45,7 @@ public static class MauiProgram {
         builder.Services.AddScoped<AuthService>();
         builder.Services.AddScoped<TravelService>();
         builder.Services.AddScoped<ExpenseService>();
+        builder.Services.AddScoped<MafTravelAgentService>();
         builder.Services.AddScoped<QwenService>();
         builder.Services.AddScoped<ThemeService>();
         

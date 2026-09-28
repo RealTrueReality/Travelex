@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Channels;
+using System.ClientModel;
 using Microsoft.Extensions.Logging;
 
 namespace Travelex.Services;
@@ -14,6 +15,7 @@ namespace Travelex.Services;
 public sealed class QwenService : IDisposable {
     private const string ApiKeyStorageKey = "Travelex.Qwen.ApiKey";
     private const string ModelStorageKey = "Travelex.Ai.Model";
+    private const string MafPreviewStorageKey = "Travelex.Ai.UseMafPreview";
     private const string CompletionUrl = "https://maas.qianwenaiapi.com/compatible-mode/v1/chat/completions";
     public const string QwenModel = "qwen3.8-max";
     public const string DeepSeekModel = "deepseek-v4-pro-0813";
@@ -21,8 +23,12 @@ public sealed class QwenService : IDisposable {
 
     private readonly HttpClient _httpClient = new();
     private readonly ILogger<QwenService> _logger;
+    private readonly MafTravelAgentService _mafAgent;
 
-    public QwenService(ILogger<QwenService> logger) => _logger = logger;
+    public QwenService(ILogger<QwenService> logger, MafTravelAgentService mafAgent) {
+        _logger = logger;
+        _mafAgent = mafAgent;
+    }
 
     public async Task<bool> HasApiKeyAsync() =>
         !string.IsNullOrWhiteSpace(await SecureStorage.Default.GetAsync(ApiKeyStorageKey));
@@ -49,6 +55,10 @@ public sealed class QwenService : IDisposable {
     }
 
     private static bool IsSupportedModel(string model) => model is QwenModel or DeepSeekModel;
+
+    public bool GetUseMafPreview() => Preferences.Default.Get(MafPreviewStorageKey, false);
+
+    public void SetUseMafPreview(bool enabled) => Preferences.Default.Set(MafPreviewStorageKey, enabled);
 
     public async Task<string> AnalyzeTravelExpensesAsync(object travelData) {
         var apiKey = await SecureStorage.Default.GetAsync(ApiKeyStorageKey);
@@ -90,6 +100,7 @@ public sealed class QwenService : IDisposable {
             yield break;
         }
         var model = GetSelectedModel();
+        var useMafPreview = GetUseMafPreview();
 
         // Android's native HTTP handler may perform network I/O while synchronously closing a
         // response stream. Keep the entire read AND disposal path off the Blazor UI thread.
@@ -99,7 +110,8 @@ public sealed class QwenService : IDisposable {
             SingleWriter = true,
             FullMode = BoundedChannelFullMode.Wait
         });
-        var producer = Task.Run(() => ProduceStreamAsync(apiKey, model, travelData, channel.Writer, linkedCts.Token));
+        var producer = Task.Run(() => ProduceStreamAsync(apiKey, model, travelData, useMafPreview,
+            channel.Writer, linkedCts.Token));
 
         try {
             await foreach (var chunk in channel.Reader.ReadAllAsync(linkedCts.Token)) {
@@ -115,15 +127,45 @@ public sealed class QwenService : IDisposable {
         }
     }
 
-    private async Task ProduceStreamAsync(string apiKey, string model, object travelData, ChannelWriter<string> writer,
+    private async Task ProduceStreamAsync(string apiKey, string model, object travelData, bool useMafPreview,
+        ChannelWriter<string> writer,
         CancellationToken cancellationToken) {
         var state = new StreamReadState();
         try {
-            await ReadStreamAsync(apiKey, model, travelData, writer, state, cancellationToken).ConfigureAwait(false);
+            if (useMafPreview) {
+                var receivedContent = false;
+                await foreach (var chunk in _mafAgent.AnalyzeStreamAsync(apiKey, model, travelData, cancellationToken)
+                                   .ConfigureAwait(false)) {
+                    receivedContent = true;
+                    await writer.WriteAsync(chunk, cancellationToken).ConfigureAwait(false);
+                }
+                if (!receivedContent) {
+                    await writer.WriteAsync("没有收到分析结果，请稍后重试。", cancellationToken)
+                        .ConfigureAwait(false);
+                }
+                state.Completed = true;
+            }
+            else {
+                await ReadStreamAsync(apiKey, model, travelData, writer, state, cancellationToken)
+                    .ConfigureAwait(false);
+            }
             writer.TryComplete();
         }
         catch (OperationCanceledException ex) when (cancellationToken.IsCancellationRequested) {
             writer.TryComplete(ex);
+        }
+        catch (ClientResultException ex) when (useMafPreview) {
+            // SDK exception text can include provider response details. Only expose the HTTP status.
+            _logger.LogWarning("MAF request rejected: model {Model}, HTTP {StatusCode}", model, ex.Status);
+            try {
+                var message = ex.Status > 0
+                    ? $"AI 请求失败（HTTP {ex.Status}）。请检查平台余额、模型权限与 Key。"
+                    : "AI 网络请求失败，请检查连接后重试。";
+                await writer.WriteAsync(message, cancellationToken).ConfigureAwait(false);
+            }
+            finally {
+                writer.TryComplete();
+            }
         }
         catch (Exception ex) {
             // The answer is already complete if only Android's connection cleanup failed.
@@ -132,8 +174,15 @@ public sealed class QwenService : IDisposable {
                 writer.TryComplete();
             }
             else {
-                _logger.LogError(ex, "Qwen stream failed before completion");
-                writer.TryComplete(ex);
+                if (useMafPreview) {
+                    // Do not leak provider response bodies through logs or UI exceptions.
+                    _logger.LogError("MAF stream failed before completion: {ExceptionType}", ex.GetType().Name);
+                    writer.TryComplete(new IOException("MAF preview stream failed."));
+                }
+                else {
+                    _logger.LogError(ex, "Qwen stream failed before completion");
+                    writer.TryComplete(ex);
+                }
             }
         }
     }

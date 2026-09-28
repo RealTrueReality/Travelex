@@ -3,7 +3,7 @@
 
 <details class="mx-4 mb-2 rounded-xl border border-outline bg-surface px-4 py-3 text-sm">
     <summary class="cursor-pointer font-semibold text-content">
-        AI 设置：@_selectedModel · Key @(_hasApiKey ? "已保存" : "未设置")
+        AI 设置：@_selectedModel · Key @(_hasApiKey ? "已保存" : "未设置")@(_useMafPreview ? " · MAF 预览" : "")
     </summary>
     <div class="mt-3 space-y-3">
         <label class="block font-medium text-content" for="ai-model">分析模型</label>
@@ -12,6 +12,11 @@
             <option value="@Travelex.Services.QwenService.DeepSeekModel">DeepSeek V4 Pro 0813</option>
         </select>
         <p class="text-content-muted">两个模型都通过千问 AI 平台调用。免费额度以账号权益页为准；用尽后可能产生费用，建议在平台开启“免费额度用尽即停”。模型切换只影响之后发起的请求。</p>
+        <label class="flex items-start gap-2 text-content" for="maf-preview">
+            <input id="maf-preview" type="checkbox" class="mt-1" @bind="_useMafPreview" @bind:after="SaveMafPreview" />
+            <span>试用 Microsoft Agent Framework 通道</span>
+        </label>
+        <p class="text-content-muted">这是重构的第一步：目前只验证 Agent 的流式对话，还没有接入本地工具或会话记忆。关闭后仍使用原有通道；切换只影响下一次分析。</p>
         <p class="text-content-muted">个人使用时可在本机保存自己的 Key；不会写入安装包或 Git。公开分发时请改用后端代理，手机端保存的 Key 仍可能被设备持有者提取。</p>
         <label class="block font-medium text-content" for="qwen-api-key">API Key</label>
         <input id="qwen-api-key" type="password" autocomplete="off" spellcheck="false"
@@ -31,6 +36,7 @@
 @code {
     private string _apiKeyInput = string.Empty;
     private string _selectedModel = Travelex.Services.QwenService.QwenModel;
+    private bool _useMafPreview;
     private string _status = string.Empty;
     private bool _hasApiKey;
     private bool _saving;
@@ -38,10 +44,22 @@
     protected override async Task OnInitializedAsync() {
         try {
             _selectedModel = QwenService.GetSelectedModel();
+            _useMafPreview = QwenService.GetUseMafPreview();
             _hasApiKey = await QwenService.HasApiKeyAsync();
         }
         catch (Exception) {
             _status = "无法读取本机设置，请检查设备存储。";
+        }
+    }
+
+    private void SaveMafPreview() {
+        try {
+            QwenService.SetUseMafPreview(_useMafPreview);
+            _status = _useMafPreview ? "下次分析将使用 MAF 通道。" : "下次分析将使用原有通道。";
+        }
+        catch (Exception) {
+            _useMafPreview = false;
+            _status = "通道选择保存失败，请检查设备存储。";
         }
     }
 

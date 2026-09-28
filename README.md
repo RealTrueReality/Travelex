@@ -8,7 +8,7 @@ Travelex 是一款基于 .NET MAUI Blazor Hybrid 的本地优先旅行消费管�
 - 行程封面、日期、目的地和高德地图选点
 - 消费记录、自定义消费类别与分类查看
 - 全局及单次行程的消费构成、趋势和统计图表
-- 基于千问 AI 模型的流式旅行消费分析
+- 通过千问 AI 平台调用 Qwen / DeepSeek 模型进行流式旅行消费分析
 - 本地注册、登录、头像及个人资料管理
 - 明暗主题、系统主题跟随和首次启动引导
 
@@ -19,7 +19,7 @@ Travelex 是一款基于 .NET MAUI Blazor Hybrid 的本地优先旅行消费管�
 - Syncfusion Blazor Charts / Calendars / Popups
 - sqlite-net-base、SQLitePCLRaw
 - CommunityToolkit.Maui、CommunityToolkit.Mvvm
-- 千问 AI 平台、高德地图 JavaScript API
+- 千问 AI 平台、Microsoft Agent Framework（预览通道）、高德地图 JavaScript API
 
 ## 架构
 
@@ -61,7 +61,9 @@ dotnet workload install maui
 
 ### 千问 AI
 
-AI 助手使用千问 AI 平台的 OpenAI 兼容 `chat/completions` 接口（默认模型 `qwen3.7-plus`），不再需要旧版 DashScope 应用的 APP ID。个人在手机上使用时，打开「AI助手」或单次旅行 AI 分析页，展开「千问 API Key」，输入自己的 `sk-ws-` Key。Key 仅保存在该设备的系统安全存储中，不写入源码、安装包或 Windows 用户环境变量；旅行分析数据会发送至千问 AI 平台。可在同一处移除或更换 Key。
+AI 助手使用千问 AI 平台的 OpenAI 兼容 `chat/completions` 接口，默认模型为 `qwen3.8-max`，也可在 AI 设置中切换到 `deepseek-v4-pro-0813`；不再需要旧版 DashScope 应用的 APP ID。个人在手机上使用时，打开「AI助手」或单次旅行 AI 分析页，展开「AI 设置」，输入自己的 `sk-ws-` Key。Key 仅保存在该设备的系统安全存储中，不写入源码、安装包或 Windows 用户环境变量；旅行分析数据会发送至千问 AI 平台。可在同一处移除或更换 Key。
+
+「试用 Microsoft Agent Framework 通道」默认关闭。开启后，下一次聊天分析会通过 MAF 的 `AIAgent` 流式调用同一平台和模型；目前仅验证单轮对话，尚未接入本地工具、会话记忆或持久化。关闭开关即可回到原有通道。改造思路与验证步骤见 [MAF 学习笔记](docs/maf-learning.md)。
 
 此方式仅适合个人自用。移动客户端仍可能被设备持有者分析，**公开分发或多人使用时不要在客户端保存长期 API Key**，应改由受控后端代理请求、保护凭据并限制用量。[接口接入文档](https://platform.qianwenai.com/docs/developer-guides/getting-started/first-api-call) · [密钥安全建议](https://platform.qianwenai.com/docs/developer-guides/administration/api-keys)
 
